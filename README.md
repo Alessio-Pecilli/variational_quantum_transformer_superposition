@@ -19,15 +19,22 @@ In simulation, we demonstrate that the VQT can successfully learn:
 
 The circuit complexity of the proposed VQT scales as:
 
-\[
-\mathcal{O}\bigl(T (d^2 + M d)\bigr)
-\]
+### Computational Complexity
+
+The circuit complexity of the proposed Variational Quantum Transformer (VQT) scales as:
+
+O(T · (d² + M · d))
 
 compared to the complexity of a classical transformer:
 
-\[
-\mathcal{O}\bigl(T^2 d + T M d\bigr)
-\]
+O(T² · d + T · M · d)
+
+where:
+- **T** is the sequence length  
+- **d** is the embedding dimension  
+- **M** is the vocabulary size
+
+
 
 where:
 - **T** is the sequence length  
