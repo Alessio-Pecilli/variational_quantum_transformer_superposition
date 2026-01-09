@@ -5,7 +5,7 @@ Configuration settings for quantum optimization experiments.
 # Optimization settings
 OPTIMIZATION_CONFIG = {
     'num_iterations': 20,      # RIDOTTO per test veloce (era 150)
-    'num_layers': 5,
+    'num_layers': 3,
     'max_hours': 1,            # RIDOTTO
     'embedding_dim': 4,
     'num_qubits': 4,
@@ -69,10 +69,10 @@ PLOT_CONFIG = {
 # Dataset settings
 DATASET_CONFIG = {
     'default_split': 'train',
-    'max_sentences': 100,           # quante frasi caricare
-    'sentence_length': 9,           # lunghezza ESATTA in parole per ogni frase
+    'max_sentences': 3,           # quante frasi caricare
+    'sentence_length': 5,           # lunghezza ESATTA in parole per ogni frase
     'dataset_name': 'ptb_text_only',
-    'use_ptb': True,                # True = usa PTB dataset, False = usa frasi generate
+    'use_ptb': False,                # True = usa PTB dataset, False = usa frasi generate
     'random_sample': True,          # True = selezione random, False = prime N frasi
     'local_ptb_file': 'ptb_sentences.txt'  # file locale con frasi PTB pre-scaricate (una per riga)
 }
@@ -123,26 +123,22 @@ TRAINING_SENTENCES = [
 
 import random
 
-SENTENCE_LENGTH = 9
+SENTENCE_LENGTH = DATASET_CONFIG['sentence_length']
 
 SUBJECT_ADJS = [
-    "quiet", "friendly", "curious", "calm", "brave", "tired",
-    "skilled", "old", "young", "gentle", "happy"
+    "quiet", "friendly", "curious", "calm"
 ]
 
 SUBJECTS = [
-    "girl", "scientist", "cat", "student", "explorer", "traveler",
-    "musician", "robot"
+    "girl", "scientist", "cat"
 ]
 
 ADVERBS = [
-    "happily", "quietly", "slowly", "quickly", "carefully",
-    "gently", "calmly", "eagerly"
+    "happily", "quietly", "slowly"
 ]
 
 VERBS = [
-    "follows", "explores", "discovers", "approaches", "studies",
-    "observes", "walks"
+    "follows", "explores"
 ]
 
 DETERMINERS2 = [
@@ -150,19 +146,17 @@ DETERMINERS2 = [
 ]
 
 PLACE_ADJS = [
-    "hidden", "silent", "narrow", "peaceful", "lonely",
-    "ancient", "bright", "quiet"
+    "hidden"
 ]
 
 PLACES = [
-    "pathway", "garden", "bridge", "forest", "station",
-    "library", "city", "valley"
+    "pathway"
 ]
 
 # ⚠️ ENDINGS devono essere UNA PAROLA SOLA
 ENDINGS = [
     "peacefully", "softly", "curiously", "calmly",
-    "thoughtfully", "quietly", "gently", "slowly"
+   
 ]
 
 
@@ -174,10 +168,6 @@ def generate_sentence():
         random.choice(SUBJECTS),                # 3
         random.choice(ADVERBS),                 # 4
         random.choice(VERBS),                   # 5
-        random.choice(DETERMINERS2),            # 6
-        random.choice(PLACE_ADJS),              # 7
-        random.choice(PLACES),                  # 8
-        random.choice(ENDINGS),                 # 9
     ]
 
     assert len(tokens) == SENTENCE_LENGTH
@@ -304,4 +294,5 @@ def get_training_sentences():
 
 
 # Genera le frasi di training in base alla configurazione
-TRAINING_SENTENCES = get_training_sentences()
+#TRAINING_SENTENCES = get_training_sentences()
+TRAINING_SENTENCES = generate_sentences(5)  # Test genera 5 frasi

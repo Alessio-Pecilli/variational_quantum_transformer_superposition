@@ -67,7 +67,7 @@ class MaxLossEvaluationsReached(Exception):
 
 # GLOBAL COUNTER for loss evaluations (HARD CONSTRAINT: stop at 120)
 GLOBAL_LOSS_COUNTER = [0]  # Using list to allow modification in nested scopes
-MAX_LOSS_EVALUATIONS = 120
+MAX_LOSS_EVALUATIONS = 10
 
 # ---------------------------------------------------------------------
 # Logging minimale: dettagliato su rank 0, ridotto sugli altri
@@ -112,6 +112,22 @@ def box_constraints_for_unit(y_dim):
     return cons
 
 # ---------------------------------------------------------------------
+# Utility: PPL quantistica (Renyi-1/2)
+# ---------------------------------------------------------------------
+def calculate_quantum_ppl(probabilities):
+    """
+    Calcola la PPL basata sulla media delle radici quadrate (Renyi-1/2).
+    probabilities: lista dei valori di overlap |<x_target|z>|^2
+    """
+    t = len(probabilities)
+    if t == 0:
+        return float("inf")
+    sum_sqrt_p = sum(np.sqrt(p) for p in probabilities)
+    # La formula derivata dal paper: PPL = (mean_sqrt_p)^-2
+    ppl = (sum_sqrt_p / t) ** (-2)
+    return ppl
+
+# ---------------------------------------------------------------------
 # Loss su UNA frase, dato theta nativo
 # ---------------------------------------------------------------------
 def loss_for_sentence(sentence_idx, sentence, encoding, params_native, cfg, states=None):
@@ -125,9 +141,11 @@ def loss_for_sentence(sentence_idx, sentence, encoding, params_native, cfg, stat
     if states is None:
         if encoding is None:
             raise ValueError("Né states né encoding forniti! Impossibile calcolare la loss.")
-        states = encoding.encode_single(sentence)
+        states, targets = encoding.encode_single(sentence)
+    else:
+        targets = None
     
-    states_calculated, U, Z = process_sentence_states(states)
+    states_calculated, U, Z = process_sentence_states(states, targets=targets)
 
     num_layers = cfg['num_layers']
     num_qubits = cfg['num_qubits']
@@ -201,8 +219,8 @@ def distributed_objective_factory(comm, rank, size, sentences_split, encoding, l
     best_loss = np.inf
 
     # Pre-alloc per riduzioni
-    send_buf = np.zeros(2, dtype=np.float64)  # [sum_loss_local, count_local]
-    recv_buf = np.zeros(2, dtype=np.float64)
+    send_buf = np.zeros(3, dtype=np.float64)  # [sum_loss_local, count_local, sum_sqrt_p_local]
+    recv_buf = np.zeros(3, dtype=np.float64)
 
     # Lista locale di (global_idx, sentence)
     my_items = sentences_split[rank]
@@ -251,25 +269,10 @@ def distributed_objective_factory(comm, rank, size, sentences_split, encoding, l
         # Ogni rank: descala e calcola sum loss locale
         params_native = descale_from_unit(y_scaled, low, high)
 
+        # Implementazione efficiente: ciclo semplice sulle frasi locali
         local_sum = 0.0
         local_cnt = 0.0
-        for (global_idx, sentence) in my_items:
-            try:
-                # Attenzione: encoding locale è allineato con my_items
-                # my_items contiene indici e frasi; l'indice per encoding è relativo al rank
-                # quindi usiamo la posizione nella split
-                # Costruiamo la posizione relativa:
-                # Trova posizione relativa in my_items
-                # Più efficiente: manteniamo un mapping locale idx->pos
-                pass
-            except Exception:
-                # Nel caso, contiamo NaN come 0, ma non incrementiamo count
-                continue
-
-        # Implementazione efficiente: prepariamo encoding come array allineato
-        # quindi rifacciamo un ciclo semplice
-        local_sum = 0.0
-        local_cnt = 0.0
+        local_sum_sqrt_p = 0.0
         for local_pos, (global_idx, sentence) in enumerate(my_items):
             try:
                 # Se abbiamo sequenze QA, passa l'INTERA sequenza corrispondente
@@ -287,6 +290,9 @@ def distributed_objective_factory(comm, rank, size, sentences_split, encoding, l
                 if np.isfinite(loss):
                     local_sum += loss
                     local_cnt += 1.0
+                    prob = np.exp(-loss)
+                    prob = float(np.clip(prob, 0.0, 1.0))
+                    local_sum_sqrt_p += np.sqrt(prob)
             except Exception as e:
                 # Log solo su rank 0 per non inondare
                 if rank == 0:
@@ -299,13 +305,24 @@ def distributed_objective_factory(comm, rank, size, sentences_split, encoding, l
         # Allreduce su [sum, count]
         send_buf[0] = local_sum
         send_buf[1] = local_cnt
-        comm.Allreduce([send_buf, MPI.DOUBLE], [recv_buf, MPI.DOUBLE], op=MPI.SUM)
+        send_buf[2] = local_sum_sqrt_p
+        if size == 1:
+            recv_buf[:] = send_buf
+        else:
+            comm.Allreduce([send_buf, MPI.DOUBLE], [recv_buf, MPI.DOUBLE], op=MPI.SUM)
 
         global_sum = recv_buf[0]
-        global_cnt = recv_buf[1] if recv_buf[1] > 0 else 1.0
-        global_mean = global_sum / global_cnt
+        global_cnt = recv_buf[1]
+        global_sum_sqrt_p = recv_buf[2]
+        if global_cnt > 0:
+            global_mean = global_sum / global_cnt
+            mean_sqrt_p = global_sum_sqrt_p / global_cnt
+            ppl_quantum = mean_sqrt_p ** -2 if mean_sqrt_p > 0 else float("inf")
+        else:
+            global_mean = 0.0
+            ppl_quantum = float("inf")
 
-        logger.info(f"Loss media corrente: {global_mean:.6f}")
+        logger.info(f"Loss media corrente: {global_mean:.6f} | PPL-Q: {ppl_quantum:.6f}")
         loss_history.append(global_mean)
         
         # ============================================================
@@ -372,6 +389,7 @@ def distributed_objective_factory(comm, rank, size, sentences_split, encoding, l
                 # Calcolo locale
                 local_sum = 0.0
                 local_cnt = 0.0
+                local_sum_sqrt_p = 0.0
                 for local_pos, (global_idx, sentence) in enumerate(local_items):
                     try:
                         # Se abbiamo sequenze QA, passa l'INTERA sequenza corrispondente
@@ -385,13 +403,20 @@ def distributed_objective_factory(comm, rank, size, sentences_split, encoding, l
                         if np.isfinite(loss):
                             local_sum += loss
                             local_cnt += 1.0
+                            prob = np.exp(-loss)
+                            prob = float(np.clip(prob, 0.0, 1.0))
+                            local_sum_sqrt_p += np.sqrt(prob)
                     except Exception:
                         pass
 
                 # Contribuisce alla riduzione
                 send_buf[0] = local_sum
                 send_buf[1] = local_cnt
-                comm.Allreduce([send_buf, MPI.DOUBLE], [recv_buf, MPI.DOUBLE], op=MPI.SUM)
+                send_buf[2] = local_sum_sqrt_p
+                if size == 1:
+                    recv_buf[:] = send_buf
+                else:
+                    comm.Allreduce([send_buf, MPI.DOUBLE], [recv_buf, MPI.DOUBLE], op=MPI.SUM)
             else:
                 # Tag sconosciuto, termina per sicurezza
                 break
@@ -441,6 +466,7 @@ def evaluate_perplexity_on_new_sentences(best_params_native, cfg, logger):
     total_loss = 0.0
     total_words = 0
     used_sentences = 0
+    probabilities = []
 
     for idx, sentence in enumerate(test_sentences):
         word_count = len(sentence.split())
@@ -457,6 +483,8 @@ def evaluate_perplexity_on_new_sentences(best_params_native, cfg, logger):
             total_loss += loss_val
             total_words += word_count
             used_sentences += 1
+            prob = np.exp(-loss_val)
+            probabilities.append(float(np.clip(prob, 0.0, 1.0)))
         clear_memory()
 
     if used_sentences == 0 or total_words == 0:
@@ -465,11 +493,11 @@ def evaluate_perplexity_on_new_sentences(best_params_native, cfg, logger):
 
     avg_loss_sentence = total_loss / used_sentences
     avg_loss_word = total_loss / total_words
-    perplexity = float(np.exp(avg_loss_word))
+    perplexity = calculate_quantum_ppl(probabilities)
 
     logger.info(f"[EVAL] Loss media frase: {avg_loss_sentence:.6f}")
     logger.info(f"[EVAL] Loss media parola: {avg_loss_word:.6f}")
-    logger.info(f"[EVAL] Perplexity = exp(loss/word) = {perplexity:.6f}")
+    logger.info(f"[EVAL] Perplexity (Renyi-1/2) = {perplexity:.6f}")
 
     return {
         "num_sentences": len(test_sentences),
@@ -812,13 +840,14 @@ def evaluate_perplexity_on_quantum_states(best_params_native, cfg, logger):
         logger.warning("[EVAL-QA] Loss non finita")
         return None
     
-    # Perplexity: exp(loss / num_states)
+    # Perplexity (Renyi-1/2) basata su overlap
     avg_loss_per_state = loss_val / num_states
-    perplexity = float(np.exp(avg_loss_per_state))
+    prob = float(np.clip(np.exp(-loss_val), 0.0, 1.0))
+    perplexity = calculate_quantum_ppl([prob])
     
     logger.info(f"[EVAL-QA] Loss totale: {loss_val:.6f}")
     logger.info(f"[EVAL-QA] Loss media per stato: {avg_loss_per_state:.6f}")
-    logger.info(f"[EVAL-QA] Perplexity = exp(loss/stato) = {perplexity:.6f}")
+    logger.info(f"[EVAL-QA] Perplexity (Renyi-1/2) = {perplexity:.6f}")
     
     return {
         "num_states": num_states,

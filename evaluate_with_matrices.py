@@ -206,8 +206,8 @@ def evaluate_perplexity_with_ansatz_matrices(ansatz_V_matrix, ansatz_K_matrix, d
         logger.info(f"[PERPLEXITY] Rank {rank}: frase {local_idx+1}/{len(my_sentences)} (global #{global_idx}): '{sentence}'")
         
         # Codifica frase
-        states = encoding.encode_single(sentence)
-        states_calculated, U_mats, Z_mats = process_sentence_states(states)
+        states, targets = encoding.encode_single(sentence)
+        states_calculated, U_mats, Z_mats = process_sentence_states(states, targets=targets)
         
         sentence_length = len(states)
         local_words += sentence_length - 1
@@ -359,16 +359,17 @@ def analyze_quantum_registers(ansatz_V_matrix, ansatz_K_matrix, item, encoding, 
     if use_quantum_states:
         logger.info(f"[REGISTERS] Analisi registri quantistici per: STATO QUANTISTICO")
         states = [item]
+        targets = None
         item_label = "Quantum State"
     else:
         logger.info(f"[REGISTERS] Analisi registri quantistici per: '{item}'")
-        states = encoding.encode_single(item)
+        states, targets = encoding.encode_single(item)
         item_label = item
     
     embedding_dim = cfg['embedding_dim']
     
     # Processa stati
-    states_calculated, U_mats, Z_mats = process_sentence_states(states)
+    states_calculated, U_mats, Z_mats = process_sentence_states(states, targets=targets)
     sentence_length = len(states)
     
     # Crea builder

@@ -511,16 +511,20 @@ class AdaptiveQuantumCircuitFactory:
         }
 
 
-def process_sentence_states(states):
+def process_sentence_states(states, targets=None):
     """
     Process sentence states to create unitaries for quantum circuit.
     
     Args:
         states (list): List of state vectors for each word in sentence
+        targets (list, optional): Target state vectors (e.g., without positional encoding)
         
     Returns:
         tuple: (states_calculated, U, Z) - processed unitaries
     """
+    if targets is not None and len(targets) != len(states):
+        raise ValueError("targets length must match states length.")
+    target_states = targets if targets is not None else states
     states_calculated = []
     U = []
     Z = []
@@ -551,14 +555,14 @@ def process_sentence_states(states):
         #print(f"  psi normalized, shape={psi.shape}, norm={np.linalg.norm(psi):.4f}")
 
         # Target and origin
-        x = states[i]
+        x_target = target_states[i]
         z = states[i - 1]
         #print(f"  target x = word {i}, shape={x.shape}, norm={np.linalg.norm(x):.4f}")
         ##print(f"  origin z = word {i-1}, shape={z.shape}, norm={np.linalg.norm(z):.4f}")
 
         # Calculate unitaries
         try:
-            U_dagger = get_unitary_from_tk(x).conj().T
+            U_dagger = get_unitary_from_tk(x_target).conj().T
             Z_dagger = get_unitary_from_tk(z).conj().T
             unitary_psi = get_unitary_from_tk(psi)
 
