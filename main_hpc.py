@@ -111,34 +111,6 @@ def box_constraints_for_unit(y_dim):
         cons.append({'type': 'ineq', 'fun': lambda y, i=i:  1.0 + y[i]})  # y[i] >= -1
     return cons
 
-def get_embedding_shape(encoding, cfg):
-    if encoding is None:
-        return None
-    embedding_dim = cfg['embedding_dim']
-    vocab_size = len(encoding.vocabulary)
-    if vocab_size < embedding_dim:
-        raise ValueError("Vocabulary size must be >= embedding_dim for isometric E.")
-    return (vocab_size, embedding_dim)
-
-def get_quantum_param_count(params_shape):
-    return 2 * int(np.prod(params_shape))
-
-def split_total_params(params_native, params_shape, embedding_shape=None):
-    n_params_quantum = get_quantum_param_count(params_shape)
-    if params_native.size < n_params_quantum:
-        raise ValueError("Total parameter vector is smaller than quantum params.")
-    params_quantum = params_native[:n_params_quantum]
-    raw_embedding = None
-    if embedding_shape is not None:
-        expected = int(np.prod(embedding_shape))
-        embed_params = params_native[n_params_quantum:]
-        if embed_params.size != expected:
-            raise ValueError(
-                f"Embedding params size mismatch: expected {expected}, got {embed_params.size}."
-            )
-        raw_embedding = embed_params.reshape(embedding_shape)
-    return params_quantum, raw_embedding
-
 # ---------------------------------------------------------------------
 # Utility: PPL quantistica (Renyi-1/2)
 # ---------------------------------------------------------------------
@@ -225,23 +197,11 @@ def loss_for_sentence(sentence_idx, sentence, encoding, params_quantum, cfg, sta
 #   * rank 0 ritorna media globale
 # - al termine Bcast("STOP")
 # ---------------------------------------------------------------------
-def distributed_objective_factory(comm, rank, size, sentences_split, encoding, low, high, cfg, logger, params_shape, embedding_shape, log_frequency, quantum_states=None):
+def distributed_objective_factory(comm, rank, size, sentences_split, encoding, low, high, cfg, logger, quantum_states=None):
     tagbuf = np.array([0], dtype=np.int32)  # 1=EVAL, 2=STOP
     
     # Per salvare la storia delle loss (solo su rank 0 sarà popolata)
     loss_history = []
-
-    prev_embedding = [None]
-    sample_word = None
-    sample_idx = None
-    if encoding is not None and encoding.vocabulary:
-        if "The" in encoding.vocabulary:
-            sample_word = "The"
-        elif "<UNK>" in encoding.vocabulary:
-            sample_word = "<UNK>"
-        else:
-            sample_word = next(iter(encoding.vocabulary))
-        sample_idx = encoding.vocabulary[sample_word]
     
     # ============================================================
     # EARLY STOPPING COMPLETELY DISABLED (HARD CONSTRAINT)
@@ -309,35 +269,7 @@ def distributed_objective_factory(comm, rank, size, sentences_split, encoding, l
 
         # Ogni rank: descala e calcola sum loss locale
         params_native = descale_from_unit(y_scaled, low, high)
-        params_quantum, raw_embedding = split_total_params(
-            params_native, params_shape, embedding_shape
-        )
-        if encoding is not None and raw_embedding is not None:
-            embedding_matrix = encoding.set_embedding_matrix(raw_embedding, isometrize=True)
-            if log_frequency and current_eval % log_frequency == 0:
-                gram = embedding_matrix.T @ embedding_matrix
-                max_abs_err = float(
-                    np.max(np.abs(gram - np.eye(embedding_matrix.shape[1])))
-                )
-                if prev_embedding[0] is None:
-                    delta_norm = None
-                else:
-                    delta_norm = float(
-                        np.linalg.norm(embedding_matrix - prev_embedding[0])
-                    )
-                if sample_idx is not None:
-                    sample_vec = embedding_matrix[sample_idx]
-                    preview_len = min(3, sample_vec.size)
-                    preview = ", ".join(f"{v:+.4f}" for v in sample_vec[:preview_len])
-                    sample_preview = f"{sample_word}=[{preview}]"
-                else:
-                    sample_preview = "sample=NA"
-                delta_display = f"{delta_norm:.6f}" if delta_norm is not None else "NA"
-                logger.info(
-                    f"[EMBEDDING] E delta L2={delta_display} "
-                    f"max_abs(EtE-I)={max_abs_err:.2e} {sample_preview}"
-                )
-                prev_embedding[0] = embedding_matrix.copy()
+        params_quantum = params_native
 
         # Implementazione efficiente: ciclo semplice sulle frasi locali
         local_sum = 0.0
@@ -455,11 +387,7 @@ def distributed_objective_factory(comm, rank, size, sentences_split, encoding, l
                 comm.Bcast([y_scaled, MPI.DOUBLE], root=0)
 
                 params_native = descale_from_unit(y_scaled, low, high)
-                params_quantum, raw_embedding = split_total_params(
-                    params_native, params_shape, embedding_shape
-                )
-                if encoding is not None and raw_embedding is not None:
-                    encoding.set_embedding_matrix(raw_embedding, isometrize=True)
+                params_quantum = params_native
 
                 # Calcolo locale
                 local_sum = 0.0
@@ -537,13 +465,7 @@ def evaluate_perplexity_on_new_sentences(best_params_native, cfg, logger):
 
     logger.info(f"[EVAL] Calcolo perplexity su {len(test_sentences)} nuove frasi")
     encoding = Encoding(test_sentences, embeddingDim=cfg['embedding_dim'])
-    params_shape = get_params(cfg['num_qubits'], cfg['num_layers']).shape
-    embedding_shape = get_embedding_shape(encoding, cfg)
-    params_quantum, raw_embedding = split_total_params(
-        best_params_native, params_shape, embedding_shape
-    )
-    if raw_embedding is not None:
-        encoding.set_embedding_matrix(raw_embedding, isometrize=True)
+    params_quantum = best_params_native
 
     total_loss = 0.0
     total_words = 0
@@ -604,11 +526,9 @@ def save_variational_circuits_matrices(best_params_native, cfg, logger, timestam
     num_qubits = cfg['num_qubits']
     params_shape = get_params(num_qubits, num_layers).shape
     
-    n_params_half = int(np.prod(params_shape))
-    n_params_quantum = 2 * n_params_half
-    params_quantum = best_params_native[:n_params_quantum]
-    params_v = np.reshape(params_quantum[:n_params_half], params_shape)
-    params_k = np.reshape(params_quantum[n_params_half:], params_shape)
+    half = best_params_native.size // 2
+    params_v = np.reshape(best_params_native[:half], params_shape)
+    params_k = np.reshape(best_params_native[half:], params_shape)
     
     # Costruisci gli ansatz
     ansatz_v = AnsatzBuilder(num_qubits, params_v, num_layers)
@@ -634,11 +554,7 @@ def save_variational_circuits_matrices(best_params_native, cfg, logger, timestam
         f.write(f"  - Num qubits: {num_qubits}\n")
         f.write(f"  - Num layers: {num_layers}\n")
         f.write(f"  - Dimensione matrice: {2**num_qubits} x {2**num_qubits}\n")
-        embedding_params = best_params_native.size - n_params_quantum
-        f.write(
-            f"  - Parametri totali: {best_params_native.size} "
-            f"({n_params_half} per V, {n_params_half} per W, {embedding_params} embedding)\n\n"
-        )
+        f.write(f"  - Parametri totali: {best_params_native.size} ({half} per V, {half} per W)\n\n")
         
         f.write("=" * 70 + "\n")
         f.write("MATRICE U (ansatz V) - Query transformation\n")
@@ -744,11 +660,9 @@ def analyze_ancillae_state(best_params_native, cfg, logger, timestamp):
     num_qubits = cfg['num_qubits']
     params_shape = get_params(num_qubits, num_layers).shape
     
-    n_params_half = int(np.prod(params_shape))
-    n_params_quantum = 2 * n_params_half
-    params_quantum = best_params_native[:n_params_quantum]
-    params_v = np.reshape(params_quantum[:n_params_half], params_shape)
-    params_k = np.reshape(params_quantum[n_params_half:], params_shape)
+    half = best_params_native.size // 2
+    params_v = np.reshape(best_params_native[:half], params_shape)
+    params_k = np.reshape(best_params_native[half:], params_shape)
     
     # Calcola dimensioni
     embedding_dim = cfg.get('embedding_dim', 4)
@@ -823,26 +737,13 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
     num_qubits = cfg['num_qubits']
     params_shape = get_params(num_qubits, num_layers).shape
 
-    n_params_half = int(np.prod(params_shape))
-    n_params_quantum = 2 * n_params_half
-    params_quantum = best_params_native[:n_params_quantum]
-    params_v = np.reshape(params_quantum[:n_params_half], params_shape)
-    params_k = np.reshape(params_quantum[n_params_half:], params_shape)
+    half = best_params_native.size // 2
+    params_v = np.reshape(best_params_native[:half], params_shape)
+    params_k = np.reshape(best_params_native[half:], params_shape)
 
-    embedding_params = best_params_native.size - n_params_quantum
     logger.info(f"  Total parameters: {best_params_native.size}")
     logger.info(f"  V parameters (Query): {params_v.size} (shape: {params_v.shape})")
     logger.info(f"  K parameters (Key): {params_k.size} (shape: {params_k.shape})")
-    if embedding_params > 0:
-        embedding_dim = cfg.get('embedding_dim', 4)
-        if embedding_params % embedding_dim == 0:
-            vocab_size = embedding_params // embedding_dim
-            logger.info(
-                f"  Embedding parameters: {embedding_params} "
-                f"(shape: {vocab_size} x {embedding_dim})"
-            )
-        else:
-            logger.info(f"  Embedding parameters: {embedding_params}")
     
     # Print full parameter values
     logger.info(f"\n  V (Query) parameters:")
@@ -927,13 +828,11 @@ def evaluate_perplexity_on_quantum_states(best_params_native, cfg, logger):
     
     # Calcola loss con gli stati di test
     try:
-        params_shape = get_params(cfg['num_qubits'], cfg['num_layers']).shape
-        params_quantum, _ = split_total_params(best_params_native, params_shape, None)
         loss_val = loss_for_sentence(
             sentence_idx=0,
             sentence="test_quantum_states",
             encoding=None,  # Non serve encoding!
-            params_quantum=params_quantum,
+            params_quantum=best_params_native,
             cfg=cfg,
             states=test_states_list
         )
@@ -1080,10 +979,7 @@ def main():
         # Parametrizzazione
         params_shape = get_params(cfg['num_qubits'], cfg['num_layers']).shape
         n_params_half = int(np.prod(params_shape))
-        n_params_quantum = 2 * n_params_half
-        embedding_shape = get_embedding_shape(encoding_local, cfg)
-        embedding_params = int(np.prod(embedding_shape)) if embedding_shape else 0
-        n_params = n_params_quantum + embedding_params
+        n_params = 2 * n_params_half
 
         low, high = get_param_bounds(n_params)
 
@@ -1091,10 +987,7 @@ def main():
         if rank == 0:
             rng = np.random.default_rng(cfg.get('seed', 42))
             y0 = rng.uniform(-1.0, 1.0, size=n_params)  # nello spazio [-1,1]
-            logger.info(
-                f"Parametri: quantum={n_params_quantum} embed={embedding_params} "
-                f"tot={n_params} shape_half={params_shape}"
-            )
+            logger.info(f"Parametri: tot={n_params}  shape_half={params_shape}")
 
         # Prepara objective distribuito
         # sentences_split è una lista di liste: per ogni rank, lista di (global_idx, sentence)
@@ -1109,7 +1002,6 @@ def main():
 
         objective, stop_workers, worker_loop, loss_history, best_params_tracker = distributed_objective_factory(
             comm, rank, size, sentences_split, encoding_local, low, high, cfg, logger,
-            params_shape, embedding_shape, cfg.get('log_frequency', 10),
             quantum_states=quantum_states if use_quantum_states else None
         )
 
@@ -1302,11 +1194,8 @@ def main():
             f.write(f"max_loss_evaluations_limit={MAX_LOSS_EVALUATIONS}\n")
             f.write(f"best_loss_mean={best_f:.8f}\n")
             f.write(f"best_loss_seen={tracker_best_loss:.8f}\n")
-            f.write(f"n_params_total={n_params}\n")
-            f.write(f"n_params_quantum={n_params_quantum}\n")
-            f.write(f"n_params_embedding={embedding_params}\n")
+            f.write(f"n_params={n_params}\n")
             f.write(f"param_shape_half={params_shape}\n")
-            f.write(f"embedding_shape={embedding_shape}\n")
             f.write(f"maxiter={MAXITER_PER_RUN}, tol={TOL}\n")
             f.write("\n# Stopping Configuration (HARD CONSTRAINTS)\n")
             f.write(f"early_stopping=DISABLED\n")
