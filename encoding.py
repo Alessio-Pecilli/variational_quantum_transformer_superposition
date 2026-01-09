@@ -12,15 +12,19 @@ from config import (
 )
 
 class Encoding:
-    def __init__(self, sentences=None, embeddingDim=16, usePretrained=False, embeddingSeed=0):
+    def __init__(self, sentences=None, embeddingDim=16, usePretrained=False, embeddingSeed=0, embeddingMatrix=None):
         self.sentences = [s.split() for s in sentences] if sentences else []
         self.embeddingDim = embeddingDim
         self.usePretrained = usePretrained
         self.embeddingSeed = embeddingSeed
         self.vocabulary = self._buildVocabulary()
+        self.vocabSize = len(self.vocabulary)
         self.model = self._loadModel()
-        self.embeddingMatrix = self._buildEmbeddingMatrix()
-        self.embeddingMatrix.setflags(write=False)
+        if embeddingMatrix is None:
+            embeddingMatrix = self._buildEmbeddingMatrix()
+            self.set_embedding_matrix(embeddingMatrix, isometrize=False)
+        else:
+            self.set_embedding_matrix(embeddingMatrix, isometrize=True)
         is_isometric = np.allclose(
             self.embeddingMatrix.T @ self.embeddingMatrix, np.eye(self.embeddingDim)
         )
@@ -64,6 +68,28 @@ class Encoding:
         rng = np.random.default_rng(self.embeddingSeed)
         embedding, _ = np.linalg.qr(rng.standard_normal((vocabSize, self.embeddingDim)))
         return embedding
+
+    @staticmethod
+    def isometrize_matrix(matrix):
+        if matrix.shape[0] < matrix.shape[1]:
+            raise ValueError("Cannot isometrize when rows < columns.")
+        q, r = np.linalg.qr(matrix)
+        diag = np.sign(np.diag(r))
+        diag[diag == 0] = 1.0
+        return q * diag
+
+    def set_embedding_matrix(self, embedding_matrix, isometrize=True):
+        matrix = np.asarray(embedding_matrix, dtype=np.float64)
+        expected_shape = (self.vocabSize, self.embeddingDim)
+        if matrix.shape != expected_shape:
+            raise ValueError(
+                f"Embedding matrix shape must be {expected_shape}, got {matrix.shape}."
+            )
+        if isometrize:
+            matrix = self.isometrize_matrix(matrix)
+        self.embeddingMatrix = matrix
+        self.embeddingMatrix.setflags(write=False)
+        return self.embeddingMatrix
 
     # ============================================================
     # Funzioni di codifica singola (no array globali)

@@ -9,7 +9,7 @@ OPTIMIZATION_CONFIG = {
     'max_hours': 1,            # RIDOTTO
     'embedding_dim': 4,
     'num_qubits': 4,
-    'opt_maxiter': 50,         # RIDOTTO per test veloce (era 300)
+    'opt_maxiter': 150,        # AUMENTATO per ottimizzazione con embedding
     'opt_maxfev': 60,          # RIDOTTO
     'restarts': 1,             # NUOVO: solo 1 restart per fare presto
     'epochs': 10,
