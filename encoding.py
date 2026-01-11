@@ -14,7 +14,15 @@ from config import (
 class Encoding:
     _printed_checks = False
 
-    def __init__(self, sentences=None, embeddingDim=16, usePretrained=False, embeddingSeed=0, embeddingMatrix=None):
+    def __init__(
+        self,
+        sentences=None,
+        embeddingDim=16,
+        usePretrained=False,
+        embeddingSeed=0,
+        embeddingMatrix=None,
+        rotationMatrix=None,
+    ):
         self.sentences = [s.split() for s in sentences] if sentences else []
         self.embeddingDim = embeddingDim
         self.usePretrained = usePretrained
@@ -24,12 +32,13 @@ class Encoding:
         self.model = self._loadModel()
         if embeddingMatrix is None:
             embeddingMatrix = self._buildEmbeddingMatrix()
-            isometrize = False
-        else:
-            isometrize = True
-        self.rotationMatrix = self._buildRotationMatrix()
-        self.rotationMatrix.setflags(write=False)
-        self.set_embedding_matrix(embeddingMatrix, isometrize=isometrize)
+        if rotationMatrix is None:
+            rotationMatrix = self._buildRotationMatrix()
+        self.set_embedding_matrix(
+            embeddingMatrix,
+            rotation_matrix=rotationMatrix,
+            isometrize=True,
+        )
         if not Encoding._printed_checks:
             self._print_embedding_checks()
             Encoding._printed_checks = True
@@ -100,11 +109,14 @@ class Encoding:
         )
         det_v = np.linalg.det(self.rotationMatrix)
         det_v_abs = float(np.abs(det_v))
+        ef_equal = np.allclose(self.embeddingMatrix, self.outputEmbeddingMatrix)
+        ef_diff = float(np.linalg.norm(self.embeddingMatrix - self.outputEmbeddingMatrix))
         print(f"[EMBEDDING] Check 1 (E^T E == I): {e_isometric}")
         print(f"[EMBEDDING] Check 2 (F^T F == I): {f_isometric}")
         print(f"[EMBEDDING] Check 3 (F F^T == E E^T): {range_equal}")
         print(f"[EMBEDDING] Check 4 (V^T V == I): {v_unitary}")
         print(f"[EMBEDDING] det(V) = {det_v:.6f} |det(V)| = {det_v_abs:.6f}")
+        print(f"[EMBEDDING] E != F: {not ef_equal} |E-F|={ef_diff:.6f}")
 
     @staticmethod
     def isometrize_matrix(matrix):
@@ -115,20 +127,33 @@ class Encoding:
         diag[diag == 0] = 1.0
         return q * diag
 
-    def set_embedding_matrix(self, embedding_matrix, isometrize=True):
+    def set_embedding_matrix(self, embedding_matrix, rotation_matrix=None, isometrize=True):
         matrix = np.asarray(embedding_matrix, dtype=np.float64)
         expected_shape = (self.vocabSize, self.embeddingDim)
         if matrix.shape != expected_shape:
             raise ValueError(
                 f"Embedding matrix shape must be {expected_shape}, got {matrix.shape}."
             )
+        if rotation_matrix is None:
+            if hasattr(self, "rotationMatrix"):
+                rotation_matrix = self.rotationMatrix
+            else:
+                rotation_matrix = self._buildRotationMatrix()
+        rotation_matrix = np.asarray(rotation_matrix, dtype=np.float64)
+        rotation_shape = (self.embeddingDim, self.embeddingDim)
+        if rotation_matrix.shape != rotation_shape:
+            raise ValueError(
+                f"Rotation matrix shape must be {rotation_shape}, got {rotation_matrix.shape}."
+            )
         if isometrize:
             matrix = self.isometrize_matrix(matrix)
+            rotation_matrix = self.isometrize_matrix(rotation_matrix)
         self.embeddingMatrix = matrix
         self.embeddingMatrix.setflags(write=False)
-        if hasattr(self, "rotationMatrix"):
-            self.outputEmbeddingMatrix = self.embeddingMatrix @ self.rotationMatrix
-            self.outputEmbeddingMatrix.setflags(write=False)
+        self.rotationMatrix = rotation_matrix
+        self.rotationMatrix.setflags(write=False)
+        self.outputEmbeddingMatrix = self.embeddingMatrix @ self.rotationMatrix
+        self.outputEmbeddingMatrix.setflags(write=False)
         return self.embeddingMatrix
 
     # ============================================================
