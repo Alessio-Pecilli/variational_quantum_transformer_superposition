@@ -11,7 +11,7 @@
 #SBATCH --ntasks-per-node=20     # 5 × 20 = 100 rank (ben sotto il limite 256)
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=0                  # usa TUTTA la RAM del nodo BOOST
-#SBATCH --time=24:00:00
+#SBATCH --time=15:00:00
 
 echo "=== JOB $SLURM_JOB_ID STARTED at $(date) on $(hostname) ==="
 
@@ -24,8 +24,15 @@ source /leonardo_work/IscrC_QuSALa/venv_py311/bin/activate
 export OMP_NUM_THREADS=1
 export OPENBLAS_NUM_THREADS=1
 export MKL_NUM_THREADS=1
+# Forza UCX a usare i trasporti corretti (InfiniBand e Shared Memory standard)
+export UCX_TLS=self,shm,rc,ud
+# Aumenta i timeout per dare tempo ai rank di scambiarsi gli indirizzi
+export UCX_RECONNECT_WAIT=15s
+export UCX_CONNECT_TIMEOUT=300s
+# Risolve spesso il problema "Shared memory error" su architetture NVIDIA/Atos
+export UCX_MEMTYPE_CACHE=n
 
-cd /leonardo_work/IscrC_QuSALa/variational_quantum_transformer_sovrapposition || exit 1
+cd /leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superposition || exit 1
 mkdir -p logs
 
 srun --mpi=pmix_v3 python3 main_hpc.py

@@ -5,14 +5,14 @@ Configuration settings for quantum optimization experiments.
 # Optimization settings
 OPTIMIZATION_CONFIG = {
     'num_iterations': 20,      # RIDOTTO per test veloce (era 150)
-    'num_layers': 3,
+    'num_layers': 5,
     'max_hours': 1,            # RIDOTTO
     'embedding_dim': 4,
     'num_qubits': 4,
     'opt_maxiter': 150,        # AUMENTATO per ottimizzazione con embedding
     'opt_maxfev': 60,          # RIDOTTO
     'restarts': 1,             # NUOVO: solo 1 restart per fare presto
-    'epochs': 10,
+    'epochs': 100,
     'learning_rate':  0.001,
     'save_frequency': 10,
     'log_frequency': 10,
@@ -69,10 +69,10 @@ PLOT_CONFIG = {
 # Dataset settings
 DATASET_CONFIG = {
     'default_split': 'train',
-    'max_sentences': 3,           # quante frasi caricare
-    'sentence_length': 5,           # lunghezza ESATTA in parole per ogni frase
+    'max_sentences': 100,           # quante frasi caricare
+    'sentence_length': 9,           # lunghezza ESATTA in parole per ogni frase
     'dataset_name': 'ptb_text_only',
-    'use_ptb': False,                # True = usa PTB dataset, False = usa frasi generate
+    'use_ptb': True,                # True = usa PTB dataset, False = usa frasi generate
     'random_sample': True,          # True = selezione random, False = prime N frasi
     'local_ptb_file': 'ptb_sentences.txt'  # file locale con frasi PTB pre-scaricate (una per riga)
 }
@@ -83,7 +83,7 @@ QUANTUM_STATES_CONFIG = {
     'num_states': 9,                # N = numero di "frasi quantistiche" da trainare (distribuite tra rank)
     'num_qubits': 2,                # numero di qubit (dimensione Hilbert = 2^num_qubits)
     'max_time': 10,                 # M = evoluzioni temporali per frase (come "parole") - INTERO
-    'use_test_mode': True           # True = B(t)=1 costante e J=1 uniforme
+    'use_test_mode': False           # True = B(t)=1 costante e J=1 uniforme
 }
 
 # ML Classico Training Config (per MLClassicoSENTENCES e MLClassicoQUANTUMSTATES)
@@ -294,5 +294,5 @@ def get_training_sentences():
 
 
 # Genera le frasi di training in base alla configurazione
-#TRAINING_SENTENCES = get_training_sentences()
-TRAINING_SENTENCES = generate_sentences(5)  # Test genera 5 frasi
+TRAINING_SENTENCES = get_training_sentences()
+#TRAINING_SENTENCES = generate_sentences(5)  # Test genera 5 frasi
