@@ -67,7 +67,7 @@ class MaxLossEvaluationsReached(Exception):
 
 # GLOBAL COUNTER for loss evaluations (HARD CONSTRAINT: stop at 120)
 GLOBAL_LOSS_COUNTER = [0]  # Using list to allow modification in nested scopes
-MAX_LOSS_EVALUATIONS = 10
+MAX_LOSS_EVALUATIONS = 100
 
 # ---------------------------------------------------------------------
 # Logging minimale: dettagliato su rank 0, ridotto sugli altri
