@@ -70,7 +70,7 @@ PLOT_CONFIG = {
 DATASET_CONFIG = {
     'default_split': 'train',
     'max_sentences': 100,           # quante frasi caricare
-    'sentence_length': 9,           # lunghezza ESATTA in parole per ogni frase
+    'sentence_length': 5,           # lunghezza ESATTA in parole per ogni frase
     'dataset_name': 'ptb_text_only',
     'use_ptb': True,                # True = usa PTB dataset, False = usa frasi generate
     'random_sample': True,          # True = selezione random, False = prime N frasi
@@ -83,7 +83,9 @@ QUANTUM_STATES_CONFIG = {
     'num_states': 9,                # N = numero di "frasi quantistiche" da trainare (distribuite tra rank)
     'num_qubits': 2,                # numero di qubit (dimensione Hilbert = 2^num_qubits)
     'max_time': 10,                 # M = evoluzioni temporali per frase (come "parole") - INTERO
-    'use_test_mode': False           # True = B(t)=1 costante e J=1 uniforme
+    'use_test_mode': False,         # True = B(t)=1 costante e J=1 uniforme
+    'num_test_sets': 3,             # Numero di test set diversi da valutare
+    'skip_register_analysis': True  # True = salta analisi registri (evita errore AerSimulator con gate custom)
 }
 
 # ML Classico Training Config (per MLClassicoSENTENCES e MLClassicoQUANTUMSTATES)

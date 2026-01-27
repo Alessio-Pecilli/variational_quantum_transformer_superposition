@@ -889,13 +889,28 @@ def main():
     # ANALISI REGISTRI (su un esempio, solo rank 0)
     # ============================================================
     if rank == 0:
-        logger.info(f"\n{'=' * 80}")
-        logger.info("FASE 2: ANALISI REGISTRI QUANTISTICI")
-        logger.info(f"{'=' * 80}\n")
+        skip_register_analysis = qs_cfg.get('skip_register_analysis', False)
         
-        register_stats = analyze_quantum_registers(
-            ansatz_V_matrix, ansatz_K_matrix, example_item, encoding, cfg, logger, timestamp, use_quantum_states
-        )
+        if skip_register_analysis:
+            logger.info(f"\n{'=' * 80}")
+            logger.info("FASE 2: ANALISI REGISTRI QUANTISTICI - SKIPPATA")
+            logger.info(f"{'=' * 80}\n")
+            logger.info("[REGISTERS] Analisi registri disabilitata (skip_register_analysis=True)")
+            logger.info("[REGISTERS] Motivo: evita errore AerSimulator con gate custom (c-unitary)")
+            register_stats = None
+        else:
+            logger.info(f"\n{'=' * 80}")
+            logger.info("FASE 2: ANALISI REGISTRI QUANTISTICI")
+            logger.info(f"{'=' * 80}\n")
+            
+            try:
+                register_stats = analyze_quantum_registers(
+                    ansatz_V_matrix, ansatz_K_matrix, example_item, encoding, cfg, logger, timestamp, use_quantum_states
+                )
+            except Exception as e:
+                logger.warning(f"[REGISTERS] Errore durante analisi registri: {e}")
+                logger.warning("[REGISTERS] Analisi registri saltata a causa dell'errore")
+                register_stats = None
         
         # ============================================================
         # SALVA SUMMARY FINALE
@@ -937,25 +952,30 @@ def main():
             f.write("REGISTRI QUANTISTICI (ESEMPIO):\n")
             f.write("=" * 80 + "\n\n")
             
-            f.write(f"  Registro A (query, {register_stats['n_qubits_A']} qubits):\n")
-            f.write(f"    - Coerenza quantistica: {register_stats['register_A']['has_quantum_coherence']}\n")
-            f.write(f"    - Coefficienti complessi: {register_stats['register_A']['num_complex']}/{register_stats['register_A']['num_total']}\n")
-            f.write(f"    - Entropia: {register_stats['register_A']['entropy']:.4f} bits\n\n")
-            
-            f.write(f"  Registro B (key, {register_stats['n_qubits_B']} qubits):\n")
-            f.write(f"    - Coerenza quantistica: {register_stats['register_B']['has_quantum_coherence']}\n")
-            f.write(f"    - Coefficienti complessi: {register_stats['register_B']['num_complex']}/{register_stats['register_B']['num_total']}\n")
-            f.write(f"    - Entropia: {register_stats['register_B']['entropy']:.4f} bits\n\n")
-            
-            f.write(f"  Registro C (ancillae, {register_stats['n_control_qubits']} qubits):\n")
-            f.write(f"    - Coerenza quantistica: {register_stats['register_C']['has_quantum_coherence']}\n")
-            f.write(f"    - Coefficienti complessi: {register_stats['register_C']['num_complex']}/{register_stats['register_C']['num_total']}\n")
-            f.write(f"    - Entropia: {register_stats['register_C']['entropy']:.4f} bits\n\n")
-            
-            f.write(f"  Registri A+B combinati (target, {register_stats['n_target_qubits']} qubits):\n")
-            f.write(f"    - Coerenza quantistica: {register_stats['register_AB']['has_quantum_coherence']}\n")
-            f.write(f"    - Coefficienti complessi: {register_stats['register_AB']['num_complex']}/{register_stats['register_AB']['num_total']}\n")
-            f.write(f"    - Entropia: {register_stats['register_AB']['entropy']:.4f} bits\n")
+            if register_stats is not None:
+                f.write(f"  Registro A (query, {register_stats['n_qubits_A']} qubits):\n")
+                f.write(f"    - Coerenza quantistica: {register_stats['register_A']['has_quantum_coherence']}\n")
+                f.write(f"    - Coefficienti complessi: {register_stats['register_A']['num_complex']}/{register_stats['register_A']['num_total']}\n")
+                f.write(f"    - Entropia: {register_stats['register_A']['entropy']:.4f} bits\n\n")
+                
+                f.write(f"  Registro B (key, {register_stats['n_qubits_B']} qubits):\n")
+                f.write(f"    - Coerenza quantistica: {register_stats['register_B']['has_quantum_coherence']}\n")
+                f.write(f"    - Coefficienti complessi: {register_stats['register_B']['num_complex']}/{register_stats['register_B']['num_total']}\n")
+                f.write(f"    - Entropia: {register_stats['register_B']['entropy']:.4f} bits\n\n")
+                
+                f.write(f"  Registro C (ancillae, {register_stats['n_control_qubits']} qubits):\n")
+                f.write(f"    - Coerenza quantistica: {register_stats['register_C']['has_quantum_coherence']}\n")
+                f.write(f"    - Coefficienti complessi: {register_stats['register_C']['num_complex']}/{register_stats['register_C']['num_total']}\n")
+                f.write(f"    - Entropia: {register_stats['register_C']['entropy']:.4f} bits\n\n")
+                
+                f.write(f"  Registri A+B combinati (target, {register_stats['n_target_qubits']} qubits):\n")
+                f.write(f"    - Coerenza quantistica: {register_stats['register_AB']['has_quantum_coherence']}\n")
+                f.write(f"    - Coefficienti complessi: {register_stats['register_AB']['num_complex']}/{register_stats['register_AB']['num_total']}\n")
+                f.write(f"    - Entropia: {register_stats['register_AB']['entropy']:.4f} bits\n")
+            else:
+                f.write("ANALISI REGISTRI SKIPPATA\n")
+                f.write("  (skip_register_analysis=True in configurazione)\n")
+                f.write("  Motivo: evita errore AerSimulator con gate custom (c-unitary)\n")
         
         logger.info(f"✓ Summary salvato in: {summary_file}")
         logger.info(f"\n{'=' * 80}")
