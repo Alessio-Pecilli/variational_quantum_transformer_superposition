@@ -62,6 +62,23 @@ from layer import AnsatzBuilder
 from quantum_annealing import generate_quantum_states
 
 
+# =====================================================================
+# Utility: PPL quantistica (Renyi-1/2)
+# =====================================================================
+def calculate_quantum_ppl(probabilities):
+    """
+    Calcola la PPL basata sulla media delle radici quadrate (Renyi-1/2).
+    probabilities: lista dei valori di overlap |<x_target|z>|^2
+    Formula: PPL = (mean_sqrt_p)^-2
+    """
+    t = len(probabilities)
+    if t == 0:
+        return float("inf")
+    sum_sqrt_p = sum(np.sqrt(p) for p in probabilities)
+    ppl = (sum_sqrt_p / t) ** (-2)
+    return ppl
+
+
 def setup_logging():
     """Setup logging per questo script."""
     logger = logging.getLogger(__name__)
@@ -155,6 +172,7 @@ def load_ansatz_parameters(w_path='W_matrix.npy', u_path='U_matrix.npy', logger=
 def evaluate_perplexity_with_ansatz_matrices(ansatz_V_matrix, ansatz_K_matrix, data_input, encoding, cfg, logger, use_quantum_states=False):
     """
     Calcola la perplexity usando le matrici unitarie degli ansatz V e K pre-calcolate.
+    Utilizza la formula corretta: prob = np.exp(-loss_val) e PPL basata su Renyi-1/2.
     
     PARALLELIZZAZIONE MPI:
     - Ogni rank elabora SOLO i suoi dati assegnati
@@ -201,45 +219,73 @@ def evaluate_perplexity_with_ansatz_matrices(ansatz_V_matrix, ansatz_K_matrix, d
     local_loss = 0.0
     local_words = 0
     item_losses = []
+    probabilities = []  # Per calcolo PPL Renyi-1/2
     
     for local_idx, (global_idx, item) in enumerate(my_data):
-        logger.info(f"[PERPLEXITY] Rank {rank}: frase {local_idx+1}/{len(my_sentences)} (global #{global_idx}): '{sentence}'")
+        try:
+            if use_quantum_states:
+                # Modalità quantum states
+                psi = item  # item è uno stato quantistico
+                states_calculated = psi
+                U_mats = None
+                Z_mats = None
+                sentence_length = len(psi) if isinstance(psi, (list, np.ndarray)) else 1
+                logger.info(f"[PERPLEXITY] Rank {rank}: stato {local_idx+1}/{len(my_data)} (global #{global_idx})")
+            else:
+                # Modalità frasi
+                sentence = item
+                if encoding is None:
+                    logger.warning(f"[PERPLEXITY] Rank {rank}: encoding è None ma use_quantum_states=False")
+                    continue
+                
+                states, targets = encoding.encode_single(sentence)
+                states_calculated, U_mats, Z_mats = process_sentence_states(states, targets=targets)
+                
+                sentence_length = len(states)
+                logger.info(f"[PERPLEXITY] Rank {rank}: frase {local_idx+1}/{len(my_data)} (global #{global_idx}): '{sentence[:50]}...'")
+            
+            local_words += max(sentence_length - 1, 1)
+            
+            # Crea builder
+            builder = GeneralizedQuantumCircuitBuilder(
+                embedding_dim=embedding_dim,
+                sentence_length=sentence_length
+            )
+            
+            # Costruisci circuito usando le matrici ansatz pre-calcolate
+            loss_val = compute_loss_with_ansatz_matrices(
+                builder, states_calculated, U_mats, Z_mats,
+                ansatz_V_matrix, ansatz_K_matrix, logger
+            )
+            
+            if np.isfinite(loss_val):
+                item_losses.append((global_idx, loss_val))
+                local_loss += loss_val
+                
+                # Calcola probabilità: prob = exp(-loss_val)
+                prob = float(np.clip(np.exp(-loss_val), 0.0, 1.0))
+                probabilities.append(prob)
+                
+                logger.info(f"[PERPLEXITY] Rank {rank}: item #{global_idx} → loss={loss_val:.8f}, prob={prob:.8f}")
+            else:
+                logger.warning(f"[PERPLEXITY] Rank {rank}: loss non finita per item #{global_idx}")
         
-        # Codifica frase
-        states = encoding.encode_single(sentence)
-        states_calculated, U_mats, Z_mats = process_sentence_states(states)
-        
-        sentence_length = len(states)
-        local_words += sentence_length - 1
-        
-        # Crea builder
-        builder = GeneralizedQuantumCircuitBuilder(
-            embedding_dim=embedding_dim,
-            sentence_length=sentence_length
-        )
-        
-        # Costruisci circuito usando le matrici ansatz pre-calcolate
-        loss = compute_loss_with_ansatz_matrices(
-            builder, states_calculated, U_mats, Z_mats,
-            ansatz_V_matrix, ansatz_K_matrix, logger
-        )
-        
-        sentence_losses.append((global_idx, loss))
-        local_loss += loss
-        
-        logger.info(f"[PERPLEXITY] Rank {rank}: frase #{global_idx} → loss={loss:.8f}")
+        except Exception as e:
+            logger.warning(f"[PERPLEXITY] Rank {rank}: errore elaborazione item #{global_idx}: {e}")
+            continue
     
     # ============================================================
     # AGGREGAZIONE RISULTATI (MPI gather su rank 0)
     # ============================================================
     logger.info(f"[PERPLEXITY] Rank {rank}: elaborazione locale completata, invio risultati...")
     
-    # Gather: ogni rank invia (local_loss, local_words, sentence_losses)
+    # Gather: ogni rank invia (local_loss, local_words, item_losses, probabilities)
     local_data = {
         'loss': local_loss,
         'words': local_words,
-        'sentence_losses': sentence_losses,
-        'num_sentences': len(my_sentences)
+        'item_losses': item_losses,
+        'probabilities': probabilities,
+        'num_items': len([x for x in item_losses])
     }
     
     all_data = comm.gather(local_data, root=0)
@@ -250,36 +296,47 @@ def evaluate_perplexity_with_ansatz_matrices(ansatz_V_matrix, ansatz_K_matrix, d
         
         total_loss = sum(d['loss'] for d in all_data)
         total_words = sum(d['words'] for d in all_data)
-        total_sentences_processed = sum(d['num_sentences'] for d in all_data)
+        total_items_processed = sum(d['num_items'] for d in all_data)
         
-        # Unisci tutte le sentence_losses
-        all_sentence_losses = []
+        # Unisci tutte le item_losses
+        all_item_losses = []
         for d in all_data:
-            all_sentence_losses.extend(d['sentence_losses'])
+            all_item_losses.extend(d['item_losses'])
+        
+        # Unisci tutte le probabilità
+        all_probabilities = []
+        for d in all_data:
+            all_probabilities.extend(d['probabilities'])
         
         # Ordina per global_idx
-        all_sentence_losses.sort(key=lambda x: x[0])
-        sentence_losses_only = [loss for _, loss in all_sentence_losses]
+        all_item_losses.sort(key=lambda x: x[0])
+        item_losses_only = [loss for _, loss in all_item_losses]
         
-        avg_loss = total_loss / total_sentences_processed if total_sentences_processed > 0 else float('inf')
+        # Calcola metriche
+        avg_loss = total_loss / total_items_processed if total_items_processed > 0 else float('inf')
         avg_loss_per_word = total_loss / total_words if total_words > 0 else float('inf')
-        perplexity = np.exp(avg_loss_per_word)
         
-        logger.info(f"[PERPLEXITY] Frasi valutate: {total_sentences_processed}/{total_sentences}")
+        # PPL usando formula Renyi-1/2 con probabilità
+        perplexity = calculate_quantum_ppl(all_probabilities)
+        
+        logger.info(f"[PERPLEXITY] Items valutati: {total_items_processed}/{total_data}")
         logger.info(f"[PERPLEXITY] Parole totali: {total_words}")
         logger.info(f"[PERPLEXITY] Loss totale: {total_loss:.8f}")
-        logger.info(f"[PERPLEXITY] Loss media per frase: {avg_loss:.8f}")
+        logger.info(f"[PERPLEXITY] Loss media per item: {avg_loss:.8f}")
         logger.info(f"[PERPLEXITY] Loss media per parola: {avg_loss_per_word:.8f}")
-        logger.info(f"[PERPLEXITY] Perplexity: {perplexity:.8f}")
+        logger.info(f"[PERPLEXITY] Probabilità media: {np.mean(all_probabilities):.8f}")
+        logger.info(f"[PERPLEXITY] Perplexity (Renyi-1/2): {perplexity:.8f}")
         
         return {
             'perplexity': perplexity,
             'total_loss': total_loss,
-            'avg_loss_per_sentence': avg_loss,
+            'avg_loss_per_item': avg_loss,
             'avg_loss_per_word': avg_loss_per_word,
-            'num_sentences': total_sentences_processed,
+            'num_items': total_items_processed,
             'num_words': total_words,
-            'sentence_losses': sentence_losses_only
+            'avg_probability': np.mean(all_probabilities),
+            'item_losses': item_losses_only,
+            'probabilities': all_probabilities
         }
     else:
         # Altri ranks ritornano None
@@ -359,16 +416,17 @@ def analyze_quantum_registers(ansatz_V_matrix, ansatz_K_matrix, item, encoding, 
     if use_quantum_states:
         logger.info(f"[REGISTERS] Analisi registri quantistici per: STATO QUANTISTICO")
         states = [item]
+        targets = None
         item_label = "Quantum State"
     else:
         logger.info(f"[REGISTERS] Analisi registri quantistici per: '{item}'")
-        states = encoding.encode_single(item)
+        states, targets = encoding.encode_single(item)
         item_label = item
     
     embedding_dim = cfg['embedding_dim']
     
     # Processa stati
-    states_calculated, U_mats, Z_mats = process_sentence_states(states)
+    states_calculated, U_mats, Z_mats = process_sentence_states(states, targets=targets)
     sentence_length = len(states)
     
     # Crea builder
@@ -660,74 +718,196 @@ def main():
     
     # Carica configurazione (tutti i ranks)
     cfg = OPTIMIZATION_CONFIG
-    dataset_cfg = DATASET_CONFIG
     
     if rank == 0:
         logger.info(f"\n[CONFIG] Configurazione:")
         logger.info(f"[CONFIG] Embedding dim: {cfg['embedding_dim']}")
         logger.info(f"[CONFIG] Num qubits: {cfg['num_qubits']}")
         logger.info(f"[CONFIG] Num layers: {cfg['num_layers']}")
-        logger.info(f"[CONFIG] Max sentences: {dataset_cfg['max_sentences']}")
-        logger.info(f"[CONFIG] Sentence length: {dataset_cfg['sentence_length']}")
     
-    # Rank 0 carica le frasi, poi broadcast a tutti
-    if rank == 0:
-        logger.info(f"\n[DATA] Caricamento frasi da PTB...")
-        sentences = get_training_sentences()
-        logger.info(f"[DATA] ✓ Caricate {len(sentences)} frasi")
+    # ============================================================
+    # SCELTA: Stati Quantistici vs Sentences Testuali
+    # ============================================================
+    qs_cfg = QUANTUM_STATES_CONFIG
+    use_quantum_states = qs_cfg.get('use_quantum_states', False)
+    num_test_sets = qs_cfg.get('num_test_sets', 3)  # Numero di test set diversi
+    
+    if use_quantum_states:
+        # ============================================================
+        # MODALITÀ QUANTUM STATES (multipli test set)
+        # ============================================================
+        if rank == 0:
+            logger.info(f"\n[DATA] Modalità: QUANTUM STATES")
+            logger.info(f"[DATA] Numero di test set da valutare: {num_test_sets}")
+        
+        num_states = qs_cfg.get('num_states', 9)
+        num_qubits_qs = qs_cfg.get('num_qubits', 2)
+        max_time = qs_cfg.get('max_time', 10.0)
+        use_test_mode = qs_cfg.get('use_test_mode', True)
+        
+        if rank == 0:
+            logger.info(f"[DATA] Configurazione per test set:")
+            logger.info(f"[DATA]   - Num stati per set: {num_states}")
+            logger.info(f"[DATA]   - Num qubits: {num_qubits_qs}")
+            logger.info(f"[DATA]   - Max time: {max_time}")
+            logger.info(f"[DATA]   - Test mode: {use_test_mode}")
+        
+        # Lista per raccogliere i risultati di tutti i test set
+        all_test_results = []
+        all_probabilities_sets = []
+        
+        for test_set_idx in range(num_test_sets):
+            if rank == 0:
+                logger.info(f"\n{'='*60}")
+                logger.info(f"TEST SET {test_set_idx + 1}/{num_test_sets}")
+                logger.info(f"{'='*60}")
+            
+            # Genera NUOVI stati quantistici per questo test set
+            quantum_states = generate_quantum_states(
+                num_states=num_states,
+                num_qubits=num_qubits_qs,
+                max_time=max_time,
+                use_test_mode=use_test_mode
+            )
+            
+            if rank == 0:
+                logger.info(f"[DATA] ✓ Generati {len(quantum_states)} stati quantistici per test set {test_set_idx + 1}")
+            
+            # Valuta perplexity su questo test set
+            perplexity_results = evaluate_perplexity_with_ansatz_matrices(
+                ansatz_V_matrix, ansatz_K_matrix, quantum_states, None, cfg, logger, use_quantum_states=True
+            )
+            
+            if rank == 0:
+                all_test_results.append(perplexity_results)
+                all_probabilities_sets.append(perplexity_results['probabilities'])
+            
+            comm.Barrier()
+        
+        if rank == 0:
+            # Calcola media della PPL su tutti i test set
+            ppl_values = [r['perplexity'] for r in all_test_results]
+            avg_ppl = np.mean(ppl_values)
+            std_ppl = np.std(ppl_values)
+            
+            # Media delle probabilità su tutti i test set
+            all_probs_combined = []
+            for prob_set in all_probabilities_sets:
+                all_probs_combined.extend(prob_set)
+            avg_prob_all = np.mean(all_probs_combined)
+            
+            example_item = quantum_states[0]
+            
+            logger.info(f"\n{'='*80}")
+            logger.info("RISULTATI AGGREGATI (tutti i test set)")
+            logger.info(f"{'='*80}")
+            logger.info(f"[RESULTS] PPL media su {num_test_sets} test set: {avg_ppl:.8f}")
+            logger.info(f"[RESULTS] PPL deviazione standard: {std_ppl:.8f}")
+            logger.info(f"[RESULTS] Probabilità media (tutti i test set): {avg_prob_all:.8f}")
+            
+            for i, r in enumerate(all_test_results):
+                logger.info(f"[RESULTS] Test set {i+1}: PPL={r['perplexity']:.8f}, Items={r['num_items']}")
+    
     else:
-        sentences = None
-    
-    # Broadcast frasi a tutti i ranks
-    sentences = comm.bcast(sentences, root=0)
-    
-    # Tutti i ranks inizializzano encoding (necessario per codifica locale)
-    encoding = Encoding(sentences=sentences, embeddingDim=cfg['embedding_dim'])
-    logger.info(f"[RANK {rank}] Encoding inizializzato")
-    
-    # Sincronizza prima di iniziare elaborazione
-    comm.Barrier()
+        # ============================================================
+        # MODALITÀ SENTENCES (multipli test set)
+        # ============================================================
+        if rank == 0:
+            logger.info(f"\n[DATA] Modalità: SENTENCES")
+            logger.info(f"[DATA] Numero di test set da valutare: {num_test_sets}")
+        
+        # Carica frasi base
+        if rank == 0:
+            logger.info(f"[DATA] Caricamento frasi da PTB...")
+            sentences = get_training_sentences()
+            logger.info(f"[DATA] ✓ Caricate {len(sentences)} frasi totali")
+        else:
+            sentences = None
+        
+        # Broadcast frasi a tutti i ranks
+        sentences = comm.bcast(sentences, root=0)
+        
+        # Inizializza encoding (usato per tutti i test set)
+        encoding = Encoding(sentences=sentences, embeddingDim=cfg['embedding_dim'])
+        
+        all_test_results = []
+        all_probabilities_sets = []
+        
+        # Dividi le frasi in test set
+        frasi_per_set = len(sentences) // num_test_sets
+        
+        for test_set_idx in range(num_test_sets):
+            if rank == 0:
+                logger.info(f"\n{'='*60}")
+                logger.info(f"TEST SET {test_set_idx + 1}/{num_test_sets}")
+                logger.info(f"{'='*60}")
+            
+            # Estrai un sottinsieme di frasi per questo test set
+            start_idx = test_set_idx * frasi_per_set
+            end_idx = (test_set_idx + 1) * frasi_per_set if test_set_idx < num_test_sets - 1 else len(sentences)
+            test_sentences = sentences[start_idx:end_idx]
+            
+            if rank == 0:
+                logger.info(f"[DATA] Test set {test_set_idx + 1}: frasi {start_idx}-{end_idx} ({len(test_sentences)} frasi)")
+            
+            # Valuta perplexity su questo test set
+            perplexity_results = evaluate_perplexity_with_ansatz_matrices(
+                ansatz_V_matrix, ansatz_K_matrix, test_sentences, encoding, cfg, logger, use_quantum_states=False
+            )
+            
+            if rank == 0:
+                all_test_results.append(perplexity_results)
+                all_probabilities_sets.append(perplexity_results['probabilities'])
+            
+            comm.Barrier()
+        
+        if rank == 0:
+            # Calcola media della PPL su tutti i test set
+            ppl_values = [r['perplexity'] for r in all_test_results]
+            avg_ppl = np.mean(ppl_values)
+            std_ppl = np.std(ppl_values)
+            
+            # Media delle probabilità su tutti i test set
+            all_probs_combined = []
+            for prob_set in all_probabilities_sets:
+                all_probs_combined.extend(prob_set)
+            avg_prob_all = np.mean(all_probs_combined)
+            
+            example_item = sentences[0]
+            
+            logger.info(f"\n{'='*80}")
+            logger.info("RISULTATI AGGREGATI (tutti i test set)")
+            logger.info(f"{'='*80}")
+            logger.info(f"[RESULTS] PPL media su {num_test_sets} test set: {avg_ppl:.8f}")
+            logger.info(f"[RESULTS] PPL deviazione standard: {std_ppl:.8f}")
+            logger.info(f"[RESULTS] Probabilità media (tutti i test set): {avg_prob_all:.8f}")
+            
+            for i, r in enumerate(all_test_results):
+                logger.info(f"[RESULTS] Test set {i+1}: PPL={r['perplexity']:.8f}, Items={r['num_items']}")
     
     # ============================================================
-    # FASE 1: VALUTA PERPLEXITY (distribuito tra ranks)
+    # ANALISI REGISTRI (su un esempio, solo rank 0)
     # ============================================================
     if rank == 0:
         logger.info(f"\n{'=' * 80}")
-        logger.info("FASE 1: VALUTAZIONE PERPLEXITY (DISTRIBUITA)")
-        logger.info(f"{'=' * 80}\n")
-    
-    perplexity_results = evaluate_perplexity_with_ansatz_matrices(
-        ansatz_V_matrix, ansatz_K_matrix, sentences, encoding, cfg, logger
-    )
-    
-    # Sincronizza dopo perplexity
-    comm.Barrier()
-    
-    # ============================================================
-    # FASE 2: ANALISI REGISTRI (solo rank 0)
-    # ============================================================
-    if rank == 0:
-        logger.info(f"\n{'=' * 80}")
-        logger.info("FASE 2: ANALISI REGISTRI QUANTISTICI (RANK 0)")
+        logger.info("FASE 2: ANALISI REGISTRI QUANTISTICI")
         logger.info(f"{'=' * 80}\n")
         
-        # Usa la prima frase come esempio
-        example_sentence = sentences[0]
         register_stats = analyze_quantum_registers(
-            ansatz_V_matrix, ansatz_K_matrix, example_sentence, encoding, cfg, logger, timestamp
+            ansatz_V_matrix, ansatz_K_matrix, example_item, encoding, cfg, logger, timestamp, use_quantum_states
         )
-    
+        
         # ============================================================
-        # FASE 3: SALVA SUMMARY FINALE (solo rank 0)
+        # SALVA SUMMARY FINALE
         # ============================================================
         logger.info(f"\n{'=' * 80}")
-        logger.info("SUMMARY FINALE")
+        logger.info("SALVATAGGIO SUMMARY FINALE")
         logger.info(f"{'=' * 80}\n")
         
         summary_file = f"evaluation_summary_{timestamp}.txt"
         with open(summary_file, 'w', encoding='utf-8') as f:
             f.write("=" * 80 + "\n")
-            f.write("EVALUATION SUMMARY (MPI)\n")
+            f.write("EVALUATION SUMMARY (MULTIPLE TEST SETS)\n")
             f.write("=" * 80 + "\n\n")
             
             f.write(f"Timestamp: {timestamp}\n")
@@ -736,34 +916,28 @@ def main():
             f.write(f"  - W_matrix: {w_file}\n")
             f.write(f"  - U_matrix: {u_file}\n\n")
             
-            f.write("PERPLEXITY:\n")
-            f.write(f"  - Perplexity: {perplexity_results['perplexity']:.8f}\n")
-            f.write(f"  - Frasi valutate: {perplexity_results['num_sentences']}\n")
-            f.write(f"  - Parole totali: {perplexity_results['num_words']}\n")
-            f.write(f"  - Loss media/frase: {perplexity_results['avg_loss_per_sentence']:.8f}\n")
-            f.write(f"  - Loss media/parola: {perplexity_results['avg_loss_per_word']:.8f}\n\n")
+            f.write(f"MODALITÀ: {'QUANTUM STATES' if use_quantum_states else 'SENTENCES'}\n")
+            f.write(f"Numero test set: {num_test_sets}\n\n")
             
-            f.write("REGISTRI QUANTISTICI:\n\n")
+            f.write("PERPLEXITY (AGGREGATO):\n")
+            f.write(f"  - PPL media: {avg_ppl:.8f}\n")
+            f.write(f"  - PPL std dev: {std_ppl:.8f}\n")
+            f.write(f"  - Probabilità media (tutti): {avg_prob_all:.8f}\n\n")
             
-            f.write(f"  Registro A (query, {register_stats['n_qubits_A']} qubits):\n")
-            f.write(f"    - Coerenza quantistica: {register_stats['register_A']['has_quantum_coherence']}\n")
-            f.write(f"    - Coefficienti complessi: {register_stats['register_A']['num_complex']}/{register_stats['register_A']['num_total']}\n")
-            f.write(f"    - Entropia: {register_stats['register_A']['entropy']:.4f} bits\n\n")
+            f.write("DETTAGLI PER TEST SET:\n")
+            for i, r in enumerate(all_test_results):
+                f.write(f"\n  Test Set {i+1}:\n")
+                f.write(f"    - Perplexity: {r['perplexity']:.8f}\n")
+                f.write(f"    - Items valutati: {r['num_items']}\n")
+                f.write(f"    - Probabilità media: {r['avg_probability']:.8f}\n")
+                f.write(f"    - Loss totale: {r['total_loss']:.8f}\n")
+                f.write(f"    - Loss media per item: {r['avg_loss_per_item']:.8f}\n")
             
-            f.write(f"  Registro B (key, {register_stats['n_qubits_B']} qubits):\n")
-            f.write(f"    - Coerenza quantistica: {register_stats['register_B']['has_quantum_coherence']}\n")
-            f.write(f"    - Coefficienti complessi: {register_stats['register_B']['num_complex']}/{register_stats['register_B']['num_total']}\n")
-            f.write(f"    - Entropia: {register_stats['register_B']['entropy']:.4f} bits\n\n")
+            f.write("\n" + "=" * 80 + "\n")
+            f.write("REGISTRI QUANTISTICI (ESEMPIO):\n")
+            f.write("=" * 80 + "\n\n")
             
-            f.write(f"  Registro C (ancillae, {register_stats['n_control_qubits']} qubits):\n")
-            f.write(f"    - Coerenza quantistica: {register_stats['register_C']['has_quantum_coherence']}\n")
-            f.write(f"    - Coefficienti complessi: {register_stats['register_C']['num_complex']}/{register_stats['register_C']['num_total']}\n")
-            f.write(f"    - Entropia: {register_stats['register_C']['entropy']:.4f} bits\n\n")
             
-            f.write(f"  Registri A+B combinati (target, {register_stats['n_target_qubits']} qubits):\n")
-            f.write(f"    - Coerenza quantistica: {register_stats['register_AB']['has_quantum_coherence']}\n")
-            f.write(f"    - Coefficienti complessi: {register_stats['register_AB']['num_complex']}/{register_stats['register_AB']['num_total']}\n")
-            f.write(f"    - Entropia: {register_stats['register_AB']['entropy']:.4f} bits\n")
         
         logger.info(f"✓ Summary salvato in: {summary_file}")
         logger.info(f"\n{'=' * 80}")
@@ -773,135 +947,6 @@ def main():
     # Sincronizzazione finale
     comm.Barrier()
     logger.info(f"[RANK {rank}] Terminato")
-    
-    # ==================================================================
-    # SCELTA: Stati Quantistici vs Sentences Testuali
-    # ==================================================================
-    qs_cfg = QUANTUM_STATES_CONFIG
-    use_quantum_states = qs_cfg.get('use_quantum_states', False)
-    
-    if use_quantum_states:
-        # ============================================================
-        # MODALITÀ QUANTUM STATES
-        # ============================================================
-        if rank == 0:
-            logger.info(f"\n[DATA] Modalità: QUANTUM STATES")
-            logger.info(f"[DATA] Generazione nuovi stati quantistici per test...")
-        
-        num_states = qs_cfg.get('num_states', 9)
-        num_qubits_qs = qs_cfg.get('num_qubits', 2)
-        max_time = qs_cfg.get('max_time', 10.0)
-        use_test_mode = qs_cfg.get('use_test_mode', True)
-        
-        if rank == 0:
-            logger.info(f"[DATA] Configurazione:")
-            logger.info(f"[DATA]   - Num stati: {num_states}")
-            logger.info(f"[DATA]   - Num qubits: {num_qubits_qs}")
-            logger.info(f"[DATA]   - Max time: {max_time}")
-            logger.info(f"[DATA]   - Test mode: {use_test_mode}")
-        
-        # Genera NUOVI stati quantistici (diversi dal training)
-        quantum_states = generate_quantum_states(
-            num_states=num_states,
-            num_qubits=num_qubits_qs,
-            max_time=max_time,
-            use_test_mode=use_test_mode
-        )
-        
-        if rank == 0:
-            logger.info(f"[DATA] ✓ Generati {len(quantum_states)} stati quantistici")
-        
-        data_input = quantum_states
-        encoding = None  # Non serve encoding per stati quantistici
-        example_item = quantum_states[0]
-        
-    else:
-        # ============================================================
-        # MODALITÀ SENTENCES
-        # ============================================================
-        if rank == 0:
-            logger.info(f"\n[DATA] Modalità: SENTENCES")
-            logger.info(f"[DATA] Caricamento frasi da PTB...")
-        
-        sentences = get_training_sentences()
-        
-        if rank == 0:
-            logger.info(f"[DATA] ✓ Caricate {len(sentences)} frasi")
-        
-        # Inizializza encoding
-        encoding = Encoding(sentences=sentences, embeddingDim=cfg['embedding_dim'])
-        data_input = sentences
-        example_item = sentences[0]
-    
-    # 1. VALUTA PERPLEXITY
-    if rank == 0:
-        logger.info(f"\n{'=' * 80}")
-        logger.info("FASE 1: VALUTAZIONE PERPLEXITY")
-        logger.info(f"{'=' * 80}\n")
-    
-    perplexity_results = evaluate_perplexity_with_ansatz_matrices(
-        ansatz_V_matrix, ansatz_K_matrix, data_input, encoding, cfg, logger, use_quantum_states
-    )
-    
-    # 2. ANALISI REGISTRI (su un esempio)
-    if rank == 0:
-        logger.info(f"\n{'=' * 80}")
-        logger.info("FASE 2: ANALISI REGISTRI QUANTISTICI")
-        logger.info(f"{'=' * 80}\n")
-    
-    register_stats = analyze_quantum_registers(
-        ansatz_V_matrix, ansatz_K_matrix, example_item, encoding, cfg, logger, timestamp, use_quantum_states
-    )
-    
-    # 3. SALVA SUMMARY FINALE
-    logger.info(f"\n{'=' * 80}")
-    logger.info("SUMMARY FINALE")
-    logger.info(f"{'=' * 80}\n")
-    
-    summary_file = f"evaluation_summary_{timestamp}.txt"
-    with open(summary_file, 'w', encoding='utf-8') as f:
-        f.write("=" * 80 + "\n")
-        f.write("EVALUATION SUMMARY\n")
-        f.write("=" * 80 + "\n\n")
-        
-        f.write(f"Timestamp: {timestamp}\n")
-        f.write(f"Matrici usate:\n")
-        f.write(f"  - W_matrix: {w_file}\n")
-        f.write(f"  - U_matrix: {u_file}\n\n")
-        
-        f.write("PERPLEXITY:\n")
-        f.write(f"  - Perplexity: {perplexity_results['perplexity']:.8f}\n")
-        f.write(f"  - Frasi valutate: {perplexity_results['num_sentences']}\n")
-        f.write(f"  - Parole totali: {perplexity_results['num_words']}\n")
-        f.write(f"  - Loss media/frase: {perplexity_results['avg_loss_per_sentence']:.8f}\n")
-        f.write(f"  - Loss media/parola: {perplexity_results['avg_loss_per_word']:.8f}\n\n")
-        
-        f.write("REGISTRI QUANTISTICI:\n\n")
-        
-        f.write(f"  Registro A (query, {register_stats['n_qubits_A']} qubits):\n")
-        f.write(f"    - Coerenza quantistica: {register_stats['register_A']['has_quantum_coherence']}\n")
-        f.write(f"    - Coefficienti complessi: {register_stats['register_A']['num_complex']}/{register_stats['register_A']['num_total']}\n")
-        f.write(f"    - Entropia: {register_stats['register_A']['entropy']:.4f} bits\n\n")
-        
-        f.write(f"  Registro B (key, {register_stats['n_qubits_B']} qubits):\n")
-        f.write(f"    - Coerenza quantistica: {register_stats['register_B']['has_quantum_coherence']}\n")
-        f.write(f"    - Coefficienti complessi: {register_stats['register_B']['num_complex']}/{register_stats['register_B']['num_total']}\n")
-        f.write(f"    - Entropia: {register_stats['register_B']['entropy']:.4f} bits\n\n")
-        
-        f.write(f"  Registro C (ancillae, {register_stats['n_control_qubits']} qubits):\n")
-        f.write(f"    - Coerenza quantistica: {register_stats['register_C']['has_quantum_coherence']}\n")
-        f.write(f"    - Coefficienti complessi: {register_stats['register_C']['num_complex']}/{register_stats['register_C']['num_total']}\n")
-        f.write(f"    - Entropia: {register_stats['register_C']['entropy']:.4f} bits\n\n")
-        
-        f.write(f"  Registri A+B combinati (target, {register_stats['n_target_qubits']} qubits):\n")
-        f.write(f"    - Coerenza quantistica: {register_stats['register_AB']['has_quantum_coherence']}\n")
-        f.write(f"    - Coefficienti complessi: {register_stats['register_AB']['num_complex']}/{register_stats['register_AB']['num_total']}\n")
-        f.write(f"    - Entropia: {register_stats['register_AB']['entropy']:.4f} bits\n")
-    
-    logger.info(f"✓ Summary salvato in: {summary_file}")
-    logger.info(f"\n{'=' * 80}")
-    logger.info("VALUTAZIONE COMPLETATA!")
-    logger.info(f"{'=' * 80}\n")
 
 
 if __name__ == "__main__":
