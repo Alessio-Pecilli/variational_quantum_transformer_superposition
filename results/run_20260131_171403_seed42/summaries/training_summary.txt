@@ -1,0 +1,30 @@
+total_loss_evaluations=100
+max_loss_evaluations_limit=100
+best_loss_mean=1.63891185
+best_loss_seen=1.63891185
+n_params_total=4576
+n_params_quantum=480
+n_params_embedding=0
+n_params_rotation=0
+n_params_projection=4096
+param_shape_half=(5, 2, 2, 4, 3)
+projection_shape=(4, 1024)
+maxiter=150, tol=1e-05
+
+# Stopping Configuration (HARD CONSTRAINTS)
+early_stopping=DISABLED
+stopping_criterion=ONLY at 100 loss evaluations
+patience=DISABLED
+delta_checks=DISABLED
+
+# Optimization Results
+stopped_at_max_evaluations=True
+stop_reason=Reached max 100 loss evaluations
+actual_iterations=86
+mpi_size=100, sentences=100
+
+# Test Data Perplexity
+eval_sentences_used=100/100
+eval_avg_loss_per_sentence=1.62662536
+eval_avg_loss_per_word=nan
+eval_perplexity=5.08756652
