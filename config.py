@@ -2,6 +2,14 @@
 Configuration settings for quantum optimization experiments.
 """
 
+from pathlib import Path
+
+# Test-only mode settings
+TEST_ONLY_CONFIG = {
+    'skip_training': False,  # True = salta training e carica matrici pre-addestrate
+    'matrices_dir': Path.cwd(),  # Directory con le matrici (default: cartella corrente)
+}
+
 # Optimization settings
 OPTIMIZATION_CONFIG = {
     'num_iterations': 20,      # RIDOTTO per test veloce (era 150)

@@ -1305,6 +1305,97 @@ def main():
 
     logger = setup_logging(rank)
     cfg = OPTIMIZATION_CONFIG
+    
+    # ============================================================
+    # TEST-ONLY MODE: Skip training e carica matrici pre-addestrate
+    # ============================================================
+    from config import TEST_ONLY_CONFIG
+    if TEST_ONLY_CONFIG.get('skip_training', False):
+        if rank == 0:
+            logger.info("\n" + "="*80)
+            logger.info("=== TEST-ONLY MODE: SKIP TRAINING ===")
+            logger.info("="*80)
+            
+            matrices_dir = Path(TEST_ONLY_CONFIG.get('matrices_dir', Path.cwd()))
+            logger.info(f"[TEST-ONLY] Caricamento matrici da: {matrices_dir}")
+            
+            # Verifica che esistano tutti i file necessari
+            required_files = [
+                'best_params_native.npy', 'E_matrix.npy', 'F_matrix.npy',
+                'U_matrix.npy', 'V_rotation.npy', 'W_matrix.npy', 'metadata.npy'
+            ]
+            
+            missing_files = [f for f in required_files if not (matrices_dir / f).exists()]
+            if missing_files:
+                logger.error(f"[TEST-ONLY] File mancanti: {missing_files}")
+                logger.error(f"[TEST-ONLY] Verifica che i file siano in: {matrices_dir}")
+                return 1
+            
+            # Carica matrici
+            try:
+                best_params_native = np.load(matrices_dir / 'best_params_native.npy')
+                E_matrix = np.load(matrices_dir / 'E_matrix.npy')
+                F_matrix = np.load(matrices_dir / 'F_matrix.npy')
+                U_matrix = np.load(matrices_dir / 'U_matrix.npy')
+                V_rotation = np.load(matrices_dir / 'V_rotation.npy')
+                W_matrix = np.load(matrices_dir / 'W_matrix.npy')
+                metadata = np.load(matrices_dir / 'metadata.npy', allow_pickle=True).item()
+                
+                logger.info(f"[TEST-ONLY] ✓ Matrici caricate:")
+                logger.info(f"[TEST-ONLY]   - best_params_native: {best_params_native.shape}")
+                logger.info(f"[TEST-ONLY]   - U_matrix: {U_matrix.shape}")
+                logger.info(f"[TEST-ONLY]   - W_matrix: {W_matrix.shape}")
+                logger.info(f"[TEST-ONLY]   - E_matrix: {E_matrix.shape}")
+                logger.info(f"[TEST-ONLY]   - F_matrix: {F_matrix.shape}")
+                logger.info(f"[TEST-ONLY]   - V_rotation: {V_rotation.shape}")
+                logger.info(f"[TEST-ONLY]   - Metadata: {metadata}")
+                
+                # Crea una finta run_dir con le matrici caricate
+                ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                results_dir = Path("results")
+                results_dir.mkdir(exist_ok=True)
+                run_id = f"test_only_{ts}"
+                run_dir = results_dir / run_id
+                run_dir.mkdir(exist_ok=True)
+                matrices_subdir = run_dir / "matrices"
+                matrices_subdir.mkdir(exist_ok=True)
+                
+                # Copia le matrici nella sottocartella per compatibilità con run_3fold_cross_validation
+                np.save(matrices_subdir / "best_params_native.npy", best_params_native)
+                np.save(matrices_subdir / "E_matrix.npy", E_matrix)
+                np.save(matrices_subdir / "F_matrix.npy", F_matrix)
+                np.save(matrices_subdir / "U_matrix.npy", U_matrix)
+                np.save(matrices_subdir / "V_rotation.npy", V_rotation)
+                np.save(matrices_subdir / "W_matrix.npy", W_matrix)
+                np.save(matrices_subdir / "metadata.npy", metadata)
+                
+                logger.info(f"[TEST-ONLY] ✓ Matrici copiate in: {matrices_subdir}")
+                
+                # Esegui direttamente la 3-fold cross-validation
+                logger.info(f"[TEST-ONLY] Inizio 3-fold cross-validation...")
+                
+                # SOLO frasi testuali (come specificato)
+                use_quantum_states = False
+                
+                cv_results = run_3fold_cross_validation(
+                    run_dir, cfg, logger, use_quantum_states=use_quantum_states
+                )
+                
+                logger.info(f"[TEST-ONLY] ✓ Cross-validation completata: {len(cv_results)} folds")
+                logger.info("\n" + "="*80)
+                logger.info("=== TEST-ONLY MODE COMPLETATO ===")
+                logger.info("="*80)
+                
+                return 0
+                
+            except Exception as e:
+                logger.error(f"[TEST-ONLY] Errore nel caricamento/test: {e}")
+                logger.error(traceback.format_exc())
+                return 1
+        else:
+            # Rank != 0: aspetta e termina
+            comm.Barrier()
+            return 0
 
     try:
         # ==================================================================
@@ -1590,30 +1681,7 @@ def main():
                 logger.error(traceback.format_exc())
         else:
             logger.info("[ANCILLAE] ⏭ Skip analisi ancillae (modalità FRASI TESTUALI)")
-        
-        # ============================================================
-        # VALUTAZIONE PERPLEXITY (CRUCIALE - UNA SOLA VOLTA)
-        # ============================================================
-        logger.info("[EVAL] Inizio valutazione perplexity...")
-        eval_metrics = None
-        try:
-            if not use_quantum_states:
-                eval_metrics = evaluate_perplexity_on_new_sentences(
-                    best_params_native, cfg, logger
-                )
-            else:
-                # Valuta perplexity con NUOVI stati quantistici
-                eval_metrics = evaluate_perplexity_on_quantum_states(
-                    best_params_native, cfg, logger
-                )
-            
-            if eval_metrics:
-                logger.info(f"[EVAL] ✓ Perplexity calcolata: {eval_metrics['perplexity']:.6f}")
-            else:
-                logger.warning("[EVAL] ✗ Nessuna metrica disponibile")
-        except Exception as e:
-            logger.error(f"[EVAL] ✗ Errore nel calcolo perplexity: {e}")
-            logger.error(traceback.format_exc())
+    
         
         # ============================================================
         # 3-FOLD CROSS VALIDATION (POST-TRAINING)
