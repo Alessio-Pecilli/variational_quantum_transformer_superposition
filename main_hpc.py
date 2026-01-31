@@ -52,6 +52,12 @@ from encoding import Encoding
 from optimization import get_params
 from generalized_quantum_circuits import GeneralizedQuantumCircuitBuilder
 from quantum_utils import clear_memory
+from quantum_projection import (
+    QuantumStateProjector,
+    create_projector_from_config,
+    get_projection_shape,
+    get_projection_param_count,
+)
 
 from scipy.optimize import minimize
 
@@ -124,31 +130,63 @@ def get_rotation_shape(cfg):
     embedding_dim = cfg['embedding_dim']
     return (embedding_dim, embedding_dim)
 
-def get_param_counts(params_shape, embedding_shape=None, rotation_shape=None):
+def get_param_counts(params_shape, embedding_shape=None, rotation_shape=None, projection_shape=None):
+    """
+    Calculate parameter counts for all trainable matrices.
+    
+    Args:
+        params_shape: Shape for quantum circuit params (U, W)
+        embedding_shape: Shape for E matrix (vocab_size, embedding_dim) - text mode
+        rotation_shape: Shape for V matrix (embedding_dim, embedding_dim) - text mode
+        projection_shape: Shape for P matrix (target_dim, source_dim) - quantum mode
+    
+    Returns:
+        Tuple of (n_quantum, n_embedding, n_rotation, n_projection)
+    """
     n_quantum = 2 * int(np.prod(params_shape))
     n_embedding = int(np.prod(embedding_shape)) if embedding_shape else 0
     n_rotation = int(np.prod(rotation_shape)) if rotation_shape else 0
-    return n_quantum, n_embedding, n_rotation
+    n_projection = int(np.prod(projection_shape)) if projection_shape else 0
+    return n_quantum, n_embedding, n_rotation, n_projection
 
-def split_total_params(params_native, params_shape, embedding_shape=None, rotation_shape=None):
-    n_quantum, n_embedding, n_rotation = get_param_counts(
-        params_shape, embedding_shape, rotation_shape
+def split_total_params(params_native, params_shape, embedding_shape=None, rotation_shape=None, projection_shape=None):
+    """
+    Split total parameter vector into components.
+    
+    For TEXT mode (use_quantum_states=False):
+        params_quantum (U, W) + raw_embedding (E) + raw_rotation (V)
+        
+    For QUANTUM mode (use_quantum_states=True, use_projection=True):
+        params_quantum (U, W) + raw_projection (P)
+    
+    Returns:
+        (params_quantum, raw_embedding, raw_rotation, raw_projection)
+    """
+    n_quantum, n_embedding, n_rotation, n_projection = get_param_counts(
+        params_shape, embedding_shape, rotation_shape, projection_shape
     )
-    expected = n_quantum + n_embedding + n_rotation
+    expected = n_quantum + n_embedding + n_rotation + n_projection
     if params_native.size != expected:
         raise ValueError(
-            f"Total parameter vector mismatch: expected {expected}, got {params_native.size}."
+            f"Total parameter vector mismatch: expected {expected}, got {params_native.size}. "
+            f"(n_quantum={n_quantum}, n_embedding={n_embedding}, n_rotation={n_rotation}, n_projection={n_projection})"
         )
     params_quantum = params_native[:n_quantum]
     raw_embedding = None
     raw_rotation = None
+    raw_projection = None
     offset = n_quantum
+    
     if n_embedding:
         raw_embedding = params_native[offset:offset + n_embedding].reshape(embedding_shape)
         offset += n_embedding
     if n_rotation:
         raw_rotation = params_native[offset:offset + n_rotation].reshape(rotation_shape)
-    return params_quantum, raw_embedding, raw_rotation
+        offset += n_rotation
+    if n_projection:
+        raw_projection = params_native[offset:offset + n_projection].reshape(projection_shape)
+    
+    return params_quantum, raw_embedding, raw_rotation, raw_projection
 
 # ---------------------------------------------------------------------
 # Utility: PPL quantistica (Renyi-1/2)
@@ -175,9 +213,22 @@ def calculate_quantum_ppl(probabilities):
 # ---------------------------------------------------------------------
 # Loss su UNA frase, dato theta nativo
 # ---------------------------------------------------------------------
-def loss_for_sentence(sentence_idx, sentence, encoding, params_quantum, cfg, states=None):
-    # states, U, Z per la frase
+def loss_for_sentence(sentence_idx, sentence, encoding, params_quantum, cfg, states=None, projector=None):
+    """
+    Calculate loss for a single sentence/sequence.
     
+    Args:
+        sentence_idx: Index of sentence
+        sentence: Text sentence (for text mode)
+        encoding: Encoding instance (for text mode)
+        params_quantum: Quantum circuit parameters
+        cfg: Configuration dict
+        states: Pre-computed quantum states (for quantum mode)
+        projector: QuantumStateProjector instance (for quantum mode with projection)
+    
+    Returns:
+        Loss value (float)
+    """
     mem = psutil.Process().memory_info().rss / 1024**3
     print(f"[Rank {MPI.COMM_WORLD.Get_rank()}] Memoria attuale: {mem:.2f} GB")
 
@@ -193,6 +244,16 @@ def loss_for_sentence(sentence_idx, sentence, encoding, params_quantum, cfg, sta
             targets_from_F = len(targets) > 0
             print(f"[MATRIX USAGE] Targets estratti da F (outputEmbeddingMatrix): shape={F_shape}, num_targets={len(targets)}")
     else:
+        # QUANTUM MODE: Se abbiamo un projector, proietta gli stati
+        if projector is not None:
+            # states è una lista o array di stati ad alta dimensione (2^D)
+            # Convertiamo in array se lista
+            states_array = np.array(states) if isinstance(states, list) else states
+            # Proietta ogni stato da 2^D a 2^d
+            projected_states = projector.project_sequence(states_array)
+            # Converti in lista per process_sentence_states
+            states = list(projected_states)
+            print(f"[PROJECTION] Proiezione P applicata: {states_array.shape} -> {projected_states.shape}")
         targets = None
     
     states_calculated, U, Z = process_sentence_states(states, targets=targets)
@@ -262,7 +323,29 @@ def distributed_objective_factory(
     rotation_shape,
     log_frequency,
     quantum_states=None,
+    projection_shape=None,
+    projector=None,
 ):
+    """
+    Factory for distributed objective function.
+    
+    Args:
+        comm: MPI communicator
+        rank: MPI rank
+        size: MPI size
+        sentences_split: Split of sentences per rank
+        encoding: Encoding instance (text mode)
+        low, high: Parameter bounds
+        cfg: Configuration
+        logger: Logger instance
+        params_shape: Shape for quantum params
+        embedding_shape: Shape for E matrix (text mode)
+        rotation_shape: Shape for V matrix (text mode)
+        log_frequency: Logging frequency
+        quantum_states: Quantum states array (quantum mode)
+        projection_shape: Shape for P matrix (quantum mode)
+        projector: QuantumStateProjector instance (quantum mode)
+    """
     tagbuf = np.array([0], dtype=np.int32)  # 1=EVAL, 2=STOP
     
     # Per salvare la storia delle loss (solo su rank 0 sarà popolata)
@@ -337,9 +420,18 @@ def distributed_objective_factory(
 
         # Ogni rank: descala e calcola sum loss locale
         params_native = descale_from_unit(y_scaled, low, high)
-        params_quantum, raw_embedding, raw_rotation = split_total_params(
-            params_native, params_shape, embedding_shape, rotation_shape
+        params_quantum, raw_embedding, raw_rotation, raw_projection = split_total_params(
+            params_native, params_shape, embedding_shape, rotation_shape, projection_shape
         )
+        
+        # Se abbiamo P (modalità quantum con proiezione), imposta nel projector
+        local_projector = None
+        if projector is not None and raw_projection is not None:
+            projector.set_params(raw_projection.flatten())
+            local_projector = projector
+            if log_frequency and current_eval % log_frequency == 0:
+                logger.info(f"[PROJECTION] P matrix set: shape={raw_projection.shape}, norm={np.linalg.norm(raw_projection):.4f}")
+        
         if encoding is not None and raw_embedding is not None and raw_rotation is not None:
             encoding.set_embedding_matrix(
                 raw_embedding, rotation_matrix=raw_rotation, isometrize=True
@@ -399,7 +491,10 @@ def distributed_objective_factory(
                 else:
                     states_to_use = None
                     
-                loss = loss_for_sentence(local_pos, sentence, encoding, params_quantum, cfg, states=states_to_use)
+                loss = loss_for_sentence(
+                    local_pos, sentence, encoding, params_quantum, cfg, 
+                    states=states_to_use, projector=local_projector
+                )
                 if np.isfinite(loss):
                     local_sum += loss
                     local_cnt += 1.0
@@ -505,9 +600,16 @@ def distributed_objective_factory(
                 comm.Bcast([y_scaled, MPI.DOUBLE], root=0)
 
                 params_native = descale_from_unit(y_scaled, low, high)
-                params_quantum, raw_embedding, raw_rotation = split_total_params(
-                    params_native, params_shape, embedding_shape, rotation_shape
+                params_quantum, raw_embedding, raw_rotation, raw_projection = split_total_params(
+                    params_native, params_shape, embedding_shape, rotation_shape, projection_shape
                 )
+                
+                # Se abbiamo P (modalità quantum con proiezione), imposta nel projector
+                local_projector = None
+                if projector is not None and raw_projection is not None:
+                    projector.set_params(raw_projection.flatten())
+                    local_projector = projector
+                
                 if encoding is not None and raw_embedding is not None and raw_rotation is not None:
                     encoding.set_embedding_matrix(
                         raw_embedding, rotation_matrix=raw_rotation, isometrize=True
@@ -526,7 +628,10 @@ def distributed_objective_factory(
                         else:
                             states_to_use = None
                             
-                        loss = loss_for_sentence(local_pos, sentence, encoding, params_quantum, cfg, states=states_to_use)
+                        loss = loss_for_sentence(
+                            local_pos, sentence, encoding, params_quantum, cfg, 
+                            states=states_to_use, projector=local_projector
+                        )
                         if np.isfinite(loss):
                             local_sum += loss
                             local_cnt += 1.0
@@ -660,12 +765,23 @@ def evaluate_perplexity_on_new_sentences(best_params_native, cfg, logger):
     }
 
 
-def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_instance=None):
+def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_instance=None, 
+                      projection_shape=None, embedding_shape=None, rotation_shape=None):
     """
-    Salva TUTTE e 4 le matrici: U, W, E, F con run_id univoco.
+    Salva TUTTE le matrici: U, W, E, F e P (se quantum states mode) con run_id univoco.
     
     Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
     Formula PPL: exp(L)
+    
+    Args:
+        best_params_native: Parametri ottimizzati (include P se projection_shape è fornito)
+        cfg: Configurazione
+        logger: Logger
+        timestamp: Timestamp per run_id
+        encoding_instance: Istanza encoding (per text mode)
+        projection_shape: Shape della matrice P (target_dim, source_dim) per quantum states mode
+        embedding_shape: Shape della matrice E (vocab_size, embedding_dim) - opzionale, dedotto se None
+        rotation_shape: Shape della matrice V (embedding_dim, 2^num_qubits) - opzionale, dedotto se None
     """
     from layer import AnsatzBuilder
     from qiskit.quantum_info import Operator
@@ -691,12 +807,16 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
     num_layers = cfg['num_layers']
     num_qubits = cfg['num_qubits']
     params_shape = get_params(num_qubits, num_layers).shape
-    embedding_shape = get_embedding_shape(encoding_instance, cfg) if encoding_instance else None
-    rotation_shape = get_rotation_shape(cfg) if embedding_shape else None
     
-    # Split parametri
-    params_quantum, raw_embedding, raw_rotation = split_total_params(
-        best_params_native, params_shape, embedding_shape, rotation_shape
+    # Se embedding_shape non è passato esplicitamente, deducilo da encoding_instance
+    if embedding_shape is None:
+        embedding_shape = get_embedding_shape(encoding_instance, cfg) if encoding_instance else None
+    if rotation_shape is None:
+        rotation_shape = get_rotation_shape(cfg) if embedding_shape else None
+    
+    # Split parametri (con supporto per proiezione)
+    params_quantum, raw_embedding, raw_rotation, raw_projection = split_total_params(
+        best_params_native, params_shape, embedding_shape, rotation_shape, projection_shape
     )
     
     n_params_half = int(np.prod(params_shape))
@@ -709,10 +829,13 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
     U_matrix = Operator(ansatz_v.get_ansatz()).data
     W_matrix = Operator(ansatz_k.get_ansatz()).data
     
-    # E e F da encoding
+    # E e F da encoding (text mode)
     E_matrix = raw_embedding if raw_embedding is not None else np.array([])
     V_rotation = raw_rotation if raw_rotation is not None else np.array([])
     F_matrix = E_matrix @ V_rotation if (raw_embedding is not None and raw_rotation is not None) else np.array([])
+    
+    # P matrix per quantum states mode
+    P_matrix = raw_projection.reshape(projection_shape) if raw_projection is not None and projection_shape is not None else np.array([])
     
     # Salva matrici nella sottocartella
     np.save(matrices_dir / "U_matrix.npy", U_matrix)
@@ -720,6 +843,7 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
     np.save(matrices_dir / "E_matrix.npy", E_matrix)
     np.save(matrices_dir / "F_matrix.npy", F_matrix)
     np.save(matrices_dir / "V_rotation.npy", V_rotation)
+    np.save(matrices_dir / "P_matrix.npy", P_matrix)
     
     # SALVA ANCHE I PARAMETRI THETA per riutilizzarli nel test!
     np.save(matrices_dir / "best_params_native.npy", best_params_native)
@@ -730,9 +854,12 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
     logger.info(f"[SAVE] E shape: {E_matrix.shape} -> {matrices_dir / 'E_matrix.npy'}")
     logger.info(f"[SAVE] F shape: {F_matrix.shape} -> {matrices_dir / 'F_matrix.npy'}")
     logger.info(f"[SAVE] V_rotation shape: {V_rotation.shape} -> {matrices_dir / 'V_rotation.npy'}")
+    logger.info(f"[SAVE] P shape: {P_matrix.shape} -> {matrices_dir / 'P_matrix.npy'}")
     logger.info(f"[SAVE] Parametri theta: {best_params_native.shape} -> {matrices_dir / 'best_params_native.npy'}")
     
     # Salva metadata
+    use_quantum_states = cfg.get('use_quantum_states', False)
+    qs_cfg = cfg.get('quantum_states_config', {})
     metadata = {
         'run_id': run_id,
         'timestamp': timestamp,
@@ -743,7 +870,12 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
         'U_shape': U_matrix.shape,
         'W_shape': W_matrix.shape,
         'E_shape': E_matrix.shape,
-        'F_shape': F_matrix.shape
+        'F_shape': F_matrix.shape,
+        'P_shape': P_matrix.shape if P_matrix.size > 0 else None,
+        'use_quantum_states': use_quantum_states,
+        'source_qubits': qs_cfg.get('source_qubits', None),
+        'target_qubits': qs_cfg.get('target_qubits', None),
+        'use_projection': qs_cfg.get('use_projection', False)
     }
     np.save(matrices_dir / "metadata.npy", metadata)
     logger.info(f"[SAVE] Metadata salvato")
@@ -890,7 +1022,24 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
     logger.info(f"  Total parameters: {best_params_native.size}")
     logger.info(f"  U parameters (Query): {params_v.size} (shape: {params_v.shape})")
     logger.info(f"  W parameters (Key): {params_k.size} (shape: {params_k.shape})")
-    if extra_params > 0:
+    
+    # Determina se siamo in quantum mode con proiezione
+    use_quantum_states = QUANTUM_STATES_CONFIG.get('use_quantum_states', False)
+    use_projection = QUANTUM_STATES_CONFIG.get('use_projection', False)
+    
+    if use_quantum_states and use_projection:
+        # QUANTUM MODE: mostra P invece di E/V
+        source_qubits = QUANTUM_STATES_CONFIG.get('source_qubits', 10)
+        target_qubits = QUANTUM_STATES_CONFIG.get('target_qubits', 2)
+        source_dim = 2 ** source_qubits
+        target_dim = 2 ** target_qubits
+        projection_params = target_dim * source_dim
+        logger.info(f"  P parameters (Projection): {projection_params}")
+        logger.info(f"  P shape: {target_dim} x {source_dim} (2^{target_qubits} x 2^{source_qubits})")
+        logger.info(f"  E parameters: 0 (not used in quantum mode)")
+        logger.info(f"  V parameters: 0 (not used in quantum mode)")
+    elif extra_params > 0:
+        # TEXT MODE: mostra E e V
         logger.info(f"  E parameters (Embedding): {embedding_params}")
         logger.info(f"  V parameters (Rotation): {rotation_params}")
         if embedding_params > 0 and embedding_params % embedding_dim == 0:
@@ -901,7 +1050,7 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
     # 5) QUANTUM REGISTERS CONFIGURATION
     logger.info(f"\n[QUANTUM REGISTERS]")
     embedding_dim = cfg.get('embedding_dim', 4)
-    sentence_length = 9
+    sentence_length = cfg.get('max_time', 5)  # Parole per frase
     
     n_target_qubits = int(np.ceil(np.log2(embedding_dim * embedding_dim)))
     n_control_qubits = int(np.ceil(np.log2(sentence_length)))
@@ -974,6 +1123,7 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     E_matrix = np.load(matrices_dir / "E_matrix.npy")
     F_matrix = np.load(matrices_dir / "F_matrix.npy")
     V_rotation = np.load(matrices_dir / "V_rotation.npy")
+    P_matrix = np.load(matrices_dir / "P_matrix.npy") if (matrices_dir / "P_matrix.npy").exists() else np.array([])
     best_params_native = np.load(matrices_dir / "best_params_native.npy")
     metadata = np.load(matrices_dir / "metadata.npy", allow_pickle=True).item()
     
@@ -982,8 +1132,23 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     logger.info(f"[CV] ✓ E caricata: {E_matrix.shape}")
     logger.info(f"[CV] ✓ F caricata: {F_matrix.shape}")
     logger.info(f"[CV] ✓ V_rotation caricata: {V_rotation.shape}")
+    logger.info(f"[CV] ✓ P caricata: {P_matrix.shape}")
     logger.info(f"[CV] ✓ Parametri theta caricati: {best_params_native.shape}")
     logger.info(f"[CV] Run ID: {metadata['run_id']}")
+    
+    # Setup del projector se in quantum states mode con proiezione
+    projector = None
+    if use_quantum_states and P_matrix.size > 0:
+        from quantum_projection import QuantumStateProjector
+        projection_shape = P_matrix.shape
+        projector = QuantumStateProjector(
+            source_dim=projection_shape[1],
+            target_dim=projection_shape[0]
+        )
+        projector.set_params(P_matrix.flatten())
+        logger.info(f"[CV] ✓ Projector configurato: {projection_shape[1]} -> {projection_shape[0]}")
+    else:
+        projection_shape = None
     
     # Configurazione da DATASET_CONFIG
     from config import DATASET_CONFIG
@@ -997,7 +1162,9 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
         from quantum_annealing import generate_quantum_states
         qs_cfg = QUANTUM_STATES_CONFIG
         num_states = min(max_test_sentences, qs_cfg.get('num_states', 9))
-        num_qubits_qs = qs_cfg.get('num_qubits', 2)
+        # Usa source_qubits se c'è proiezione, altrimenti num_qubits
+        use_projection_qs = qs_cfg.get('use_projection', False) and P_matrix.size > 0
+        num_qubits_qs = qs_cfg.get('source_qubits', qs_cfg.get('num_qubits', 2)) if use_projection_qs else qs_cfg.get('num_qubits', 2)
         # max_time determina il numero di "parole" (stati temporali)
         max_time = sentence_length  # Usa sentence_length da config
         
@@ -1005,7 +1172,7 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
         hilbert_dim = 2 ** num_qubits_qs
         test_sentences_all = []
         
-        logger.info(f"[CV] Generazione {num_states} stati quantistici test (max_time={max_time})")
+        logger.info(f"[CV] Generazione {num_states} stati quantistici test (D={num_qubits_qs}, max_time={max_time})")
         
         for i in range(num_states):
             random_real = rng.standard_normal(hilbert_dim)
@@ -1085,8 +1252,8 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
         embedding_shape = (E_matrix.shape[0], E_matrix.shape[1]) if E_matrix.size > 0 else None
         rotation_shape = (V_rotation.shape[0], V_rotation.shape[1]) if V_rotation.size > 0 else None
         
-        params_quantum, _, _ = split_total_params(
-            best_params_native, params_shape, embedding_shape, rotation_shape
+        params_quantum, _, _, _ = split_total_params(
+            best_params_native, params_shape, embedding_shape, rotation_shape, projection_shape
         )
         
         # Calcola LOSS REALE per ogni frase usando TUTTE le matrici addestrate
@@ -1102,7 +1269,8 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
                     encoding if not use_quantum_states else None, 
                     params_quantum,  # USA parametri quantum REALI (da U e W)
                     cfg, 
-                    states=qstates
+                    states=qstates,
+                    projector=projector  # Passa projector per stati quantistici
                 )
                 if np.isfinite(loss_val):
                     fold_losses.append(loss_val)
@@ -1417,7 +1585,12 @@ def main():
             qs_cfg = QUANTUM_STATES_CONFIG
             num_quantum_sentences = qs_cfg.get('num_states', 9)  # N "frasi quantistiche"
             sentence_length_quantum = int(qs_cfg.get('max_time', 10))  # M "parole" per frase
-            num_qubits_qs = qs_cfg.get('num_qubits', 2)
+            
+            # Supporto per proiezione: usa source_qubits se abilitata
+            use_projection_qs = qs_cfg.get('use_projection', False)
+            source_qubits = qs_cfg.get('source_qubits', 10)  # D = qubit sorgente (default 10)
+            target_qubits = qs_cfg.get('target_qubits', qs_cfg.get('num_qubits', 2))  # d = qubit target
+            num_qubits_qs = source_qubits if use_projection_qs else qs_cfg.get('num_qubits', 2)
             use_test_mode = qs_cfg.get('use_test_mode', True)
             
             if rank == 0:
@@ -1426,7 +1599,12 @@ def main():
                 logger.info(f"[QUANTUM] ========================================")
                 logger.info(f"[QUANTUM] Frasi quantistiche (num_states): {num_quantum_sentences}")
                 logger.info(f"[QUANTUM] Parole per frase (max_time): {sentence_length_quantum}")
-                logger.info(f"[QUANTUM] Dimensione Hilbert: 2^{num_qubits_qs} = {2**num_qubits_qs}")
+                if use_projection_qs:
+                    logger.info(f"[QUANTUM] ✓ PROIEZIONE ABILITATA: {source_qubits} qubit -> {target_qubits} qubit")
+                    logger.info(f"[QUANTUM] Dimensione Hilbert sorgente: 2^{source_qubits} = {2**source_qubits}")
+                    logger.info(f"[QUANTUM] Dimensione Hilbert target: 2^{target_qubits} = {2**target_qubits}")
+                else:
+                    logger.info(f"[QUANTUM] Dimensione Hilbert: 2^{num_qubits_qs} = {2**num_qubits_qs}")
                 logger.info(f"[QUANTUM] MPI ranks: {size}")
                 logger.info(f"[QUANTUM] Frasi per rank: ~{num_quantum_sentences // size}")
             
@@ -1506,10 +1684,32 @@ def main():
         params_shape = get_params(cfg['num_qubits'], cfg['num_layers']).shape
         embedding_shape = get_embedding_shape(encoding_local, cfg)
         rotation_shape = get_rotation_shape(cfg) if embedding_shape is not None else None
-        n_params_quantum, n_params_embedding, n_params_rotation = get_param_counts(
-            params_shape, embedding_shape, rotation_shape
+        
+        # Setup proiezione per quantum states mode
+        projection_shape = None
+        projector = None
+        if use_quantum_states:
+            from quantum_projection import create_projector_from_config, get_projection_shape
+            projection_shape = get_projection_shape(QUANTUM_STATES_CONFIG)
+            if projection_shape is not None:
+                projector = create_projector_from_config(QUANTUM_STATES_CONFIG)
+                if rank == 0:
+                    logger.info(f"[PROJECTION] ✓ Projector creato: {projection_shape[1]} -> {projection_shape[0]}")
+                
+                # In quantum states mode con proiezione:
+                # - P fa il lavoro di E (proietta stati → embedding)
+                # - E non serve (non ci sono parole)
+                # - V non serve (gli stati proiettati sono già i target)
+                # embedding_shape e rotation_shape restano None
+                
+                if rank == 0:
+                    logger.info(f"[QUANTUM] P sostituisce E (embedding): {projection_shape}")
+                    logger.info(f"[QUANTUM] V non serve in quantum mode (target = stati proiettati)")
+        
+        n_params_quantum, n_params_embedding, n_params_rotation, n_params_projection = get_param_counts(
+            params_shape, embedding_shape, rotation_shape, projection_shape
         )
-        n_params = n_params_quantum + n_params_embedding + n_params_rotation
+        n_params = n_params_quantum + n_params_embedding + n_params_rotation + n_params_projection
 
         low, high = get_param_bounds(n_params)
 
@@ -1519,7 +1719,7 @@ def main():
             y0 = rng.uniform(-1.0, 1.0, size=n_params)  # nello spazio [-1,1]
             logger.info(
                 f"Parametri: quantum={n_params_quantum} embed={n_params_embedding} "
-                f"rot={n_params_rotation} tot={n_params} shape_half={params_shape}"
+                f"rot={n_params_rotation} proj={n_params_projection} tot={n_params} shape_half={params_shape}"
             )
 
         # Prepara objective distribuito
@@ -1536,7 +1736,9 @@ def main():
         objective, stop_workers, worker_loop, loss_history, best_params_tracker = distributed_objective_factory(
             comm, rank, size, sentences_split, encoding_local, low, high, cfg, logger,
             params_shape, embedding_shape, rotation_shape, cfg.get('log_frequency', 10),
-            quantum_states=quantum_states if use_quantum_states else None
+            quantum_states=quantum_states if use_quantum_states else None,
+            projection_shape=projection_shape,
+            projector=projector
         )
 
         # Rank non-zero: entra nel loop worker e resta in ascolto
@@ -1650,13 +1852,17 @@ def main():
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         # ============================================================
-        # SALVATAGGIO TUTTE LE MATRICI U, W, E, F (CRUCIALE)
+        # SALVATAGGIO TUTTE LE MATRICI U, W, E, F, P (CRUCIALE)
         # ============================================================
-        logger.info("[SAVE] Inizio salvataggio TUTTE le matrici U, W, E, F...")
+        logger.info("[SAVE] Inizio salvataggio TUTTE le matrici U, W, E, F, P...")
         run_dir = None
         try:
             run_dir = save_all_matrices(
-                best_params_native, cfg, logger, ts, encoding_instance=encoding_local
+                best_params_native, cfg, logger, ts, 
+                encoding_instance=encoding_local,
+                projection_shape=projection_shape,
+                embedding_shape=embedding_shape,
+                rotation_shape=rotation_shape
             )
             logger.info(f"[SAVE] ✓ Tutte le matrici salvate in: {run_dir}")
         except Exception as e:
@@ -1664,23 +1870,10 @@ def main():
             logger.error(traceback.format_exc())
         
         # ============================================================
-        # ANALISI STATO ANCILLAE (REGISTRO C) - SOLO PER QUANTUM STATES
+        # ANALISI STATO ANCILLAE (REGISTRO C) - SKIPPATA
         # ============================================================
         ancillae_stats = None
-        if use_quantum_states:
-            logger.info("[ANCILLAE] Inizio analisi registro C (ancillae)...")
-            try:
-                ancillae_stats = analyze_ancillae_state(
-                    best_params_native, cfg, logger, ts
-                )
-                logger.info(f"[ANCILLAE] ✓ Analisi completata!")
-                logger.info(f"[ANCILLAE] Coerenza quantistica: {ancillae_stats['has_quantum_coherence']}")
-                logger.info(f"[ANCILLAE] Coefficienti complessi: {ancillae_stats['num_complex']}/{ancillae_stats['num_total']}")
-            except Exception as e:
-                logger.error(f"[ANCILLAE] ✗ Errore nell'analisi ancillae: {e}")
-                logger.error(traceback.format_exc())
-        else:
-            logger.info("[ANCILLAE] ⏭ Skip analisi ancillae (modalità FRASI TESTUALI)")
+        logger.info("[ANCILLAE] ⏭ Analisi registro C skippata (disabilitata)")
     
         
         # ============================================================
@@ -1704,6 +1897,17 @@ def main():
         # ============================================================
         # Get best loss from tracker
         tracker_best_loss = best_params_tracker.get('loss', best_f)
+        
+        # eval_metrics dovrebbe essere calcolato dalla CV, per ora None
+        eval_metrics = None
+        if 'cv_results' in locals() and cv_results:
+            # Estrai metriche aggregate dalla CV
+            eval_metrics = {
+                'num_sentences': sum(r.get('num_sentences', 0) for r in cv_results),
+                'used_sentences': sum(r.get('num_sentences', 0) for r in cv_results),
+                'avg_loss_per_sentence': np.mean([r.get('loss', float('nan')) for r in cv_results if np.isfinite(r.get('loss', float('nan')))]),
+                'perplexity': np.mean([r.get('ppl', float('nan')) for r in cv_results if np.isfinite(r.get('ppl', float('nan')))])
+            }
         
         print_final_training_summary(
             best_params_native=best_params_native,
@@ -1753,7 +1957,10 @@ def main():
             f.write(f"n_params_quantum={n_params_quantum}\n")
             f.write(f"n_params_embedding={n_params_embedding}\n")
             f.write(f"n_params_rotation={n_params_rotation}\n")
+            f.write(f"n_params_projection={n_params_projection}\n")
             f.write(f"param_shape_half={params_shape}\n")
+            if projection_shape is not None:
+                f.write(f"projection_shape={projection_shape}\n")
             f.write(f"maxiter={MAXITER_PER_RUN}, tol={TOL}\n")
             f.write("\n# Stopping Configuration (HARD CONSTRAINTS)\n")
             f.write(f"early_stopping=DISABLED\n")

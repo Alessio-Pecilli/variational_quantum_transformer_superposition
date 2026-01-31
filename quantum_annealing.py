@@ -70,6 +70,210 @@ class PauliOperators:
         return PauliOperators.tensor_product(*ops)
 
 
+class TFIMHamiltonian:
+    """
+    Transverse Field Ising Model (TFIM) Hamiltonian.
+    
+    Hamiltoniana statica (no annealing):
+        H = Σᵢ Xᵢ + Σ⟨i,j⟩ Jᵢⱼ ZᵢZⱼ
+    
+    Caratteristiche:
+        - Entrambi i termini sempre attivi (no scheduling)
+        - Coefficiente campo trasverso = 1 (fisso)
+        - Coefficiente interazione Ising = 1 (fisso)
+        - Jᵢⱼ ~ Uniform[0,1] (generati una volta all'init)
+    
+    Uso:
+        tfim = TFIMHamiltonian(num_qubits=3)
+        H = tfim.H  # Hamiltoniana completa
+        states = tfim.generate_sequential_states(5)  # 5 stati evoluti
+    """
+    
+    def __init__(self, num_qubits: int, 
+                 J_matrix: Optional[np.ndarray] = None,
+                 seed: Optional[int] = None):
+        """
+        Inizializza l'Hamiltoniana TFIM.
+        
+        Args:
+            num_qubits: Numero di qubit
+            J_matrix: Matrice di accoppiamento Jᵢⱼ (simmetrica).
+                     Se None, viene generata casualmente da Uniform[0,1].
+            seed: Seed per riproducibilità dei Jᵢⱼ random
+        """
+        self.num_qubits = num_qubits
+        self.dim = 2 ** num_qubits  # Dimensione spazio di Hilbert
+        
+        # Coefficienti fissi (come da specifica)
+        self.transverse_field_coeff = 1.0
+        self.ising_coeff = 1.0
+        
+        # Genera matrice di accoppiamento J (una sola volta)
+        if J_matrix is not None:
+            assert J_matrix.shape == (num_qubits, num_qubits), \
+                f"J_matrix deve essere {num_qubits}x{num_qubits}"
+            self.J = J_matrix.copy()
+        else:
+            self.J = self._generate_random_coupling(seed)
+        
+        # Pre-calcola operatori (costosi da costruire)
+        self._build_operators()
+        
+        # Costruisce Hamiltoniana completa (statica, no scheduling)
+        self._H = self.H_transverse + self.H_ising
+        
+        print(f"[TFIM] Inizializzata Hamiltoniana Transverse Field Ising Model:")
+        print(f"       - Qubit: {self.num_qubits}")
+        print(f"       - Dimensione Hilbert: {self.dim}")
+        print(f"       - Coefficiente campo trasverso: {self.transverse_field_coeff}")
+        print(f"       - Coefficiente interazione Ising: {self.ising_coeff}")
+        print(f"       - Jᵢⱼ ∈ [0, 1] (random, fissi)")
+    
+    def _generate_random_coupling(self, seed: Optional[int] = None) -> np.ndarray:
+        """
+        Genera matrice di accoppiamento casuale simmetrica.
+        Jᵢⱼ ~ Uniform[0, 1]
+        
+        Args:
+            seed: Seed opzionale per riproducibilità
+            
+        Returns:
+            Matrice J simmetrica con Jᵢⱼ ∈ [0, 1], diagonale = 0
+        """
+        if seed is not None:
+            rng = np.random.default_rng(seed)
+        else:
+            rng = np.random.default_rng()
+        
+        # Genera matrice triangolare superiore
+        J = np.zeros((self.num_qubits, self.num_qubits))
+        for i in range(self.num_qubits):
+            for j in range(i + 1, self.num_qubits):
+                J[i, j] = rng.uniform(0, 1)
+                J[j, i] = J[i, j]  # Simmetrica
+        
+        return J
+    
+    def _build_operators(self):
+        """
+        Pre-calcola i termini dell'Hamiltoniana.
+        
+        H_transverse = Σᵢ Xᵢ          (campo trasverso)
+        H_ising = Σ⟨i,j⟩ Jᵢⱼ ZᵢZⱼ    (interazione Ising)
+        """
+        N = self.num_qubits
+        
+        # Termine Campo Trasverso: Σᵢ Xᵢ (coefficiente = 1)
+        self.H_transverse = np.zeros((self.dim, self.dim), dtype=complex)
+        for i in range(N):
+            self.H_transverse += self.transverse_field_coeff * \
+                PauliOperators.single_qubit_op(PauliOperators.X, i, N)
+        
+        # Termine Interazione Ising: Σ⟨i,j⟩ Jᵢⱼ ZᵢZⱼ (coefficiente = 1)
+        self.H_ising = np.zeros((self.dim, self.dim), dtype=complex)
+        for i in range(N):
+            for j in range(i + 1, N):
+                if self.J[i, j] != 0:
+                    ZZ = PauliOperators.two_qubit_op(
+                        PauliOperators.Z, PauliOperators.Z, i, j, N
+                    )
+                    self.H_ising += self.ising_coeff * self.J[i, j] * ZZ
+    
+    @property
+    def H(self) -> np.ndarray:
+        """
+        Hamiltoniana completa (statica).
+        
+        H = Σᵢ Xᵢ + Σ⟨i,j⟩ Jᵢⱼ ZᵢZⱼ
+        
+        Returns:
+            Matrice Hamiltoniana 2^N x 2^N
+        """
+        return self._H
+    
+    def ground_state(self) -> tuple:
+        """
+        Calcola lo stato fondamentale.
+        
+        Returns:
+            (energia, stato): Energia e autovettore dello stato fondamentale
+        """
+        eigenvalues, eigenvectors = np.linalg.eigh(self._H)
+        idx = np.argmin(eigenvalues)
+        return eigenvalues[idx], eigenvectors[:, idx]
+    
+    def compute_gap(self) -> float:
+        """
+        Calcola il gap energetico tra ground state e primo eccitato.
+        
+        Returns:
+            Gap energetico Δ = E₁ - E₀
+        """
+        eigenvalues = np.linalg.eigvalsh(self._H)
+        return eigenvalues[1] - eigenvalues[0]
+    
+    def generate_sequential_states(self, num_states: int, 
+                                   max_time: float = 10.0,
+                                   initial_state: Optional[np.ndarray] = None) -> tuple:
+        """
+        Genera N stati sequenziali usando evoluzione unitaria e^{-iHt}.
+        
+        Args:
+            num_states: Numero di stati da generare
+            max_time: Tempo massimo di evoluzione
+            initial_state: Stato iniziale (default: |000...0⟩)
+            
+        Returns:
+            (states, times): Array di stati shape (num_states, dim) e tempi
+        """
+        # Stato iniziale
+        if initial_state is not None:
+            psi0 = initial_state.copy()
+        else:
+            # Default: |000...0⟩ 
+            psi0 = np.zeros(self.dim, dtype=complex)
+            psi0[0] = 1.0
+        
+        # Normalizza
+        psi0 = psi0 / np.linalg.norm(psi0)
+        
+        # Tempi per ogni stato
+        times = np.linspace(0, max_time, num_states)
+        
+        # Diagonalizza H per evoluzione efficiente
+        eigenvalues, eigenvectors = np.linalg.eigh(self._H)
+        
+        # Coefficienti: c_k = ⟨E_k|ψ₀⟩
+        coeffs = np.conj(eigenvectors.T) @ psi0
+        
+        # Genera stati evoluti
+        states = np.zeros((num_states, self.dim), dtype=complex)
+        
+        for i, t in enumerate(times):
+            # |ψ(t)⟩ = Σ_k c_k e^{-iE_k t} |E_k⟩
+            phase_factors = np.exp(-1j * eigenvalues * t)
+            states[i] = eigenvectors @ (coeffs * phase_factors)
+            # Normalizza per stabilità
+            states[i] = states[i] / np.linalg.norm(states[i])
+        
+        return states, times
+    
+    @classmethod
+    def create_from_config(cls, config: dict) -> 'TFIMHamiltonian':
+        """
+        Crea istanza TFIM da configurazione (compatibile con config.py).
+        
+        Args:
+            config: Dizionario con 'num_qubits' e opzionalmente 'seed'
+            
+        Returns:
+            TFIMHamiltonian configurata
+        """
+        num_qubits = config.get('num_qubits', 2)
+        seed = config.get('seed', None)
+        return cls(num_qubits=num_qubits, seed=seed)
+
+
 class SchedulingFunctions:
     """Funzioni di scheduling B(t) per quantum annealing."""
     
@@ -482,28 +686,36 @@ class QuantumAnnealingHamiltonian:
 def generate_quantum_states(num_states: int, num_qubits: int = 2, 
                             max_time: float = 10.0,
                             initial_state: np.ndarray = None,
-                            use_test_mode: bool = True) -> np.ndarray:
+                            use_test_mode: bool = True,
+                            seed: Optional[int] = None) -> np.ndarray:
     """
     Funzione principale per generare N stati quantistici sequenziali.
+    
+    USA SEMPRE TFIMHamiltonian con:
+        H = Σᵢ Xᵢ + Σ⟨i,j⟩ Jᵢⱼ ZᵢZⱼ
+    
+    Caratteristiche:
+        - Entrambi i termini sempre attivi (NO scheduling)
+        - Coefficiente campo trasverso = +1 (fisso, segno positivo)
+        - Coefficiente interazione Ising = +1 (fisso, segno positivo)
+        - Jᵢⱼ ~ Uniform[0,1]
     
     Uso semplice:
         states = generate_quantum_states(N)
     
     Args:
         num_states: Numero di stati da generare (= numero di "parole")
-        num_qubits: Numero di qubit (default: 3, → dim=8)
+        num_qubits: Numero di qubit (default: 2, → dim=4)
         max_time: Tempo massimo di evoluzione (default: 10.0)
-        initial_state: Stato iniziale custom (default: |000...0⟩ per evoluzione interessante)
-        use_test_mode: Se True, usa B(t)=1 e J=1 (default: True)
+        initial_state: Stato iniziale custom (default: |000...0⟩)
+        use_test_mode: IGNORATO - mantenuto per retrocompatibilità
+        seed: Seed per riproducibilità dei Jᵢⱼ random
         
     Returns:
         np.ndarray: Array di stati quantistici, shape (num_states, 2^num_qubits)
     """
-    # Crea Hamiltoniana
-    if use_test_mode:
-        hamiltonian = QuantumAnnealingHamiltonian.create_test_instance(num_qubits, max_time)
-    else:
-        hamiltonian = QuantumAnnealingHamiltonian(num_qubits, total_time=max_time)
+    # USA SEMPRE TFIMHamiltonian (ignora use_test_mode)
+    hamiltonian = TFIMHamiltonian(num_qubits=num_qubits, seed=seed)
     
     # Stato iniziale di default: |000...0⟩ (non autostato → evoluzione interessante)
     if initial_state is None:
@@ -516,6 +728,44 @@ def generate_quantum_states(num_states: int, num_qubits: int = 2,
     )
     
     return states
+
+
+def generate_tfim_states(num_states: int, num_qubits: int = 2,
+                         max_time: float = 10.0,
+                         initial_state: np.ndarray = None,
+                         seed: Optional[int] = None) -> np.ndarray:
+    """
+    Genera N stati quantistici sequenziali usando l'Hamiltoniana TFIM.
+    
+    Hamiltoniana: H = Σᵢ Xᵢ + Σ⟨i,j⟩ Jᵢⱼ ZᵢZⱼ
+    
+    Caratteristiche:
+        - Entrambi i termini sempre attivi (NO scheduling)
+        - Coefficiente campo trasverso = +1 (fisso, segno positivo)
+        - Coefficiente interazione Ising = +1 (fisso, segno positivo)
+        - Jᵢⱼ ~ Uniform[0,1]
+    
+    Uso semplice:
+        states = generate_tfim_states(N)
+    
+    Args:
+        num_states: Numero di stati da generare (= numero di "parole")
+        num_qubits: Numero di qubit (default: 2, → dim=4)
+        max_time: Tempo massimo di evoluzione (default: 10.0)
+        initial_state: Stato iniziale custom (default: |000...0⟩)
+        seed: Seed per riproducibilità dei Jᵢⱼ random
+        
+    Returns:
+        np.ndarray: Array di stati quantistici, shape (num_states, 2^num_qubits)
+    """
+    # Delega a generate_quantum_states (stessa implementazione)
+    return generate_quantum_states(
+        num_states=num_states,
+        num_qubits=num_qubits,
+        max_time=max_time,
+        initial_state=initial_state,
+        seed=seed
+    )
 
 
 class AnnealingSimulator:
