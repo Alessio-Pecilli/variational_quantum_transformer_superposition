@@ -20,7 +20,7 @@ OPTIMIZATION_CONFIG = {
     'opt_maxiter': 150,        # AUMENTATO per ottimizzazione con embedding
     'opt_maxfev': 60,          # RIDOTTO
     'restarts': 1,             # NUOVO: solo 1 restart per fare presto
-    'epochs': 100,
+    'epochs': 3,
     'learning_rate':  0.001,
     'save_frequency': 10,
     'log_frequency': 10,
@@ -87,10 +87,13 @@ DATASET_CONFIG = {
 
 # Quantum States settings (alternativa a sentences testuali)
 QUANTUM_STATES_CONFIG = {
-    'use_quantum_states': False,    # True = usa stati quantistici, False = usa sentences testuali
-    'num_states': 9,                # N = numero di "frasi quantistiche" da trainare (distribuite tra rank)
-    'num_qubits': 2,                # numero di qubit (dimensione Hilbert = 2^num_qubits)
-    'max_time': 10,                 # M = evoluzioni temporali per frase (come "parole") - INTERO
+    'use_quantum_states': True,    # True = usa stati quantistici, False = usa sentences testuali
+    'num_states': 6,                # N = numero di "frasi quantistiche" (serve almeno 6 per 3-fold CV)
+    'num_qubits': 2,                # Qubit del circuito QSA (escluse ancille)
+    'source_qubits': 6,            # D = qubit sorgente Hamiltoniana (es. 6 -> 64 dim)
+    'target_qubits': 2,             # d = qubit target dopo P (2 -> 4 dim = embedding_dim)
+    'use_projection': True,         # Se True, usa layer P per proiettare da 2^D a 2^d
+    'max_time': 5,                 # M = evoluzioni temporali per frase (come "parole") - INTERO
     'use_test_mode': False,         # True = B(t)=1 costante e J=1 uniforme
     'num_test_sets': 3,             # Numero di test set diversi da valutare
     'skip_register_analysis': True  # True = salta analisi registri (evita errore AerSimulator con gate custom)
