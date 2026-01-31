@@ -187,6 +187,11 @@ def loss_for_sentence(sentence_idx, sentence, encoding, params_quantum, cfg, sta
         if encoding is None:
             raise ValueError("Né states né encoding forniti! Impossibile calcolare la loss.")
         states, targets = encoding.encode_single(sentence)
+        # ✅ Log: Verifica che F venga usata per i targets
+        if hasattr(encoding, 'outputEmbeddingMatrix'):
+            F_shape = encoding.outputEmbeddingMatrix.shape
+            targets_from_F = len(targets) > 0
+            print(f"[MATRIX USAGE] Targets estratti da F (outputEmbeddingMatrix): shape={F_shape}, num_targets={len(targets)}")
     else:
         targets = None
     
@@ -593,6 +598,13 @@ def evaluate_perplexity_on_new_sentences(best_params_native, cfg, logger):
     encoding.set_embedding_matrix(
         raw_embedding, rotation_matrix=raw_rotation, isometrize=True
     )
+    
+    # ✅ Verifica che F sia stata calcolata
+    logger.info(f"[EVAL] Matrici configurate:")
+    logger.info(f"[EVAL]   E (embeddingMatrix): {encoding.embeddingMatrix.shape}")
+    logger.info(f"[EVAL]   V (rotationMatrix): {encoding.rotationMatrix.shape}")
+    logger.info(f"[EVAL]   F (outputEmbeddingMatrix = E @ V): {encoding.outputEmbeddingMatrix.shape}")
+    logger.info(f"[EVAL] ✅ Tutte le 4 matrici (U, W, E, F) saranno usate nel test")
 
     total_loss = 0.0
     total_words = 0
@@ -709,12 +721,16 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
     np.save(matrices_dir / "F_matrix.npy", F_matrix)
     np.save(matrices_dir / "V_rotation.npy", V_rotation)
     
+    # SALVA ANCHE I PARAMETRI THETA per riutilizzarli nel test!
+    np.save(matrices_dir / "best_params_native.npy", best_params_native)
+    
     # Log shapes
     logger.info(f"[SAVE] U shape: {U_matrix.shape} -> {matrices_dir / 'U_matrix.npy'}")
     logger.info(f"[SAVE] W shape: {W_matrix.shape} -> {matrices_dir / 'W_matrix.npy'}")
     logger.info(f"[SAVE] E shape: {E_matrix.shape} -> {matrices_dir / 'E_matrix.npy'}")
     logger.info(f"[SAVE] F shape: {F_matrix.shape} -> {matrices_dir / 'F_matrix.npy'}")
     logger.info(f"[SAVE] V_rotation shape: {V_rotation.shape} -> {matrices_dir / 'V_rotation.npy'}")
+    logger.info(f"[SAVE] Parametri theta: {best_params_native.shape} -> {matrices_dir / 'best_params_native.npy'}")
     
     # Salva metadata
     metadata = {
@@ -952,12 +968,13 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     # Percorso matrici nella sottocartella
     matrices_dir = run_dir / "matrices"
     
-    # Carica TUTTE le matrici
+    # Carica TUTTE le matrici E I PARAMETRI THETA
     U_matrix = np.load(matrices_dir / "U_matrix.npy")
     W_matrix = np.load(matrices_dir / "W_matrix.npy")
     E_matrix = np.load(matrices_dir / "E_matrix.npy")
     F_matrix = np.load(matrices_dir / "F_matrix.npy")
     V_rotation = np.load(matrices_dir / "V_rotation.npy")
+    best_params_native = np.load(matrices_dir / "best_params_native.npy")
     metadata = np.load(matrices_dir / "metadata.npy", allow_pickle=True).item()
     
     logger.info(f"[CV] ✓ U caricata: {U_matrix.shape}")
@@ -965,6 +982,7 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     logger.info(f"[CV] ✓ E caricata: {E_matrix.shape}")
     logger.info(f"[CV] ✓ F caricata: {F_matrix.shape}")
     logger.info(f"[CV] ✓ V_rotation caricata: {V_rotation.shape}")
+    logger.info(f"[CV] ✓ Parametri theta caricati: {best_params_native.shape}")
     logger.info(f"[CV] Run ID: {metadata['run_id']}")
     
     # Configurazione da DATASET_CONFIG
@@ -1052,20 +1070,49 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
             # Imposta E e V dall'addestramento
             encoding.set_embedding_matrix(E_matrix, rotation_matrix=V_rotation, isometrize=False)
             logger.info(f"[CV] Fold {fold_idx+1} - Encoding configurato con E e V caricati")
+            # ✅ Verifica che F sia stata calcolata correttamente
+            F_computed = encoding.outputEmbeddingMatrix
+            F_from_file_norm = np.linalg.norm(F_matrix - F_computed)
+            logger.info(f"[CV] Fold {fold_idx+1} - F calcolata: shape={F_computed.shape}")
+            logger.info(f"[CV] Fold {fold_idx+1} - Verifica F: ||F_caricata - F_calcolata|| = {F_from_file_norm:.2e}")
+            logger.info(f"[CV] Fold {fold_idx+1} - ✅ TUTTE le 4 matrici (U, W, E, F) verranno usate nel test")
         else:
             encoding = None
+            logger.info(f"[CV] Fold {fold_idx+1} - Usa stati quantistici, encoding=None")
         
-        logger.info(f"[CV] Fold {fold_idx+1} - Usa matrici: U={U_matrix.shape}, W={W_matrix.shape}, E={E_matrix.shape}, F={F_matrix.shape}")
+        # Estrai params_quantum da best_params_native
+        params_shape = get_params(cfg['num_qubits'], cfg['num_layers']).shape
+        embedding_shape = (E_matrix.shape[0], E_matrix.shape[1]) if E_matrix.size > 0 else None
+        rotation_shape = (V_rotation.shape[0], V_rotation.shape[1]) if V_rotation.size > 0 else None
         
-        # Calcola metriche per questo fold
+        params_quantum, _, _ = split_total_params(
+            best_params_native, params_shape, embedding_shape, rotation_shape
+        )
+        
+        # Calcola LOSS REALE per ogni frase usando TUTTE le matrici addestrate
         probabilities = []
+        fold_losses = []
         
-        # Simulazione calcolo (in produzione, usa loss_for_sentence con params ricostruiti)
         for sent_idx, (sentence, qstates) in enumerate(fold_data):
-            # Simulazione: genera probabilità fittizie
-            # In produzione: calcola vera loss usando circuito quantistico
-            dummy_prob = 0.3 + 0.4 * np.random.rand()
-            probabilities.append(dummy_prob)
+            try:
+                # USA loss_for_sentence con i parametri REALI addestrati!
+                loss_val = loss_for_sentence(
+                    sent_idx, 
+                    sentence, 
+                    encoding if not use_quantum_states else None, 
+                    params_quantum,  # USA parametri quantum REALI (da U e W)
+                    cfg, 
+                    states=qstates
+                )
+                if np.isfinite(loss_val):
+                    fold_losses.append(loss_val)
+                    # Converti loss in probabilità: p = exp(-loss)
+                    prob = np.exp(-loss_val)
+                    prob = float(np.clip(prob, 0.0, 1.0))
+                    probabilities.append(prob)
+            except Exception as e:
+                logger.warning(f"[CV] Fold {fold_idx+1} - Errore frase {sent_idx}: {e}")
+                continue
         
         if probabilities:
             # Formula corretta dalle immagini:
@@ -1106,10 +1153,17 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     losses = [r['loss'] for r in fold_results if np.isfinite(r['loss'])]
     ppls = [r['ppl'] for r in fold_results if np.isfinite(r['ppl'])]
     
+    logger.info(f"\n[CV] Fold con dati validi: {len(losses)}/{len(fold_results)}")
+    
+    if len(losses) < 2:
+        logger.warning(f"[CV] ⚠️ ATTENZIONE: Solo {len(losses)} fold con dati validi!")
+        logger.warning(f"[CV] ⚠️ Serve almeno 2 fold per calcolare deviazione standard significativa")
+        logger.warning(f"[CV] ⚠️ Aumenta max_sentences in DATASET_CONFIG per avere più frasi test")
+    
     if losses:
         mean_loss = np.mean(losses)
-        std_loss = np.std(losses, ddof=1)  # Sample std (n-1)
-        sem_loss = std_loss / np.sqrt(len(losses))  # Standard error of mean
+        std_loss = np.std(losses, ddof=1) if len(losses) > 1 else 0.0  # Sample std (n-1)
+        sem_loss = std_loss / np.sqrt(len(losses)) if len(losses) > 1 else 0.0  # Standard error of mean
     else:
         mean_loss = float("inf")
         std_loss = 0.0
@@ -1117,8 +1171,8 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     
     if ppls:
         mean_ppl = np.mean(ppls)
-        std_ppl = np.std(ppls, ddof=1)  # Sample std (n-1)
-        sem_ppl = std_ppl / np.sqrt(len(ppls))  # Standard error of mean
+        std_ppl = np.std(ppls, ddof=1) if len(ppls) > 1 else 0.0  # Sample std (n-1)
+        sem_ppl = std_ppl / np.sqrt(len(ppls)) if len(ppls) > 1 else 0.0  # Standard error of mean
     else:
         mean_ppl = float("inf")
         std_ppl = 0.0
@@ -1143,20 +1197,27 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
         logger.info(f"  Fold {r['fold']}: Loss={r['loss']:.6f}, PPL={r['ppl']:.6f}")
     logger.info(f"")
     
-    logger.info(f"Risultati:")
+    logger.info(f"Risultati ({len(losses)} fold validi):")
     logger.info(f"  Loss (media)  = {mean_loss:.6f}")
-    logger.info(f"  Loss (std)    = {std_loss:.6f}")
-    logger.info(f"  Loss (sem)    = {sem_loss:.6f}")
+    logger.info(f"  Loss (std)    = {std_loss:.6f}  {'⚠️ (calcolato su 1 valore)' if len(losses) == 1 else ''}")
+    logger.info(f"  Loss (sem)    = {sem_loss:.6f}  {'⚠️ (calcolato su 1 valore)' if len(losses) == 1 else ''}")
     logger.info(f"")
     logger.info(f"  PPL (media)   = {mean_ppl:.6f}")
-    logger.info(f"  PPL (std)     = {std_ppl:.6f}")
-    logger.info(f"  PPL (sem)     = {sem_ppl:.6f}")
+    logger.info(f"  PPL (std)     = {std_ppl:.6f}  {'⚠️ (calcolato su 1 valore)' if len(ppls) == 1 else ''}")
+    logger.info(f"  PPL (sem)     = {sem_ppl:.6f}  {'⚠️ (calcolato su 1 valore)' if len(ppls) == 1 else ''}")
     logger.info(f"")
-    logger.info(f"Metriche richieste:")
-    logger.info(f"  ERRORE MEDIO (std Loss)         = {std_loss:.6f}")
-    logger.info(f"  DEVIAZIONE STANDARD (std PPL)   = {std_ppl:.6f}")
-    logger.info(f"  STANDARD ERROR MEAN (sem Loss)  = {sem_loss:.6f}")
-    logger.info(f"  STANDARD ERROR MEAN (sem PPL)   = {sem_ppl:.6f}")
+    logger.info(f"=" * 80)
+    logger.info(f"METRICHE STATISTICHE RICHIESTE:")
+    logger.info(f"=" * 80)
+    logger.info(f"  📊 ERRORE MEDIO (std Loss)         = {std_loss:.6f}  {f'[n={len(losses)}]' if losses else '[n=0]'}")
+    logger.info(f"  📊 DEVIAZIONE STANDARD (std PPL)   = {std_ppl:.6f}  {f'[n={len(ppls)}]' if ppls else '[n=0]'}")
+    logger.info(f"  📊 STANDARD ERROR MEAN (sem Loss)  = {sem_loss:.6f}  {f'[n={len(losses)}]' if losses else '[n=0]'}")
+    logger.info(f"  📊 STANDARD ERROR MEAN (sem PPL)   = {sem_ppl:.6f}  {f'[n={len(ppls)}]' if ppls else '[n=0]'}")
+    logger.info(f"=" * 80)
+    if len(losses) == 1:
+        logger.info(f"")
+        logger.info(f"⚠️  NOTA: Con solo 1 fold valido, std e sem sono 0 (serve n≥2)")
+        logger.info(f"⚠️  SOLUZIONE: Aumenta max_sentences in config.py DATASET_CONFIG")
     logger.info(f"")
     logger.info(f"Consistency check per fold:")
     for r in fold_results:
@@ -1512,19 +1573,23 @@ def main():
             logger.error(traceback.format_exc())
         
         # ============================================================
-        # ANALISI STATO ANCILLAE (REGISTRO C)
+        # ANALISI STATO ANCILLAE (REGISTRO C) - SOLO PER QUANTUM STATES
         # ============================================================
-        logger.info("[ANCILLAE] Inizio analisi registro C (ancillae)...")
-        try:
-            ancillae_stats = analyze_ancillae_state(
-                best_params_native, cfg, logger, ts
-            )
-            logger.info(f"[ANCILLAE] ✓ Analisi completata!")
-            logger.info(f"[ANCILLAE] Coerenza quantistica: {ancillae_stats['has_quantum_coherence']}")
-            logger.info(f"[ANCILLAE] Coefficienti complessi: {ancillae_stats['num_complex']}/{ancillae_stats['num_total']}")
-        except Exception as e:
-            logger.error(f"[ANCILLAE] ✗ Errore nell'analisi ancillae: {e}")
-            logger.error(traceback.format_exc())
+        ancillae_stats = None
+        if use_quantum_states:
+            logger.info("[ANCILLAE] Inizio analisi registro C (ancillae)...")
+            try:
+                ancillae_stats = analyze_ancillae_state(
+                    best_params_native, cfg, logger, ts
+                )
+                logger.info(f"[ANCILLAE] ✓ Analisi completata!")
+                logger.info(f"[ANCILLAE] Coerenza quantistica: {ancillae_stats['has_quantum_coherence']}")
+                logger.info(f"[ANCILLAE] Coefficienti complessi: {ancillae_stats['num_complex']}/{ancillae_stats['num_total']}")
+            except Exception as e:
+                logger.error(f"[ANCILLAE] ✗ Errore nell'analisi ancillae: {e}")
+                logger.error(traceback.format_exc())
+        else:
+            logger.info("[ANCILLAE] ⏭ Skip analisi ancillae (modalità FRASI TESTUALI)")
         
         # ============================================================
         # VALUTAZIONE PERPLEXITY (CRUCIALE - UNA SOLA VOLTA)
