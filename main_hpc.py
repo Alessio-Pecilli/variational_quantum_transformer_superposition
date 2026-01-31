@@ -659,15 +659,19 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
     from qiskit.quantum_info import Operator
     from optimization import get_params
     
-    # Crea cartella dedicata
-    save_dir = Path("saved_matrices")
-    save_dir.mkdir(exist_ok=True)
+    # Crea struttura cartelle
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
     
     # Run ID univoco
     seed = cfg.get('seed', 42)
-    run_id = f"{timestamp}_seed{seed}"
-    run_dir = save_dir / run_id
+    run_id = f"run_{timestamp}_seed{seed}"
+    run_dir = results_dir / run_id
     run_dir.mkdir(exist_ok=True)
+    
+    # Sottocartella per matrici
+    matrices_dir = run_dir / "matrices"
+    matrices_dir.mkdir(exist_ok=True)
     
     logger.info(f"[SAVE] Salvataggio matrici in: {run_dir}")
     logger.info(f"[SAVE] Run ID: {run_id}")
@@ -698,19 +702,19 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
     V_rotation = raw_rotation if raw_rotation is not None else np.array([])
     F_matrix = E_matrix @ V_rotation if (raw_embedding is not None and raw_rotation is not None) else np.array([])
     
-    # Salva matrici
-    np.save(run_dir / "U_matrix.npy", U_matrix)
-    np.save(run_dir / "W_matrix.npy", W_matrix)
-    np.save(run_dir / "E_matrix.npy", E_matrix)
-    np.save(run_dir / "F_matrix.npy", F_matrix)
-    np.save(run_dir / "V_rotation.npy", V_rotation)
+    # Salva matrici nella sottocartella
+    np.save(matrices_dir / "U_matrix.npy", U_matrix)
+    np.save(matrices_dir / "W_matrix.npy", W_matrix)
+    np.save(matrices_dir / "E_matrix.npy", E_matrix)
+    np.save(matrices_dir / "F_matrix.npy", F_matrix)
+    np.save(matrices_dir / "V_rotation.npy", V_rotation)
     
     # Log shapes
-    logger.info(f"[SAVE] U shape: {U_matrix.shape} -> {run_dir / 'U_matrix.npy'}")
-    logger.info(f"[SAVE] W shape: {W_matrix.shape} -> {run_dir / 'W_matrix.npy'}")
-    logger.info(f"[SAVE] E shape: {E_matrix.shape} -> {run_dir / 'E_matrix.npy'}")
-    logger.info(f"[SAVE] F shape: {F_matrix.shape} -> {run_dir / 'F_matrix.npy'}")
-    logger.info(f"[SAVE] V_rotation shape: {V_rotation.shape} -> {run_dir / 'V_rotation.npy'}")
+    logger.info(f"[SAVE] U shape: {U_matrix.shape} -> {matrices_dir / 'U_matrix.npy'}")
+    logger.info(f"[SAVE] W shape: {W_matrix.shape} -> {matrices_dir / 'W_matrix.npy'}")
+    logger.info(f"[SAVE] E shape: {E_matrix.shape} -> {matrices_dir / 'E_matrix.npy'}")
+    logger.info(f"[SAVE] F shape: {F_matrix.shape} -> {matrices_dir / 'F_matrix.npy'}")
+    logger.info(f"[SAVE] V_rotation shape: {V_rotation.shape} -> {matrices_dir / 'V_rotation.npy'}")
     
     # Salva metadata
     metadata = {
@@ -725,10 +729,10 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
         'E_shape': E_matrix.shape,
         'F_shape': F_matrix.shape
     }
-    np.save(run_dir / "metadata.npy", metadata)
+    np.save(matrices_dir / "metadata.npy", metadata)
     logger.info(f"[SAVE] Metadata salvato")
     
-    return run_dir, U_matrix, W_matrix, E_matrix, F_matrix
+    return run_dir
 
 
 def analyze_ancillae_state(best_params_native, cfg, logger, timestamp):
@@ -945,13 +949,16 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     logger.info("="*80)
     logger.info(f"[CV] Caricamento parametri da: {run_dir}")
     
+    # Percorso matrici nella sottocartella
+    matrices_dir = run_dir / "matrices"
+    
     # Carica TUTTE le matrici
-    U_matrix = np.load(run_dir / "U_matrix.npy")
-    W_matrix = np.load(run_dir / "W_matrix.npy")
-    E_matrix = np.load(run_dir / "E_matrix.npy")
-    F_matrix = np.load(run_dir / "F_matrix.npy")
-    V_rotation = np.load(run_dir / "V_rotation.npy")
-    metadata = np.load(run_dir / "metadata.npy", allow_pickle=True).item()
+    U_matrix = np.load(matrices_dir / "U_matrix.npy")
+    W_matrix = np.load(matrices_dir / "W_matrix.npy")
+    E_matrix = np.load(matrices_dir / "E_matrix.npy")
+    F_matrix = np.load(matrices_dir / "F_matrix.npy")
+    V_rotation = np.load(matrices_dir / "V_rotation.npy")
+    metadata = np.load(matrices_dir / "metadata.npy", allow_pickle=True).item()
     
     logger.info(f"[CV] ✓ U caricata: {U_matrix.shape}")
     logger.info(f"[CV] ✓ W caricata: {W_matrix.shape}")
@@ -1160,58 +1167,6 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
             check2 = np.abs(ppl_alt - r['ppl']) < 1e-6
             logger.info(f"  Fold {r['fold']}: exp({r['loss']:.6f}) = {expected_ppl:.6f} vs {r['ppl']:.6f} [exp: {check1}, alt: {check2}]")
     logger.info("="*80 + "\n")
-    
-    # ✨ GRAFICO ANDAMENTO LOSS E PPL TRA I FOLD (PRIMA DEL TEST)
-    try:
-        import matplotlib
-        matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
-        
-        fold_numbers = [r['fold'] for r in fold_results]
-        fold_losses = [r['loss'] for r in fold_results]
-        fold_ppls = [r['ppl'] for r in fold_results]
-        
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-        
-        # Grafico Loss
-        ax1.plot(fold_numbers, fold_losses, marker='o', linewidth=2, markersize=8, color='blue', label='Loss per Fold')
-        ax1.axhline(mean_loss, color='green', linestyle='--', linewidth=1.5, label=f'Mean Loss: {mean_loss:.4f}')
-        ax1.fill_between(fold_numbers, 
-                         [mean_loss - std_loss]*len(fold_numbers), 
-                         [mean_loss + std_loss]*len(fold_numbers), 
-                         alpha=0.2, color='green', label=f'±1 Std: {std_loss:.4f}')
-        ax1.set_xlabel('Fold', fontsize=12)
-        ax1.set_ylabel('Loss', fontsize=12)
-        ax1.set_title('Loss per Fold (3-Fold CV)', fontsize=14, fontweight='bold')
-        ax1.legend(loc='best')
-        ax1.grid(True, alpha=0.3)
-        ax1.set_xticks(fold_numbers)
-        
-        # Grafico PPL
-        ax2.plot(fold_numbers, fold_ppls, marker='s', linewidth=2, markersize=8, color='red', label='PPL per Fold')
-        ax2.axhline(mean_ppl, color='orange', linestyle='--', linewidth=1.5, label=f'Mean PPL: {mean_ppl:.4f}')
-        ax2.fill_between(fold_numbers, 
-                         [mean_ppl - std_ppl]*len(fold_numbers), 
-                         [mean_ppl + std_ppl]*len(fold_numbers), 
-                         alpha=0.2, color='orange', label=f'±1 Std: {std_ppl:.4f}')
-        ax2.set_xlabel('Fold', fontsize=12)
-        ax2.set_ylabel('Perplexity', fontsize=12)
-        ax2.set_title('Perplexity per Fold (3-Fold CV)', fontsize=14, fontweight='bold')
-        ax2.legend(loc='best')
-        ax2.grid(True, alpha=0.3)
-        ax2.set_xticks(fold_numbers)
-        
-        plt.tight_layout()
-        
-        # Salva il grafico
-        plot_path = run_dir / "3fold_cv_metrics.png"
-        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
-        plt.close()
-        
-        logger.info(f"[CV] ✓ Grafico salvato in: {plot_path}")
-        
-    except Exception as e:
-        logger.warning(f"[CV] ⚠ Impossibile creare grafico: {e}")
     
     return fold_results
 
@@ -1548,7 +1503,7 @@ def main():
         logger.info("[SAVE] Inizio salvataggio TUTTE le matrici U, W, E, F...")
         run_dir = None
         try:
-            run_dir, U_matrix, W_matrix, E_matrix, F_matrix = save_all_matrices(
+            run_dir = save_all_matrices(
                 best_params_native, cfg, logger, ts, encoding_instance=encoding_local
             )
             logger.info(f"[SAVE] ✓ Tutte le matrici salvate in: {run_dir}")
@@ -1630,10 +1585,33 @@ def main():
         )
 
         # ============================================================
-        # SALVATAGGIO PARAMETRI E SUMMARY
+        # SALVATAGGIO PARAMETRI, SUMMARY E GRAFICI
         # ============================================================
-        np.save(f"theta_finali_native_{ts}.npy", best_params_native)
-        with open(f"training_summary_{ts}.txt", "w", encoding="utf-8") as f:
+        # Usa run_dir se disponibile, altrimenti crea struttura
+        if run_dir:
+            output_dir = run_dir
+        else:
+            results_dir = Path("results")
+            results_dir.mkdir(exist_ok=True)
+            seed = cfg.get('seed', 42)
+            run_id = f"run_{ts}_seed{seed}"
+            output_dir = results_dir / run_id
+            output_dir.mkdir(exist_ok=True)
+        
+        # Sottocartelle
+        params_dir = output_dir / "parameters"
+        params_dir.mkdir(exist_ok=True)
+        summaries_dir = output_dir / "summaries"
+        summaries_dir.mkdir(exist_ok=True)
+        plots_dir = output_dir / "plots"
+        plots_dir.mkdir(exist_ok=True)
+        
+        # Salva parametri
+        np.save(params_dir / "theta_finali_native.npy", best_params_native)
+        logger.info(f"[SAVE] Parametri salvati in {params_dir / 'theta_finali_native.npy'}")
+        
+        # Salva summary
+        with open(summaries_dir / "training_summary.txt", "w", encoding="utf-8") as f:
             f.write(f"total_loss_evaluations={GLOBAL_LOSS_COUNTER[0]}\n")
             f.write(f"max_loss_evaluations_limit={MAX_LOSS_EVALUATIONS}\n")
             f.write(f"best_loss_mean={best_f:.8f}\n")
@@ -1670,13 +1648,48 @@ def main():
             else:
                 f.write("eval_perplexity=NA\n")
         
+        logger.info(f"[SAVE] Summary salvato in {summaries_dir / 'training_summary.txt'}")
+        
         # Salvataggio storia loss
-        np.savetxt(f"loss_history_{ts}.txt", np.array(loss_history))
-        logger.info(f"[SAVE] Storia loss salvata in loss_history_{ts}.txt")
+        np.savetxt(summaries_dir / "loss_history.txt", np.array(loss_history))
+        logger.info(f"[SAVE] Storia loss salvata in {summaries_dir / 'loss_history.txt'}")
+        
+        # ✨ GRAFICO TRAINING LOSS
+        try:
+            import matplotlib
+            matplotlib.use('Agg')
+            import matplotlib.pyplot as plt
+            
+            if loss_history:
+                epochs = list(range(1, len(loss_history) + 1))
+                
+                plt.figure(figsize=(10, 6))
+                plt.plot(epochs, loss_history, marker='o', linewidth=2, markersize=4, color='blue', label='Training Loss')
+                plt.xlabel('Epoch', fontsize=12)
+                plt.ylabel('Loss', fontsize=12)
+                plt.title('Training Loss over Epochs', fontsize=14, fontweight='bold')
+                plt.legend(loc='best')
+                plt.grid(True, alpha=0.3)
+                plt.tight_layout()
+                
+                plot_path = plots_dir / "training_loss.png"
+                plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+                plt.close()
+                
+                logger.info(f"[SAVE] ✓ Grafico training loss salvato in {plot_path}")
+            else:
+                logger.warning("[SAVE] ⚠ Nessun dato loss_history per creare il grafico")
+                
+        except Exception as e:
+            logger.warning(f"[SAVE] ⚠ Impossibile creare grafico training loss: {e}")
 
         logger.info(f"[COMPLETE] Ottimizzazione completata. Loss media finale: {best_f:.6f}")
-        logger.info(f"[COMPLETE] Parametri salvati in theta_finali_native_{ts}.npy")
-        logger.info(f"[COMPLETE] Tutti i file generati con timestamp: {ts}")
+        logger.info(f"[COMPLETE] Tutti i file salvati in: {output_dir}")
+        logger.info(f"[COMPLETE] - Parametri: {params_dir}")
+        logger.info(f"[COMPLETE] - Summaries: {summaries_dir}")
+        logger.info(f"[COMPLETE] - Plots: {plots_dir}")
+        if run_dir:
+            logger.info(f"[COMPLETE] - Matrici: {run_dir / 'matrices'}")
 
         return 0
     
