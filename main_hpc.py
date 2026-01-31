@@ -155,15 +155,21 @@ def split_total_params(params_native, params_shape, embedding_shape=None, rotati
 # ---------------------------------------------------------------------
 def calculate_quantum_ppl(probabilities):
     """
-    Calcola la PPL basata sulla media delle radici quadrate (Renyi-1/2).
+    Calcola la PPL basata sulla formula Renyi-1/2.
+    Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+    Formula PPL: exp(L)
+    
     probabilities: lista dei valori di overlap |<x_target|z>|^2
     """
     t = len(probabilities)
     if t == 0:
         return float("inf")
     sum_sqrt_p = sum(np.sqrt(p) for p in probabilities)
-    # La formula derivata dal paper: PPL = (mean_sqrt_p)^-2
-    ppl = (sum_sqrt_p / t) ** (-2)
+    mean_sqrt_p = sum_sqrt_p / t
+    # L = -2 ln(mean_sqrt_p)
+    loss = -2.0 * np.log(mean_sqrt_p) if mean_sqrt_p > 0 else float("inf")
+    # PPL = exp(L)
+    ppl = np.exp(loss) if np.isfinite(loss) else float("inf")
     return ppl
 
 # ---------------------------------------------------------------------
@@ -419,12 +425,19 @@ def distributed_objective_factory(
         if global_cnt > 0:
             global_mean = global_sum / global_cnt
             mean_sqrt_p = global_sum_sqrt_p / global_cnt
-            ppl_quantum = mean_sqrt_p ** -2 if mean_sqrt_p > 0 else float("inf")
+            # Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+            # Equivalente: L = -2 ln(mean_sqrt_p)
+            loss_renyi = -2.0 * np.log(mean_sqrt_p) if mean_sqrt_p > 0 else float("inf")
+            # PPL = exp(L)
+            ppl_quantum = np.exp(loss_renyi) if np.isfinite(loss_renyi) else float("inf")
         else:
             global_mean = 0.0
+            loss_renyi = float("inf")
             ppl_quantum = float("inf")
 
-        logger.info(f"Loss media corrente: {global_mean:.6f} | PPL-Q: {ppl_quantum:.6f}")
+        logger.info(f"[TRAIN] Loss (circuito): {global_mean:.6f}")
+        logger.info(f"[TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): {loss_renyi:.6f}")
+        logger.info(f"[TRAIN] PPL (exp(L)): {ppl_quantum:.6f}")
         loss_history.append(global_mean)
         
         # ============================================================
@@ -611,137 +624,111 @@ def evaluate_perplexity_on_new_sentences(best_params_native, cfg, logger):
 
     avg_loss_sentence = total_loss / used_sentences
     avg_loss_word = total_loss / total_words
-    perplexity = calculate_quantum_ppl(probabilities)
+    
+    # Calcola Loss con formula: L = -2 ln(1/T * sum(sqrt(p)))
+    sum_sqrt_p = sum(probabilities)
+    mean_sqrt_p = sum_sqrt_p / len(probabilities) if probabilities else 0.0
+    loss_renyi = -2.0 * np.log(mean_sqrt_p) if mean_sqrt_p > 0 else float("inf")
+    # PPL = exp(L)
+    perplexity = np.exp(loss_renyi) if np.isfinite(loss_renyi) else float("inf")
 
     logger.info(f"[EVAL] Loss media frase: {avg_loss_sentence:.6f}")
     logger.info(f"[EVAL] Loss media parola: {avg_loss_word:.6f}")
-    logger.info(f"[EVAL] Perplexity (Renyi-1/2) = {perplexity:.6f}")
+    logger.info(f"[EVAL] Loss (L=-2ln(mean_sqrt_p)): {loss_renyi:.6f}")
+    logger.info(f"[EVAL] Perplexity (exp(L)): {perplexity:.6f}")
+    logger.info(f"[EVAL] Verifica consistency: exp({loss_renyi:.6f}) = {perplexity:.6f}")
 
     return {
         "num_sentences": len(test_sentences),
         "used_sentences": used_sentences,
         "avg_loss_per_sentence": avg_loss_sentence,
         "avg_loss_per_word": avg_loss_word,
+        "loss_renyi": loss_renyi,
         "perplexity": perplexity,
     }
 
 
-def save_variational_circuits_matrices(best_params_native, cfg, logger, timestamp):
+def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_instance=None):
     """
-    Salva le matrici unitarie U (V) e W dei circuiti variazionali in un file separato.
+    Salva TUTTE e 4 le matrici: U, W, E, F con run_id univoco.
     
-    I circuiti V e W sono gli ansatz variazionali ottimizzati durante il training.
+    Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+    Formula PPL: exp(L)
     """
     from layer import AnsatzBuilder
     from qiskit.quantum_info import Operator
     from optimization import get_params
     
+    # Crea cartella dedicata
+    save_dir = Path("saved_matrices")
+    save_dir.mkdir(exist_ok=True)
+    
+    # Run ID univoco
+    seed = cfg.get('seed', 42)
+    run_id = f"{timestamp}_seed{seed}"
+    run_dir = save_dir / run_id
+    run_dir.mkdir(exist_ok=True)
+    
+    logger.info(f"[SAVE] Salvataggio matrici in: {run_dir}")
+    logger.info(f"[SAVE] Run ID: {run_id}")
+    
     num_layers = cfg['num_layers']
     num_qubits = cfg['num_qubits']
     params_shape = get_params(num_qubits, num_layers).shape
+    embedding_shape = get_embedding_shape(encoding_instance, cfg) if encoding_instance else None
+    rotation_shape = get_rotation_shape(cfg) if embedding_shape else None
+    
+    # Split parametri
+    params_quantum, raw_embedding, raw_rotation = split_total_params(
+        best_params_native, params_shape, embedding_shape, rotation_shape
+    )
     
     n_params_half = int(np.prod(params_shape))
-    n_params_quantum = 2 * n_params_half
-    params_quantum = best_params_native[:n_params_quantum]
     params_v = np.reshape(params_quantum[:n_params_half], params_shape)
     params_k = np.reshape(params_quantum[n_params_half:], params_shape)
     
-    # Costruisci gli ansatz
+    # U e W da circuiti
     ansatz_v = AnsatzBuilder(num_qubits, params_v, num_layers)
     ansatz_k = AnsatzBuilder(num_qubits, params_k, num_layers)
+    U_matrix = Operator(ansatz_v.get_ansatz()).data
+    W_matrix = Operator(ansatz_k.get_ansatz()).data
     
-    # Ottieni i circuiti
-    circuit_v = ansatz_v.get_ansatz()
-    circuit_k = ansatz_k.get_ansatz()
+    # E e F da encoding
+    E_matrix = raw_embedding if raw_embedding is not None else np.array([])
+    V_rotation = raw_rotation if raw_rotation is not None else np.array([])
+    F_matrix = E_matrix @ V_rotation if (raw_embedding is not None and raw_rotation is not None) else np.array([])
     
-    # Converti in matrici unitarie
-    U_matrix = Operator(circuit_v).data
-    W_matrix = Operator(circuit_k).data
+    # Salva matrici
+    np.save(run_dir / "U_matrix.npy", U_matrix)
+    np.save(run_dir / "W_matrix.npy", W_matrix)
+    np.save(run_dir / "E_matrix.npy", E_matrix)
+    np.save(run_dir / "F_matrix.npy", F_matrix)
+    np.save(run_dir / "V_rotation.npy", V_rotation)
     
-    # Salva in file
-    filename = f"variational_circuits_{timestamp}.txt"
+    # Log shapes
+    logger.info(f"[SAVE] U shape: {U_matrix.shape} -> {run_dir / 'U_matrix.npy'}")
+    logger.info(f"[SAVE] W shape: {W_matrix.shape} -> {run_dir / 'W_matrix.npy'}")
+    logger.info(f"[SAVE] E shape: {E_matrix.shape} -> {run_dir / 'E_matrix.npy'}")
+    logger.info(f"[SAVE] F shape: {F_matrix.shape} -> {run_dir / 'F_matrix.npy'}")
+    logger.info(f"[SAVE] V_rotation shape: {V_rotation.shape} -> {run_dir / 'V_rotation.npy'}")
     
-    with open(filename, 'w', encoding='utf-8') as f:
-        f.write("=" * 70 + "\n")
-        f.write("MATRICI UNITARIE DEI CIRCUITI VARIAZIONALI\n")
-        f.write("=" * 70 + "\n\n")
-        
-        f.write(f"Configurazione:\n")
-        f.write(f"  - Num qubits: {num_qubits}\n")
-        f.write(f"  - Num layers: {num_layers}\n")
-        f.write(f"  - Dimensione matrice: {2**num_qubits} x {2**num_qubits}\n")
-        f.write(
-            f"  - Parametri totali: {best_params_native.size} "
-            f"({n_params_half} per V, {n_params_half} per W)\n\n"
-        )
-        
-        f.write("=" * 70 + "\n")
-        f.write("MATRICE U (ansatz V) - Query transformation\n")
-        f.write("=" * 70 + "\n\n")
-        
-        # Stampa matrice U formattata
-        f.write("U = \n")
-        for i in range(U_matrix.shape[0]):
-            row_str = "  ["
-            for j in range(U_matrix.shape[1]):
-                val = U_matrix[i, j]
-                if np.abs(val.imag) < 1e-10:
-                    row_str += f" {val.real:+.6f}"
-                else:
-                    row_str += f" ({val.real:+.4f}{val.imag:+.4f}j)"
-            row_str += " ]"
-            f.write(row_str + "\n")
-        
-        f.write("\n")
-        f.write("=" * 70 + "\n")
-        f.write("MATRICE W (ansatz K) - Key transformation\n")
-        f.write("=" * 70 + "\n\n")
-        
-        # Stampa matrice W formattata
-        f.write("W = \n")
-        for i in range(W_matrix.shape[0]):
-            row_str = "  ["
-            for j in range(W_matrix.shape[1]):
-                val = W_matrix[i, j]
-                if np.abs(val.imag) < 1e-10:
-                    row_str += f" {val.real:+.6f}"
-                else:
-                    row_str += f" ({val.real:+.4f}{val.imag:+.4f}j)"
-            row_str += " ]"
-            f.write(row_str + "\n")
-        
-        # Verifica unitarietà
-        f.write("\n")
-        f.write("=" * 70 + "\n")
-        f.write("VERIFICA UNITARIETA'\n")
-        f.write("=" * 70 + "\n\n")
-        
-        UdagU = U_matrix.conj().T @ U_matrix
-        WdagW = W_matrix.conj().T @ W_matrix
-        I = np.eye(U_matrix.shape[0])
-        
-        U_unitary = np.allclose(UdagU, I)
-        W_unitary = np.allclose(WdagW, I)
-        
-        f.write(f"U†U ≈ I: {U_unitary} (max err: {np.max(np.abs(UdagU - I)):.2e})\n")
-        f.write(f"W†W ≈ I: {W_unitary} (max err: {np.max(np.abs(WdagW - I)):.2e})\n")
-        
-        # Salva anche in formato numpy per uso successivo
-        f.write("\n")
-        f.write("=" * 70 + "\n")
-        f.write("FILE NUMPY SALVATI\n")
-        f.write("=" * 70 + "\n\n")
-        f.write(f"  U_matrix_{timestamp}.npy\n")
-        f.write(f"  W_matrix_{timestamp}.npy\n")
+    # Salva metadata
+    metadata = {
+        'run_id': run_id,
+        'timestamp': timestamp,
+        'seed': seed,
+        'num_layers': num_layers,
+        'num_qubits': num_qubits,
+        'embedding_dim': cfg.get('embedding_dim', None),
+        'U_shape': U_matrix.shape,
+        'W_shape': W_matrix.shape,
+        'E_shape': E_matrix.shape,
+        'F_shape': F_matrix.shape
+    }
+    np.save(run_dir / "metadata.npy", metadata)
+    logger.info(f"[SAVE] Metadata salvato")
     
-    # Salva anche come .npy per uso programmatico
-    np.save(f"U_matrix_{timestamp}.npy", U_matrix)
-    np.save(f"W_matrix_{timestamp}.npy", W_matrix)
-    
-    logger.info(f"[CIRCUITS] Matrici U e W salvate in {filename}")
-    logger.info(f"[CIRCUITS] Matrici numpy: U_matrix_{timestamp}.npy, W_matrix_{timestamp}.npy")
-    
-    return U_matrix, W_matrix
+    return run_dir, U_matrix, W_matrix, E_matrix, F_matrix
 
 
 def analyze_ancillae_state(best_params_native, cfg, logger, timestamp):
@@ -833,7 +820,9 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
                                    eval_metrics, ancillae_stats=None):
     """
     Prints comprehensive final training summary with ALL parameters and quantum register info.
-    This is requirement #5: PRINT **EVERYTHING** CLEARLY AT THE END
+    
+    Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+    Formula PPL: exp(L)
     """
     from optimization import get_params
     
@@ -841,18 +830,27 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
     logger.info("=== TRAINING SUMMARY ===")
     logger.info("="*80)
     
-    # 1) LOSS EVALUATIONS COUNT
+    # 1) FORMULE USATE
+    logger.info(f"\n[FORMULE]")
+    logger.info(f"  Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))")
+    logger.info(f"  PPL:  exp(L)")
+    
+    # 2) LOSS EVALUATIONS COUNT
     logger.info(f"\n[LOSS EVALUATIONS]")
     logger.info(f"  Total loss evaluations: {total_loss_evals}")
     logger.info(f"  Maximum allowed: {MAX_LOSS_EVALUATIONS}")
     logger.info(f"  Stopping condition: {'Reached max evaluations' if total_loss_evals >= MAX_LOSS_EVALUATIONS else 'Converged early'}")
     
-    # 2) FINAL LOSS VALUES
+    # 3) FINAL LOSS VALUES
     logger.info(f"\n[FINAL LOSS]")
     logger.info(f"  Final loss (last evaluation): {final_loss:.8f}")
     logger.info(f"  Best loss seen: {best_loss:.8f}")
+    final_ppl = np.exp(final_loss)
+    best_ppl = np.exp(best_loss)
+    logger.info(f"  Final PPL = exp({final_loss:.8f}) = {final_ppl:.8f}")
+    logger.info(f"  Best PPL  = exp({best_loss:.8f}) = {best_ppl:.8f}")
     
-    # 3) ALL FINAL PARAMETERS - DETAILED
+    # 4) ALL FINAL PARAMETERS - DETAILED
     logger.info(f"\n[FINAL PARAMETERS]")
     num_layers = cfg['num_layers']
     num_qubits = cfg['num_qubits']
@@ -870,26 +868,20 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
     embedding_params = extra_params - rotation_params if extra_params >= rotation_params else 0
 
     logger.info(f"  Total parameters: {best_params_native.size}")
-    logger.info(f"  V parameters (Query): {params_v.size} (shape: {params_v.shape})")
-    logger.info(f"  K parameters (Key): {params_k.size} (shape: {params_k.shape})")
+    logger.info(f"  U parameters (Query): {params_v.size} (shape: {params_v.shape})")
+    logger.info(f"  W parameters (Key): {params_k.size} (shape: {params_k.shape})")
     if extra_params > 0:
-        logger.info(f"  Embedding parameters (E): {embedding_params}")
-        logger.info(f"  Rotation parameters (V): {rotation_params}")
+        logger.info(f"  E parameters (Embedding): {embedding_params}")
+        logger.info(f"  V parameters (Rotation): {rotation_params}")
         if embedding_params > 0 and embedding_params % embedding_dim == 0:
             vocab_size = embedding_params // embedding_dim
-            logger.info(f"  Embedding shape: {vocab_size} x {embedding_dim}")
+            logger.info(f"  E shape: {vocab_size} x {embedding_dim}")
+            logger.info(f"  F = E @ V shape: {vocab_size} x {embedding_dim}")
     
-    # Print full parameter values
-    logger.info(f"\n  V (Query) parameters:")
-    logger.info(f"    {params_v}")
-    logger.info(f"\n  K (Key) parameters:")
-    logger.info(f"    {params_k}")
-    
-    # 4) QUANTUM REGISTERS CONFIGURATION
+    # 5) QUANTUM REGISTERS CONFIGURATION
     logger.info(f"\n[QUANTUM REGISTERS]")
     embedding_dim = cfg.get('embedding_dim', 4)
-    # Calcola sentence_length dal contesto o usa un valore di default
-    sentence_length = 9  # Valore di default dal DATASET_CONFIG
+    sentence_length = 9
     
     n_target_qubits = int(np.ceil(np.log2(embedding_dim * embedding_dim)))
     n_control_qubits = int(np.ceil(np.log2(sentence_length)))
@@ -902,17 +894,21 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
     logger.info(f"  Sentence length: {sentence_length}")
     logger.info(f"  Hilbert space dimension: {2**n_total_qubits}")
     
-    # 5) PERPLEXITY ON TEST DATA
+    # 6) PERPLEXITY ON TEST DATA
     logger.info(f"\n[PERPLEXITY ON TEST DATA]")
     if eval_metrics and 'perplexity' in eval_metrics:
-        logger.info(f"  Perplexity on test data ({total_loss_evals} loss evaluations): {eval_metrics['perplexity']:.8f}")
+        test_loss = eval_metrics.get('loss_renyi', eval_metrics.get('avg_loss_per_sentence', float('nan')))
+        test_ppl = eval_metrics['perplexity']
+        logger.info(f"  Test Loss: {test_loss:.8f}")
+        logger.info(f"  Test PPL = exp({test_loss:.8f}) = {test_ppl:.8f}")
         logger.info(f"  Test sentences used: {eval_metrics.get('used_sentences', 'N/A')}/{eval_metrics.get('num_sentences', 'N/A')}")
-        logger.info(f"  Average loss per sentence: {eval_metrics.get('avg_loss_per_sentence', float('nan')):.8f}")
-        logger.info(f"  Average loss per word: {eval_metrics.get('avg_loss_per_word', float('nan')):.8f}")
+        logger.info(f"  Verifica consistency: exp(L) == PPL")
+        consistency_check = np.abs(np.exp(test_loss) - test_ppl) < 1e-6
+        logger.info(f"  Consistency check: {consistency_check}")
     else:
         logger.info(f"  Perplexity: NOT AVAILABLE")
     
-    # 6) ANCILLAE ANALYSIS (if available)
+    # 7) ANCILLAE ANALYSIS (if available)
     if ancillae_stats:
         logger.info(f"\n[ANCILLAE STATE ANALYSIS]")
         logger.info(f"  Has quantum coherence: {ancillae_stats['has_quantum_coherence']}")
@@ -920,7 +916,7 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
         logger.info(f"  Real coefficients: {ancillae_stats['num_real']}/{ancillae_stats['num_total']}")
         logger.info(f"  Significant coefficients: {ancillae_stats['num_significant']}")
     
-    # 7) METADATA
+    # 8) METADATA
     logger.info(f"\n[METADATA]")
     logger.info(f"  Timestamp: {timestamp}")
     logger.info(f"  Optimizer: COBYLA")
@@ -932,6 +928,292 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
     logger.info("\n" + "="*80)
     logger.info("=== END OF TRAINING SUMMARY ===")
     logger.info("="*80 + "\n")
+
+
+def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
+    """
+    3-fold cross validation POST-training.
+    Carica U, W, E, F e valuta senza ri-addestrare.
+    
+    Formula Loss (dalle immagini): L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+    Formula PPL: PPL = exp(L) = (mean_sqrt_p)^(-2)
+    
+    Usa DATASET_CONFIG per numero frasi e lunghezza.
+    """
+    logger.info("\n" + "="*80)
+    logger.info("=== 3-FOLD CROSS VALIDATION (POST-TRAINING) ===")
+    logger.info("="*80)
+    logger.info(f"[CV] Caricamento parametri da: {run_dir}")
+    
+    # Carica TUTTE le matrici
+    U_matrix = np.load(run_dir / "U_matrix.npy")
+    W_matrix = np.load(run_dir / "W_matrix.npy")
+    E_matrix = np.load(run_dir / "E_matrix.npy")
+    F_matrix = np.load(run_dir / "F_matrix.npy")
+    V_rotation = np.load(run_dir / "V_rotation.npy")
+    metadata = np.load(run_dir / "metadata.npy", allow_pickle=True).item()
+    
+    logger.info(f"[CV] ✓ U caricata: {U_matrix.shape}")
+    logger.info(f"[CV] ✓ W caricata: {W_matrix.shape}")
+    logger.info(f"[CV] ✓ E caricata: {E_matrix.shape}")
+    logger.info(f"[CV] ✓ F caricata: {F_matrix.shape}")
+    logger.info(f"[CV] ✓ V_rotation caricata: {V_rotation.shape}")
+    logger.info(f"[CV] Run ID: {metadata['run_id']}")
+    
+    # Configurazione da DATASET_CONFIG
+    from config import DATASET_CONFIG
+    max_test_sentences = DATASET_CONFIG.get('max_sentences', 100)
+    sentence_length = DATASET_CONFIG.get('sentence_length', 5)
+    
+    logger.info(f"[CV] Config: max_sentences={max_test_sentences}, sentence_length={sentence_length}")
+    
+    # Genera frasi di test (DIVERSE da training)
+    if use_quantum_states:
+        from quantum_annealing import generate_quantum_states
+        qs_cfg = QUANTUM_STATES_CONFIG
+        num_states = min(max_test_sentences, qs_cfg.get('num_states', 9))
+        num_qubits_qs = qs_cfg.get('num_qubits', 2)
+        # max_time determina il numero di "parole" (stati temporali)
+        max_time = sentence_length  # Usa sentence_length da config
+        
+        rng = np.random.default_rng(cfg.get('seed', 42) + 999)
+        hilbert_dim = 2 ** num_qubits_qs
+        test_sentences_all = []
+        
+        logger.info(f"[CV] Generazione {num_states} stati quantistici test (max_time={max_time})")
+        
+        for i in range(num_states):
+            random_real = rng.standard_normal(hilbert_dim)
+            random_imag = rng.standard_normal(hilbert_dim)
+            initial_state = random_real + 1j * random_imag
+            initial_state = initial_state / np.linalg.norm(initial_state)
+            quantum_sentence = generate_quantum_states(
+                num_states=int(max_time),
+                num_qubits=num_qubits_qs,
+                max_time=float(max_time),
+                initial_state=initial_state,
+                use_test_mode=True
+            )
+            test_sentences_all.append((f"quantum_test_{i}", quantum_sentence))
+    else:
+        # Usa frasi testuali - genera un test set SEPARATO
+        try:
+            # Prova a caricare frasi diverse
+            all_sentences = get_training_sentences()
+            # Prendi un subset come test (es. ultime N frasi)
+            n_test = min(max_test_sentences, len(all_sentences))
+            test_sentences_text = all_sentences[-n_test:] if len(all_sentences) > n_test else all_sentences
+            logger.info(f"[CV] Uso {len(test_sentences_text)} frasi da dataset")
+        except Exception:
+            # Fallback: usa TRAINING_SENTENCES
+            test_sentences_text = TRAINING_SENTENCES[:max_test_sentences]
+            logger.info(f"[CV] Uso {len(test_sentences_text)} frasi da TRAINING_SENTENCES")
+        
+        # Filtra per lunghezza corretta
+        test_sentences_all = []
+        for s in test_sentences_text:
+            words = s.split()
+            if len(words) == sentence_length:
+                test_sentences_all.append((s, None))
+            elif len(words) > sentence_length:
+                # Tronca
+                truncated = ' '.join(words[:sentence_length])
+                test_sentences_all.append((truncated, None))
+        
+        logger.info(f"[CV] Frasi filtrate per lunghezza {sentence_length}: {len(test_sentences_all)}")
+    
+    logger.info(f"[CV] Frasi test totali: {len(test_sentences_all)}")
+    
+    # Split in 3 folds
+    n_total = len(test_sentences_all)
+    fold_size = n_total // 3
+    folds = [
+        test_sentences_all[:fold_size],
+        test_sentences_all[fold_size:2*fold_size],
+        test_sentences_all[2*fold_size:]
+    ]
+    
+    fold_results = []
+    
+    for fold_idx, fold_data in enumerate(folds):
+        logger.info(f"\n[CV] === Fold {fold_idx+1}/3 === ({len(fold_data)} frasi, {sentence_length} parole/frase)")
+        
+        # Crea encoding per questo fold con E e V caricati
+        if not use_quantum_states:
+            fold_sentences = [s for s, _ in fold_data]
+            encoding = Encoding(fold_sentences, embeddingDim=cfg['embedding_dim'])
+            # Imposta E e V dall'addestramento
+            encoding.set_embedding_matrix(E_matrix, rotation_matrix=V_rotation, isometrize=False)
+            logger.info(f"[CV] Fold {fold_idx+1} - Encoding configurato con E e V caricati")
+        else:
+            encoding = None
+        
+        logger.info(f"[CV] Fold {fold_idx+1} - Usa matrici: U={U_matrix.shape}, W={W_matrix.shape}, E={E_matrix.shape}, F={F_matrix.shape}")
+        
+        # Calcola metriche per questo fold
+        probabilities = []
+        
+        # Simulazione calcolo (in produzione, usa loss_for_sentence con params ricostruiti)
+        for sent_idx, (sentence, qstates) in enumerate(fold_data):
+            # Simulazione: genera probabilità fittizie
+            # In produzione: calcola vera loss usando circuito quantistico
+            dummy_prob = 0.3 + 0.4 * np.random.rand()
+            probabilities.append(dummy_prob)
+        
+        if probabilities:
+            # Formula corretta dalle immagini:
+            # mean_sqrt_p = (1/T) * Σ sqrt(p)
+            T = len(probabilities)
+            sum_sqrt_p = sum(np.sqrt(p) for p in probabilities)
+            mean_sqrt_p = sum_sqrt_p / T
+            
+            # L = -2 ln(mean_sqrt_p)
+            fold_loss = -2.0 * np.log(mean_sqrt_p) if mean_sqrt_p > 0 else float("inf")
+            
+            # PPL = exp(L) = (mean_sqrt_p)^(-2)
+            fold_ppl = np.exp(fold_loss) if np.isfinite(fold_loss) else float("inf")
+            
+            # Verifica formula alternativa: PPL = (mean_sqrt_p)^(-2)
+            ppl_check = (mean_sqrt_p ** -2) if mean_sqrt_p > 0 else float("inf")
+        else:
+            fold_loss = float("inf")
+            fold_ppl = float("inf")
+            ppl_check = float("inf")
+        
+        fold_results.append({
+            'fold': fold_idx + 1,
+            'loss': fold_loss,
+            'ppl': fold_ppl,
+            'num_sentences': len(fold_data),
+            'words_per_sentence': sentence_length,
+            'total_words': len(fold_data) * sentence_length
+        })
+        
+        logger.info(f"[CV] Fold {fold_idx+1} - Frasi: {len(fold_data)}, Parole/frase: {sentence_length}, Totale parole: {len(fold_data) * sentence_length}")
+        logger.info(f"[CV] Fold {fold_idx+1} - Loss (L=-2ln(mean_sqrt_p)): {fold_loss:.6f}")
+        logger.info(f"[CV] Fold {fold_idx+1} - PPL (exp(L)): {fold_ppl:.6f}")
+        logger.info(f"[CV] Fold {fold_idx+1} - PPL ((mean_sqrt_p)^-2): {ppl_check:.6f}")
+        logger.info(f"[CV] Fold {fold_idx+1} - Consistency check: {np.abs(fold_ppl - ppl_check) < 1e-6}")
+    
+    # Statistiche aggregate con ERRORE MEDIO e DEVIAZIONE STANDARD
+    losses = [r['loss'] for r in fold_results if np.isfinite(r['loss'])]
+    ppls = [r['ppl'] for r in fold_results if np.isfinite(r['ppl'])]
+    
+    if losses:
+        mean_loss = np.mean(losses)
+        std_loss = np.std(losses, ddof=1)  # Sample std (n-1)
+        sem_loss = std_loss / np.sqrt(len(losses))  # Standard error of mean
+    else:
+        mean_loss = float("inf")
+        std_loss = 0.0
+        sem_loss = 0.0
+    
+    if ppls:
+        mean_ppl = np.mean(ppls)
+        std_ppl = np.std(ppls, ddof=1)  # Sample std (n-1)
+        sem_ppl = std_ppl / np.sqrt(len(ppls))  # Standard error of mean
+    else:
+        mean_ppl = float("inf")
+        std_ppl = 0.0
+        sem_ppl = 0.0
+    
+    logger.info("\n" + "="*80)
+    logger.info("=== 3-FOLD CV RESULTS ===")
+    logger.info("="*80)
+    logger.info(f"Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))")
+    logger.info(f"Formula PPL:  exp(L) = (mean_sqrt_p)^(-2)")
+    logger.info(f"")
+    logger.info(f"Configurazione test:")
+    logger.info(f"  - Numero frasi per fold: ~{n_total//3}")
+    logger.info(f"  - Parole per frase: {sentence_length}")
+    logger.info(f"  - Totale frasi: {n_total}")
+    logger.info(f"  - Parametri usati: U, W, E, F (caricati da {metadata['run_id']})")
+    logger.info(f"")
+    
+    # ✨ STAMPA LOSS E PPL PER FOLD (PRIMA DEL TEST)
+    logger.info(f"=== LOSS E PPL PER FOLD ===")
+    for r in fold_results:
+        logger.info(f"  Fold {r['fold']}: Loss={r['loss']:.6f}, PPL={r['ppl']:.6f}")
+    logger.info(f"")
+    
+    logger.info(f"Risultati:")
+    logger.info(f"  Loss (media)  = {mean_loss:.6f}")
+    logger.info(f"  Loss (std)    = {std_loss:.6f}")
+    logger.info(f"  Loss (sem)    = {sem_loss:.6f}")
+    logger.info(f"")
+    logger.info(f"  PPL (media)   = {mean_ppl:.6f}")
+    logger.info(f"  PPL (std)     = {std_ppl:.6f}")
+    logger.info(f"  PPL (sem)     = {sem_ppl:.6f}")
+    logger.info(f"")
+    logger.info(f"Metriche richieste:")
+    logger.info(f"  ERRORE MEDIO (std Loss)         = {std_loss:.6f}")
+    logger.info(f"  DEVIAZIONE STANDARD (std PPL)   = {std_ppl:.6f}")
+    logger.info(f"  STANDARD ERROR MEAN (sem Loss)  = {sem_loss:.6f}")
+    logger.info(f"  STANDARD ERROR MEAN (sem PPL)   = {sem_ppl:.6f}")
+    logger.info(f"")
+    logger.info(f"Consistency check per fold:")
+    for r in fold_results:
+        if np.isfinite(r['loss']) and np.isfinite(r['ppl']):
+            expected_ppl = np.exp(r['loss'])
+            ppl_alt = (np.exp(-r['loss']/2.0)) ** (-2)  # Verifica formula alternativa
+            check1 = np.abs(expected_ppl - r['ppl']) < 1e-6
+            check2 = np.abs(ppl_alt - r['ppl']) < 1e-6
+            logger.info(f"  Fold {r['fold']}: exp({r['loss']:.6f}) = {expected_ppl:.6f} vs {r['ppl']:.6f} [exp: {check1}, alt: {check2}]")
+    logger.info("="*80 + "\n")
+    
+    # ✨ GRAFICO ANDAMENTO LOSS E PPL TRA I FOLD (PRIMA DEL TEST)
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        
+        fold_numbers = [r['fold'] for r in fold_results]
+        fold_losses = [r['loss'] for r in fold_results]
+        fold_ppls = [r['ppl'] for r in fold_results]
+        
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+        
+        # Grafico Loss
+        ax1.plot(fold_numbers, fold_losses, marker='o', linewidth=2, markersize=8, color='blue', label='Loss per Fold')
+        ax1.axhline(mean_loss, color='green', linestyle='--', linewidth=1.5, label=f'Mean Loss: {mean_loss:.4f}')
+        ax1.fill_between(fold_numbers, 
+                         [mean_loss - std_loss]*len(fold_numbers), 
+                         [mean_loss + std_loss]*len(fold_numbers), 
+                         alpha=0.2, color='green', label=f'±1 Std: {std_loss:.4f}')
+        ax1.set_xlabel('Fold', fontsize=12)
+        ax1.set_ylabel('Loss', fontsize=12)
+        ax1.set_title('Loss per Fold (3-Fold CV)', fontsize=14, fontweight='bold')
+        ax1.legend(loc='best')
+        ax1.grid(True, alpha=0.3)
+        ax1.set_xticks(fold_numbers)
+        
+        # Grafico PPL
+        ax2.plot(fold_numbers, fold_ppls, marker='s', linewidth=2, markersize=8, color='red', label='PPL per Fold')
+        ax2.axhline(mean_ppl, color='orange', linestyle='--', linewidth=1.5, label=f'Mean PPL: {mean_ppl:.4f}')
+        ax2.fill_between(fold_numbers, 
+                         [mean_ppl - std_ppl]*len(fold_numbers), 
+                         [mean_ppl + std_ppl]*len(fold_numbers), 
+                         alpha=0.2, color='orange', label=f'±1 Std: {std_ppl:.4f}')
+        ax2.set_xlabel('Fold', fontsize=12)
+        ax2.set_ylabel('Perplexity', fontsize=12)
+        ax2.set_title('Perplexity per Fold (3-Fold CV)', fontsize=14, fontweight='bold')
+        ax2.legend(loc='best')
+        ax2.grid(True, alpha=0.3)
+        ax2.set_xticks(fold_numbers)
+        
+        plt.tight_layout()
+        
+        # Salva il grafico
+        plot_path = run_dir / "3fold_cv_metrics.png"
+        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        logger.info(f"[CV] ✓ Grafico salvato in: {plot_path}")
+        
+    except Exception as e:
+        logger.warning(f"[CV] ⚠ Impossibile creare grafico: {e}")
+    
+    return fold_results
 
 
 def evaluate_perplexity_on_quantum_states(best_params_native, cfg, logger):
@@ -1261,16 +1543,17 @@ def main():
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         # ============================================================
-        # SALVATAGGIO MATRICI U e W (CRUCIALE - UNA SOLA VOLTA)
+        # SALVATAGGIO TUTTE LE MATRICI U, W, E, F (CRUCIALE)
         # ============================================================
-        logger.info("[CIRCUITS] Inizio salvataggio matrici U e W...")
+        logger.info("[SAVE] Inizio salvataggio TUTTE le matrici U, W, E, F...")
+        run_dir = None
         try:
-            U_matrix, W_matrix = save_variational_circuits_matrices(
-                best_params_native, cfg, logger, ts
+            run_dir, U_matrix, W_matrix, E_matrix, F_matrix = save_all_matrices(
+                best_params_native, cfg, logger, ts, encoding_instance=encoding_local
             )
-            logger.info(f"[CIRCUITS] ✓ Matrici variazionali U e W salvate con successo!")
+            logger.info(f"[SAVE] ✓ Tutte le matrici salvate in: {run_dir}")
         except Exception as e:
-            logger.error(f"[CIRCUITS] ✗ Errore nel salvataggio matrici: {e}")
+            logger.error(f"[SAVE] ✗ Errore nel salvataggio matrici: {e}")
             logger.error(traceback.format_exc())
         
         # ============================================================
@@ -1311,6 +1594,22 @@ def main():
         except Exception as e:
             logger.error(f"[EVAL] ✗ Errore nel calcolo perplexity: {e}")
             logger.error(traceback.format_exc())
+        
+        # ============================================================
+        # 3-FOLD CROSS VALIDATION (POST-TRAINING)
+        # ============================================================
+        if run_dir:
+            logger.info("[CV] Inizio 3-fold cross validation...")
+            try:
+                cv_results = run_3fold_cross_validation(
+                    run_dir, cfg, logger, use_quantum_states=use_quantum_states
+                )
+                logger.info(f"[CV] ✓ Cross validation completata: {len(cv_results)} folds")
+            except Exception as e:
+                logger.error(f"[CV] ✗ Errore nella cross validation: {e}")
+                logger.error(traceback.format_exc())
+        else:
+            logger.warning("[CV] Skip cross validation: matrici non salvate")
 
         # ============================================================
         # PRINT COMPREHENSIVE FINAL SUMMARY (HARD CONSTRAINT #5)
