@@ -65,9 +65,9 @@ class MaxLossEvaluationsReached(Exception):
     """
     pass
 
-# GLOBAL COUNTER for loss evaluations (HARD CONSTRAINT: stop at 120)
+# GLOBAL COUNTER for loss evaluations (controlled by config epochs)
 GLOBAL_LOSS_COUNTER = [0]  # Using list to allow modification in nested scopes
-MAX_LOSS_EVALUATIONS = 100
+MAX_LOSS_EVALUATIONS = OPTIMIZATION_CONFIG['epochs']  # Gestito da config.py
 
 # ---------------------------------------------------------------------
 # Logging minimale: dettagliato su rank 0, ridotto sugli altri
