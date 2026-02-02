@@ -1,0 +1,2221 @@
+2026-01-31 12:17:35,503 [INFO] [rank=0] [TEXT] Modalità SENTENCES TESTUALI attiva
+2026-01-31 12:17:35,519 [INFO] [rank=0] Frasi totali: 100; size MPI: 100
+2026-01-31 12:17:35,519 [INFO] [rank=0] [Rank 0] Frasi locali: 1 -> ['its contract expires dec. N']
+2026-01-31 12:17:35,544 [INFO] [rank=0] Parametri: quantum=480 embed=88 rot=16 tot=584 shape_half=(5, 2, 2, 4, 3)
+2026-01-31 12:17:35,725 [INFO] [rank=0] Inizio ottimizzazione con COBYLA (NO early stopping): maxiter=150, tol=1e-05
+2026-01-31 12:17:35,725 [INFO] [rank=0] [STOPPING CONFIG] HARD CONSTRAINT: Stop ONLY at 100 loss evaluations
+2026-01-31 12:17:35,725 [INFO] [rank=0] [STOPPING CONFIG] All early stopping logic DISABLED
+2026-01-31 12:17:36,054 [INFO] [rank=0] [LOSS EVAL 1/100] Starting evaluation...
+2026-01-31 12:18:01,884 [INFO] [rank=0] [TRAIN] Loss (circuito): 5.161863
+2026-01-31 12:18:01,886 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 5.140623
+2026-01-31 12:18:01,888 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 170.822195
+2026-01-31 12:18:01,890 [INFO] [rank=0] [TRACKER] New best! Loss=5.161863 at iter 1
+2026-01-31 12:18:01,892 [INFO] [rank=0] [TRACKING] iter=1, loss=5.161863, best=5.161863, evals=1/100
+2026-01-31 12:18:01,952 [INFO] [rank=0] [LOSS EVAL 2/100] Starting evaluation...
+2026-01-31 12:18:28,851 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.999374
+2026-01-31 12:18:28,854 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.987613
+2026-01-31 12:18:28,857 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 53.925989
+2026-01-31 12:18:28,861 [INFO] [rank=0] [TRACKER] New best! Loss=3.999374 at iter 2
+2026-01-31 12:18:28,863 [INFO] [rank=0] [TRACKING] iter=2, loss=3.999374, best=3.999374, evals=2/100
+2026-01-31 12:18:28,905 [INFO] [rank=0] [LOSS EVAL 3/100] Starting evaluation...
+2026-01-31 12:18:56,390 [INFO] [rank=0] [TRAIN] Loss (circuito): 6.480395
+2026-01-31 12:18:56,393 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 6.262414
+2026-01-31 12:18:56,396 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 524.483373
+2026-01-31 12:18:56,399 [INFO] [rank=0] [TRACKING] iter=3, loss=6.480395, best=3.999374, evals=3/100
+2026-01-31 12:18:56,449 [INFO] [rank=0] [LOSS EVAL 4/100] Starting evaluation...
+2026-01-31 12:19:24,898 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.115180
+2026-01-31 12:19:24,901 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.111427
+2026-01-31 12:19:24,904 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 22.453066
+2026-01-31 12:19:24,908 [INFO] [rank=0] [TRACKER] New best! Loss=3.115180 at iter 4
+2026-01-31 12:19:24,910 [INFO] [rank=0] [TRACKING] iter=4, loss=3.115180, best=3.115180, evals=4/100
+2026-01-31 12:19:24,965 [INFO] [rank=0] [LOSS EVAL 5/100] Starting evaluation...
+2026-01-31 12:19:53,400 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.651048
+2026-01-31 12:19:53,403 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.649047
+2026-01-31 12:19:53,406 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 14.140549
+2026-01-31 12:19:53,410 [INFO] [rank=0] [TRACKER] New best! Loss=2.651048 at iter 5
+2026-01-31 12:19:53,413 [INFO] [rank=0] [TRACKING] iter=5, loss=2.651048, best=2.651048, evals=5/100
+2026-01-31 12:19:53,470 [INFO] [rank=0] [LOSS EVAL 6/100] Starting evaluation...
+2026-01-31 12:20:22,152 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.770236
+2026-01-31 12:20:22,156 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.768555
+2026-01-31 12:20:22,158 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 15.935585
+2026-01-31 12:20:22,161 [INFO] [rank=0] [TRACKING] iter=6, loss=2.770236, best=2.651048, evals=6/100
+2026-01-31 12:20:22,223 [INFO] [rank=0] [LOSS EVAL 7/100] Starting evaluation...
+2026-01-31 12:20:50,843 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.079356
+2026-01-31 12:20:50,846 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.078601
+2026-01-31 12:20:50,849 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.993282
+2026-01-31 12:20:50,854 [INFO] [rank=0] [TRACKER] New best! Loss=2.079356 at iter 7
+2026-01-31 12:20:50,856 [INFO] [rank=0] [TRACKING] iter=7, loss=2.079356, best=2.079356, evals=7/100
+2026-01-31 12:20:50,915 [INFO] [rank=0] [LOSS EVAL 8/100] Starting evaluation...
+2026-01-31 12:21:19,666 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.538137
+2026-01-31 12:21:19,669 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.536903
+2026-01-31 12:21:19,672 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 12.640458
+2026-01-31 12:21:19,675 [INFO] [rank=0] [TRACKING] iter=8, loss=2.538137, best=2.079356, evals=8/100
+2026-01-31 12:21:19,738 [INFO] [rank=0] [LOSS EVAL 9/100] Starting evaluation...
+2026-01-31 12:21:48,434 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.396289
+2026-01-31 12:21:48,438 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.394732
+2026-01-31 12:21:48,441 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.965255
+2026-01-31 12:21:48,444 [INFO] [rank=0] [TRACKING] iter=9, loss=2.396289, best=2.079356, evals=9/100
+2026-01-31 12:21:48,506 [INFO] [rank=0] [LOSS EVAL 10/100] Starting evaluation...
+2026-01-31 12:21:48,507 [INFO] [rank=0] [EMBEDDING] E delta L2=NA V delta L2=NA EtE=I:True VtV=I:True max_abs(EtE-I)=6.66e-16 max_abs(VtV-I)=4.44e-16 range_equal=True E!=F=True |E-F|=2.721487 |det(V)|=1.000000
+2026-01-31 12:22:17,254 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.917068
+2026-01-31 12:22:17,258 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.916649
+2026-01-31 12:22:17,261 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.798142
+2026-01-31 12:22:17,265 [INFO] [rank=0] [TRACKER] New best! Loss=1.917068 at iter 10
+2026-01-31 12:22:17,268 [INFO] [rank=0] [TRACKING] iter=10, loss=1.917068, best=1.917068, evals=10/100
+2026-01-31 12:22:17,327 [INFO] [rank=0] [LOSS EVAL 11/100] Starting evaluation...
+2026-01-31 12:22:46,053 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.192937
+2026-01-31 12:22:46,057 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.192506
+2026-01-31 12:22:46,060 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.957632
+2026-01-31 12:22:46,062 [INFO] [rank=0] [TRACKING] iter=11, loss=2.192937, best=1.917068, evals=11/100
+2026-01-31 12:22:46,125 [INFO] [rank=0] [LOSS EVAL 12/100] Starting evaluation...
+2026-01-31 12:23:14,815 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.759640
+2026-01-31 12:23:14,819 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.759080
+2026-01-31 12:23:14,822 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.807090
+2026-01-31 12:23:14,825 [INFO] [rank=0] [TRACKER] New best! Loss=1.759640 at iter 12
+2026-01-31 12:23:14,828 [INFO] [rank=0] [TRACKING] iter=12, loss=1.759640, best=1.759640, evals=12/100
+2026-01-31 12:23:14,888 [INFO] [rank=0] [LOSS EVAL 13/100] Starting evaluation...
+2026-01-31 12:23:43,670 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.160087
+2026-01-31 12:23:43,674 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.159223
+2026-01-31 12:23:43,677 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.664407
+2026-01-31 12:23:43,679 [INFO] [rank=0] [TRACKING] iter=13, loss=2.160087, best=1.759640, evals=13/100
+2026-01-31 12:23:43,742 [INFO] [rank=0] [LOSS EVAL 14/100] Starting evaluation...
+2026-01-31 12:24:12,627 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.960541
+2026-01-31 12:24:12,630 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.959572
+2026-01-31 12:24:12,633 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.096289
+2026-01-31 12:24:12,636 [INFO] [rank=0] [TRACKING] iter=14, loss=1.960541, best=1.759640, evals=14/100
+2026-01-31 12:24:12,700 [INFO] [rank=0] [LOSS EVAL 15/100] Starting evaluation...
+2026-01-31 12:24:41,418 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.239072
+2026-01-31 12:24:41,422 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.238266
+2026-01-31 12:24:41,425 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.377053
+2026-01-31 12:24:41,428 [INFO] [rank=0] [TRACKING] iter=15, loss=2.239072, best=1.759640, evals=15/100
+2026-01-31 12:24:41,490 [INFO] [rank=0] [LOSS EVAL 16/100] Starting evaluation...
+2026-01-31 12:25:10,135 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.855895
+2026-01-31 12:25:10,138 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.855631
+2026-01-31 12:25:10,141 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.395730
+2026-01-31 12:25:10,143 [INFO] [rank=0] [TRACKING] iter=16, loss=1.855895, best=1.759640, evals=16/100
+2026-01-31 12:25:10,207 [INFO] [rank=0] [LOSS EVAL 17/100] Starting evaluation...
+2026-01-31 12:25:38,899 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.746605
+2026-01-31 12:25:38,902 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.746084
+2026-01-31 12:25:38,905 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.732114
+2026-01-31 12:25:38,909 [INFO] [rank=0] [TRACKER] New best! Loss=1.746605 at iter 17
+2026-01-31 12:25:38,911 [INFO] [rank=0] [TRACKING] iter=17, loss=1.746605, best=1.746605, evals=17/100
+2026-01-31 12:25:38,971 [INFO] [rank=0] [LOSS EVAL 18/100] Starting evaluation...
+2026-01-31 12:26:07,712 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.582944
+2026-01-31 12:26:07,716 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.581964
+2026-01-31 12:26:07,719 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.864500
+2026-01-31 12:26:07,723 [INFO] [rank=0] [TRACKER] New best! Loss=1.582944 at iter 18
+2026-01-31 12:26:07,726 [INFO] [rank=0] [TRACKING] iter=18, loss=1.582944, best=1.582944, evals=18/100
+2026-01-31 12:26:07,785 [INFO] [rank=0] [LOSS EVAL 19/100] Starting evaluation...
+2026-01-31 12:26:36,501 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.684619
+2026-01-31 12:26:36,505 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.683663
+2026-01-31 12:26:36,508 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.385244
+2026-01-31 12:26:36,511 [INFO] [rank=0] [TRACKING] iter=19, loss=1.684619, best=1.582944, evals=19/100
+2026-01-31 12:26:36,573 [INFO] [rank=0] [LOSS EVAL 20/100] Starting evaluation...
+2026-01-31 12:26:36,574 [INFO] [rank=0] [EMBEDDING] E delta L2=0.000000 V delta L2=0.000000 EtE=I:True VtV=I:True max_abs(EtE-I)=6.66e-16 max_abs(VtV-I)=4.44e-16 range_equal=True E!=F=True |E-F|=2.721487 |det(V)|=1.000000
+2026-01-31 12:27:05,290 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.722317
+2026-01-31 12:27:05,293 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.721717
+2026-01-31 12:27:05,297 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.594127
+2026-01-31 12:27:05,299 [INFO] [rank=0] [TRACKING] iter=20, loss=1.722317, best=1.582944, evals=20/100
+2026-01-31 12:27:05,363 [INFO] [rank=0] [LOSS EVAL 21/100] Starting evaluation...
+2026-01-31 12:27:34,117 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.823509
+2026-01-31 12:27:34,121 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.822742
+2026-01-31 12:27:34,124 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.188807
+2026-01-31 12:27:34,127 [INFO] [rank=0] [TRACKING] iter=21, loss=1.823509, best=1.582944, evals=21/100
+2026-01-31 12:27:34,189 [INFO] [rank=0] [LOSS EVAL 22/100] Starting evaluation...
+2026-01-31 12:28:02,947 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.654156
+2026-01-31 12:28:02,950 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.651912
+2026-01-31 12:28:02,953 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.216947
+2026-01-31 12:28:02,956 [INFO] [rank=0] [TRACKING] iter=22, loss=1.654156, best=1.582944, evals=22/100
+2026-01-31 12:28:03,020 [INFO] [rank=0] [LOSS EVAL 23/100] Starting evaluation...
+2026-01-31 12:28:31,745 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.638591
+2026-01-31 12:28:31,749 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.637183
+2026-01-31 12:28:31,752 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.140668
+2026-01-31 12:28:31,754 [INFO] [rank=0] [TRACKING] iter=23, loss=1.638591, best=1.582944, evals=23/100
+2026-01-31 12:28:31,821 [INFO] [rank=0] [LOSS EVAL 24/100] Starting evaluation...
+2026-01-31 12:29:00,559 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.867484
+2026-01-31 12:29:00,562 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.866227
+2026-01-31 12:29:00,565 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.463862
+2026-01-31 12:29:00,567 [INFO] [rank=0] [TRACKING] iter=24, loss=1.867484, best=1.582944, evals=24/100
+2026-01-31 12:29:00,627 [INFO] [rank=0] [LOSS EVAL 25/100] Starting evaluation...
+2026-01-31 12:29:29,338 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.821635
+2026-01-31 12:29:29,341 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.821027
+2026-01-31 12:29:29,345 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.178200
+2026-01-31 12:29:29,347 [INFO] [rank=0] [TRACKING] iter=25, loss=1.821635, best=1.582944, evals=25/100
+2026-01-31 12:29:29,413 [INFO] [rank=0] [LOSS EVAL 26/100] Starting evaluation...
+2026-01-31 12:29:58,170 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.713613
+2026-01-31 12:29:58,174 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.712300
+2026-01-31 12:29:58,177 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.541693
+2026-01-31 12:29:58,180 [INFO] [rank=0] [TRACKING] iter=26, loss=1.713613, best=1.582944, evals=26/100
+2026-01-31 12:29:58,246 [INFO] [rank=0] [LOSS EVAL 27/100] Starting evaluation...
+2026-01-31 12:30:27,018 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.912478
+2026-01-31 12:30:27,022 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.911328
+2026-01-31 12:30:27,025 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.762061
+2026-01-31 12:30:27,028 [INFO] [rank=0] [TRACKING] iter=27, loss=1.912478, best=1.582944, evals=27/100
+2026-01-31 12:30:27,091 [INFO] [rank=0] [LOSS EVAL 28/100] Starting evaluation...
+2026-01-31 12:30:55,850 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.677883
+2026-01-31 12:30:55,853 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.676533
+2026-01-31 12:30:55,856 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.346987
+2026-01-31 12:30:55,859 [INFO] [rank=0] [TRACKING] iter=28, loss=1.677883, best=1.582944, evals=28/100
+2026-01-31 12:30:55,924 [INFO] [rank=0] [LOSS EVAL 29/100] Starting evaluation...
+2026-01-31 12:31:26,122 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.697333
+2026-01-31 12:31:26,126 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.696582
+2026-01-31 12:31:26,129 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.455272
+2026-01-31 12:31:26,131 [INFO] [rank=0] [TRACKING] iter=29, loss=1.697333, best=1.582944, evals=29/100
+2026-01-31 12:31:26,198 [INFO] [rank=0] [LOSS EVAL 30/100] Starting evaluation...
+2026-01-31 12:31:26,199 [INFO] [rank=0] [EMBEDDING] E delta L2=0.000000 V delta L2=0.000000 EtE=I:True VtV=I:True max_abs(EtE-I)=6.66e-16 max_abs(VtV-I)=4.44e-16 range_equal=True E!=F=True |E-F|=2.721487 |det(V)|=1.000000
+2026-01-31 12:31:54,965 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.614507
+2026-01-31 12:31:54,969 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.612751
+2026-01-31 12:31:54,972 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.016595
+2026-01-31 12:31:54,975 [INFO] [rank=0] [TRACKING] iter=30, loss=1.614507, best=1.582944, evals=30/100
+2026-01-31 12:31:55,041 [INFO] [rank=0] [LOSS EVAL 31/100] Starting evaluation...
+2026-01-31 12:32:23,776 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.669827
+2026-01-31 12:32:23,780 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.668656
+2026-01-31 12:32:23,783 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.305032
+2026-01-31 12:32:23,786 [INFO] [rank=0] [TRACKING] iter=31, loss=1.669827, best=1.582944, evals=31/100
+2026-01-31 12:32:23,851 [INFO] [rank=0] [LOSS EVAL 32/100] Starting evaluation...
+2026-01-31 12:32:52,759 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.890498
+2026-01-31 12:32:52,763 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.889752
+2026-01-31 12:32:52,766 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.617725
+2026-01-31 12:32:52,768 [INFO] [rank=0] [TRACKING] iter=32, loss=1.890498, best=1.582944, evals=32/100
+2026-01-31 12:32:52,834 [INFO] [rank=0] [LOSS EVAL 33/100] Starting evaluation...
+2026-01-31 12:33:21,688 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.769053
+2026-01-31 12:33:21,692 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.768246
+2026-01-31 12:33:21,695 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.860567
+2026-01-31 12:33:21,698 [INFO] [rank=0] [TRACKING] iter=33, loss=1.769053, best=1.582944, evals=33/100
+2026-01-31 12:33:21,764 [INFO] [rank=0] [LOSS EVAL 34/100] Starting evaluation...
+2026-01-31 12:33:50,689 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.515433
+2026-01-31 12:33:50,693 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.514846
+2026-01-31 12:33:50,696 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.548722
+2026-01-31 12:33:50,700 [INFO] [rank=0] [TRACKER] New best! Loss=1.515433 at iter 34
+2026-01-31 12:33:50,702 [INFO] [rank=0] [TRACKING] iter=34, loss=1.515433, best=1.515433, evals=34/100
+2026-01-31 12:33:50,765 [INFO] [rank=0] [LOSS EVAL 35/100] Starting evaluation...
+2026-01-31 12:34:19,648 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.856937
+2026-01-31 12:34:19,652 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.856286
+2026-01-31 12:34:19,655 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.399924
+2026-01-31 12:34:19,658 [INFO] [rank=0] [TRACKING] iter=35, loss=1.856937, best=1.515433, evals=35/100
+2026-01-31 12:34:19,722 [INFO] [rank=0] [LOSS EVAL 36/100] Starting evaluation...
+2026-01-31 12:34:48,580 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.555054
+2026-01-31 12:34:48,584 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.554528
+2026-01-31 12:34:48,587 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.732853
+2026-01-31 12:34:48,590 [INFO] [rank=0] [TRACKING] iter=36, loss=1.555054, best=1.515433, evals=36/100
+2026-01-31 12:34:48,656 [INFO] [rank=0] [LOSS EVAL 37/100] Starting evaluation...
+2026-01-31 12:35:17,565 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.862112
+2026-01-31 12:35:17,569 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.861421
+2026-01-31 12:35:17,572 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.432869
+2026-01-31 12:35:17,575 [INFO] [rank=0] [TRACKING] iter=37, loss=1.862112, best=1.515433, evals=37/100
+2026-01-31 12:35:17,639 [INFO] [rank=0] [LOSS EVAL 38/100] Starting evaluation...
+2026-01-31 12:35:46,515 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.666745
+2026-01-31 12:35:46,519 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.665804
+2026-01-31 12:35:46,522 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.289925
+2026-01-31 12:35:46,524 [INFO] [rank=0] [TRACKING] iter=38, loss=1.666745, best=1.515433, evals=38/100
+2026-01-31 12:35:46,591 [INFO] [rank=0] [LOSS EVAL 39/100] Starting evaluation...
+2026-01-31 12:36:15,490 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.809927
+2026-01-31 12:36:15,494 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.808880
+2026-01-31 12:36:15,497 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.103607
+2026-01-31 12:36:15,500 [INFO] [rank=0] [TRACKING] iter=39, loss=1.809927, best=1.515433, evals=39/100
+2026-01-31 12:36:15,565 [INFO] [rank=0] [LOSS EVAL 40/100] Starting evaluation...
+2026-01-31 12:36:15,566 [INFO] [rank=0] [EMBEDDING] E delta L2=0.000000 V delta L2=0.000000 EtE=I:True VtV=I:True max_abs(EtE-I)=6.66e-16 max_abs(VtV-I)=4.44e-16 range_equal=True E!=F=True |E-F|=2.721487 |det(V)|=1.000000
+2026-01-31 12:36:44,484 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.558825
+2026-01-31 12:36:44,488 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.558213
+2026-01-31 12:36:44,491 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.750327
+2026-01-31 12:36:44,494 [INFO] [rank=0] [TRACKING] iter=40, loss=1.558825, best=1.515433, evals=40/100
+2026-01-31 12:36:44,560 [INFO] [rank=0] [LOSS EVAL 41/100] Starting evaluation...
+2026-01-31 12:37:13,509 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.583070
+2026-01-31 12:37:13,512 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.582511
+2026-01-31 12:37:13,515 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.867164
+2026-01-31 12:37:13,517 [INFO] [rank=0] [TRACKING] iter=41, loss=1.583070, best=1.515433, evals=41/100
+2026-01-31 12:37:13,583 [INFO] [rank=0] [LOSS EVAL 42/100] Starting evaluation...
+2026-01-31 12:37:42,506 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.533161
+2026-01-31 12:37:42,510 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.532211
+2026-01-31 12:37:42,513 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.628398
+2026-01-31 12:37:42,516 [INFO] [rank=0] [TRACKING] iter=42, loss=1.533161, best=1.515433, evals=42/100
+2026-01-31 12:37:42,584 [INFO] [rank=0] [LOSS EVAL 43/100] Starting evaluation...
+2026-01-31 12:38:11,515 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.423592
+2026-01-31 12:38:11,518 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.423140
+2026-01-31 12:38:11,521 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.150131
+2026-01-31 12:38:11,525 [INFO] [rank=0] [TRACKER] New best! Loss=1.423592 at iter 43
+2026-01-31 12:38:11,527 [INFO] [rank=0] [TRACKING] iter=43, loss=1.423592, best=1.423592, evals=43/100
+2026-01-31 12:38:11,588 [INFO] [rank=0] [LOSS EVAL 44/100] Starting evaluation...
+2026-01-31 12:38:40,590 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.479964
+2026-01-31 12:38:40,594 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.479465
+2026-01-31 12:38:40,597 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.390596
+2026-01-31 12:38:40,598 [INFO] [rank=0] [TRACKING] iter=44, loss=1.479964, best=1.423592, evals=44/100
+2026-01-31 12:38:40,665 [INFO] [rank=0] [LOSS EVAL 45/100] Starting evaluation...
+2026-01-31 12:39:09,656 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.726536
+2026-01-31 12:39:09,659 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.725868
+2026-01-31 12:39:09,662 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.617395
+2026-01-31 12:39:09,665 [INFO] [rank=0] [TRACKING] iter=45, loss=1.726536, best=1.423592, evals=45/100
+2026-01-31 12:39:09,730 [INFO] [rank=0] [LOSS EVAL 46/100] Starting evaluation...
+2026-01-31 12:39:38,650 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.433369
+2026-01-31 12:39:38,654 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.432611
+2026-01-31 12:39:38,657 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.189622
+2026-01-31 12:39:38,659 [INFO] [rank=0] [TRACKING] iter=46, loss=1.433369, best=1.423592, evals=46/100
+2026-01-31 12:39:38,725 [INFO] [rank=0] [LOSS EVAL 47/100] Starting evaluation...
+2026-01-31 12:40:07,660 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.539282
+2026-01-31 12:40:07,663 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.538953
+2026-01-31 12:40:07,666 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.659708
+2026-01-31 12:40:07,669 [INFO] [rank=0] [TRACKING] iter=47, loss=1.539282, best=1.423592, evals=47/100
+2026-01-31 12:40:07,734 [INFO] [rank=0] [LOSS EVAL 48/100] Starting evaluation...
+2026-01-31 12:40:36,663 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.587292
+2026-01-31 12:40:36,667 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.586235
+2026-01-31 12:40:36,670 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.885321
+2026-01-31 12:40:36,672 [INFO] [rank=0] [TRACKING] iter=48, loss=1.587292, best=1.423592, evals=48/100
+2026-01-31 12:40:36,738 [INFO] [rank=0] [LOSS EVAL 49/100] Starting evaluation...
+2026-01-31 12:41:05,689 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.511674
+2026-01-31 12:41:05,693 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.511426
+2026-01-31 12:41:05,696 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.533189
+2026-01-31 12:41:05,699 [INFO] [rank=0] [TRACKING] iter=49, loss=1.511674, best=1.423592, evals=49/100
+2026-01-31 12:41:05,763 [INFO] [rank=0] [LOSS EVAL 50/100] Starting evaluation...
+2026-01-31 12:41:05,764 [INFO] [rank=0] [EMBEDDING] E delta L2=0.000000 V delta L2=0.000000 EtE=I:True VtV=I:True max_abs(EtE-I)=6.66e-16 max_abs(VtV-I)=4.44e-16 range_equal=True E!=F=True |E-F|=2.721487 |det(V)|=1.000000
+2026-01-31 12:41:34,731 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.618469
+2026-01-31 12:41:34,735 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.617355
+2026-01-31 12:41:34,738 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.039742
+2026-01-31 12:41:34,741 [INFO] [rank=0] [TRACKING] iter=50, loss=1.618469, best=1.423592, evals=50/100
+2026-01-31 12:41:34,807 [INFO] [rank=0] [LOSS EVAL 51/100] Starting evaluation...
+2026-01-31 12:42:03,780 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.484288
+2026-01-31 12:42:03,783 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.483836
+2026-01-31 12:42:03,786 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.409831
+2026-01-31 12:42:03,789 [INFO] [rank=0] [TRACKING] iter=51, loss=1.484288, best=1.423592, evals=51/100
+2026-01-31 12:42:03,855 [INFO] [rank=0] [LOSS EVAL 52/100] Starting evaluation...
+2026-01-31 12:42:32,831 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.776199
+2026-01-31 12:42:32,835 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.775197
+2026-01-31 12:42:32,838 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.901445
+2026-01-31 12:42:32,840 [INFO] [rank=0] [TRACKING] iter=52, loss=1.776199, best=1.423592, evals=52/100
+2026-01-31 12:42:32,906 [INFO] [rank=0] [LOSS EVAL 53/100] Starting evaluation...
+2026-01-31 12:43:01,900 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.373186
+2026-01-31 12:43:01,903 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.372884
+2026-01-31 12:43:01,906 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.946717
+2026-01-31 12:43:01,911 [INFO] [rank=0] [TRACKER] New best! Loss=1.373186 at iter 53
+2026-01-31 12:43:01,913 [INFO] [rank=0] [TRACKING] iter=53, loss=1.373186, best=1.373186, evals=53/100
+2026-01-31 12:43:01,975 [INFO] [rank=0] [LOSS EVAL 54/100] Starting evaluation...
+2026-01-31 12:43:30,918 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.273220
+2026-01-31 12:43:30,922 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.272959
+2026-01-31 12:43:30,925 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.571406
+2026-01-31 12:43:30,930 [INFO] [rank=0] [TRACKER] New best! Loss=1.273220 at iter 54
+2026-01-31 12:43:30,933 [INFO] [rank=0] [TRACKING] iter=54, loss=1.273220, best=1.273220, evals=54/100
+2026-01-31 12:43:30,997 [INFO] [rank=0] [LOSS EVAL 55/100] Starting evaluation...
+2026-01-31 12:43:59,970 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.454477
+2026-01-31 12:43:59,974 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.454199
+2026-01-31 12:43:59,977 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.281054
+2026-01-31 12:43:59,980 [INFO] [rank=0] [TRACKING] iter=55, loss=1.454477, best=1.273220, evals=55/100
+2026-01-31 12:44:00,047 [INFO] [rank=0] [LOSS EVAL 56/100] Starting evaluation...
+2026-01-31 12:44:29,003 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.406096
+2026-01-31 12:44:29,007 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.405876
+2026-01-31 12:44:29,010 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.079098
+2026-01-31 12:44:29,013 [INFO] [rank=0] [TRACKING] iter=56, loss=1.406096, best=1.273220, evals=56/100
+2026-01-31 12:44:29,080 [INFO] [rank=0] [LOSS EVAL 57/100] Starting evaluation...
+2026-01-31 12:44:58,026 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.329787
+2026-01-31 12:44:58,030 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.329616
+2026-01-31 12:44:58,033 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.779592
+2026-01-31 12:44:58,036 [INFO] [rank=0] [TRACKING] iter=57, loss=1.329787, best=1.273220, evals=57/100
+2026-01-31 12:44:58,101 [INFO] [rank=0] [LOSS EVAL 58/100] Starting evaluation...
+2026-01-31 12:45:27,057 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.451119
+2026-01-31 12:45:27,060 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.450565
+2026-01-31 12:45:27,064 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.265524
+2026-01-31 12:45:27,066 [INFO] [rank=0] [TRACKING] iter=58, loss=1.451119, best=1.273220, evals=58/100
+2026-01-31 12:45:27,133 [INFO] [rank=0] [LOSS EVAL 59/100] Starting evaluation...
+2026-01-31 12:45:56,073 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.305695
+2026-01-31 12:45:56,077 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.305319
+2026-01-31 12:45:56,080 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.688865
+2026-01-31 12:45:56,083 [INFO] [rank=0] [TRACKING] iter=59, loss=1.305695, best=1.273220, evals=59/100
+2026-01-31 12:45:56,149 [INFO] [rank=0] [LOSS EVAL 60/100] Starting evaluation...
+2026-01-31 12:45:56,149 [INFO] [rank=0] [EMBEDDING] E delta L2=0.000000 V delta L2=0.000000 EtE=I:True VtV=I:True max_abs(EtE-I)=6.66e-16 max_abs(VtV-I)=4.44e-16 range_equal=True E!=F=True |E-F|=2.721487 |det(V)|=1.000000
+2026-01-31 12:46:25,092 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.169697
+2026-01-31 12:46:25,096 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.169603
+2026-01-31 12:46:25,099 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.220713
+2026-01-31 12:46:25,103 [INFO] [rank=0] [TRACKER] New best! Loss=1.169697 at iter 60
+2026-01-31 12:46:25,106 [INFO] [rank=0] [TRACKING] iter=60, loss=1.169697, best=1.169697, evals=60/100
+2026-01-31 12:46:25,169 [INFO] [rank=0] [LOSS EVAL 61/100] Starting evaluation...
+2026-01-31 12:46:54,104 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.209211
+2026-01-31 12:46:54,108 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.209069
+2026-01-31 12:46:54,111 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.350365
+2026-01-31 12:46:54,114 [INFO] [rank=0] [TRACKING] iter=61, loss=1.209211, best=1.169697, evals=61/100
+2026-01-31 12:46:54,180 [INFO] [rank=0] [LOSS EVAL 62/100] Starting evaluation...
+2026-01-31 12:47:23,119 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.179711
+2026-01-31 12:47:23,122 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.179349
+2026-01-31 12:47:23,126 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.252256
+2026-01-31 12:47:23,129 [INFO] [rank=0] [TRACKING] iter=62, loss=1.179711, best=1.169697, evals=62/100
+2026-01-31 12:47:23,196 [INFO] [rank=0] [LOSS EVAL 63/100] Starting evaluation...
+2026-01-31 12:47:52,149 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.132569
+2026-01-31 12:47:52,152 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.132395
+2026-01-31 12:47:52,156 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.103080
+2026-01-31 12:47:52,160 [INFO] [rank=0] [TRACKER] New best! Loss=1.132569 at iter 63
+2026-01-31 12:47:52,163 [INFO] [rank=0] [TRACKING] iter=63, loss=1.132569, best=1.132569, evals=63/100
+2026-01-31 12:47:52,225 [INFO] [rank=0] [LOSS EVAL 64/100] Starting evaluation...
+2026-01-31 12:48:21,212 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.342591
+2026-01-31 12:48:21,216 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.342434
+2026-01-31 12:48:21,219 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.828349
+2026-01-31 12:48:21,222 [INFO] [rank=0] [TRACKING] iter=64, loss=1.342591, best=1.132569, evals=64/100
+2026-01-31 12:48:21,289 [INFO] [rank=0] [LOSS EVAL 65/100] Starting evaluation...
+2026-01-31 12:48:50,282 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.387654
+2026-01-31 12:48:50,286 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.387309
+2026-01-31 12:48:50,289 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 4.004061
+2026-01-31 12:48:50,292 [INFO] [rank=0] [TRACKING] iter=65, loss=1.387654, best=1.132569, evals=65/100
+2026-01-31 12:48:50,358 [INFO] [rank=0] [LOSS EVAL 66/100] Starting evaluation...
+2026-01-31 12:49:19,339 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.245473
+2026-01-31 12:49:19,343 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.245276
+2026-01-31 12:49:19,346 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.473894
+2026-01-31 12:49:19,349 [INFO] [rank=0] [TRACKING] iter=66, loss=1.245473, best=1.132569, evals=66/100
+2026-01-31 12:49:19,416 [INFO] [rank=0] [LOSS EVAL 67/100] Starting evaluation...
+2026-01-31 12:49:48,387 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.134041
+2026-01-31 12:49:48,390 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.133853
+2026-01-31 12:49:48,393 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.107608
+2026-01-31 12:49:48,396 [INFO] [rank=0] [TRACKING] iter=67, loss=1.134041, best=1.132569, evals=67/100
+2026-01-31 12:49:48,463 [INFO] [rank=0] [LOSS EVAL 68/100] Starting evaluation...
+2026-01-31 12:50:17,507 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.207428
+2026-01-31 12:50:17,511 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.207344
+2026-01-31 12:50:17,514 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.344591
+2026-01-31 12:50:17,517 [INFO] [rank=0] [TRACKING] iter=68, loss=1.207428, best=1.132569, evals=68/100
+2026-01-31 12:50:17,583 [INFO] [rank=0] [LOSS EVAL 69/100] Starting evaluation...
+2026-01-31 12:50:46,614 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.262284
+2026-01-31 12:50:46,618 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.262101
+2026-01-31 12:50:46,620 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.532838
+2026-01-31 12:50:46,622 [INFO] [rank=0] [TRACKING] iter=69, loss=1.262284, best=1.132569, evals=69/100
+2026-01-31 12:50:46,690 [INFO] [rank=0] [LOSS EVAL 70/100] Starting evaluation...
+2026-01-31 12:50:46,691 [INFO] [rank=0] [EMBEDDING] E delta L2=0.000000 V delta L2=0.000000 EtE=I:True VtV=I:True max_abs(EtE-I)=6.66e-16 max_abs(VtV-I)=4.44e-16 range_equal=True E!=F=True |E-F|=2.721487 |det(V)|=1.000000
+2026-01-31 12:51:15,708 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.225891
+2026-01-31 12:51:15,712 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.225791
+2026-01-31 12:51:15,715 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.406860
+2026-01-31 12:51:15,718 [INFO] [rank=0] [TRACKING] iter=70, loss=1.225891, best=1.132569, evals=70/100
+2026-01-31 12:51:15,785 [INFO] [rank=0] [LOSS EVAL 71/100] Starting evaluation...
+2026-01-31 12:51:44,832 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.334287
+2026-01-31 12:51:44,836 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.334001
+2026-01-31 12:51:44,839 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.796200
+2026-01-31 12:51:44,842 [INFO] [rank=0] [TRACKING] iter=71, loss=1.334287, best=1.132569, evals=71/100
+2026-01-31 12:51:44,908 [INFO] [rank=0] [LOSS EVAL 72/100] Starting evaluation...
+2026-01-31 12:52:13,985 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.297369
+2026-01-31 12:52:13,989 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.296999
+2026-01-31 12:52:13,992 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.658302
+2026-01-31 12:52:13,995 [INFO] [rank=0] [TRACKING] iter=72, loss=1.297369, best=1.132569, evals=72/100
+2026-01-31 12:52:14,062 [INFO] [rank=0] [LOSS EVAL 73/100] Starting evaluation...
+2026-01-31 12:52:43,050 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.310957
+2026-01-31 12:52:43,054 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.310620
+2026-01-31 12:52:43,057 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.708473
+2026-01-31 12:52:43,060 [INFO] [rank=0] [TRACKING] iter=73, loss=1.310957, best=1.132569, evals=73/100
+2026-01-31 12:52:43,127 [INFO] [rank=0] [LOSS EVAL 74/100] Starting evaluation...
+2026-01-31 12:53:12,118 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.310995
+2026-01-31 12:53:12,122 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.310489
+2026-01-31 12:53:12,125 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.707985
+2026-01-31 12:53:12,128 [INFO] [rank=0] [TRACKING] iter=74, loss=1.310995, best=1.132569, evals=74/100
+2026-01-31 12:53:12,196 [INFO] [rank=0] [LOSS EVAL 75/100] Starting evaluation...
+2026-01-31 12:53:41,176 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.188106
+2026-01-31 12:53:41,180 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.187683
+2026-01-31 12:53:41,183 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.279474
+2026-01-31 12:53:41,186 [INFO] [rank=0] [TRACKING] iter=75, loss=1.188106, best=1.132569, evals=75/100
+2026-01-31 12:53:41,253 [INFO] [rank=0] [LOSS EVAL 76/100] Starting evaluation...
+2026-01-31 12:54:10,243 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.297652
+2026-01-31 12:54:10,247 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.297150
+2026-01-31 12:54:10,250 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.658854
+2026-01-31 12:54:10,253 [INFO] [rank=0] [TRACKING] iter=76, loss=1.297652, best=1.132569, evals=76/100
+2026-01-31 12:54:10,320 [INFO] [rank=0] [LOSS EVAL 77/100] Starting evaluation...
+2026-01-31 12:54:39,277 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.320514
+2026-01-31 12:54:39,280 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.320306
+2026-01-31 12:54:39,283 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.744568
+2026-01-31 12:54:39,286 [INFO] [rank=0] [TRACKING] iter=77, loss=1.320514, best=1.132569, evals=77/100
+2026-01-31 12:54:39,353 [INFO] [rank=0] [LOSS EVAL 78/100] Starting evaluation...
+2026-01-31 12:55:08,299 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.237360
+2026-01-31 12:55:08,303 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.237252
+2026-01-31 12:55:08,306 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.446130
+2026-01-31 12:55:08,309 [INFO] [rank=0] [TRACKING] iter=78, loss=1.237360, best=1.132569, evals=78/100
+2026-01-31 12:55:08,376 [INFO] [rank=0] [LOSS EVAL 79/100] Starting evaluation...
+2026-01-31 12:55:37,356 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.307856
+2026-01-31 12:55:37,360 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.307687
+2026-01-31 12:55:37,363 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.697612
+2026-01-31 12:55:37,366 [INFO] [rank=0] [TRACKING] iter=79, loss=1.307856, best=1.132569, evals=79/100
+2026-01-31 12:55:37,433 [INFO] [rank=0] [LOSS EVAL 80/100] Starting evaluation...
+2026-01-31 12:55:37,434 [INFO] [rank=0] [EMBEDDING] E delta L2=0.000000 V delta L2=0.000000 EtE=I:True VtV=I:True max_abs(EtE-I)=6.66e-16 max_abs(VtV-I)=4.44e-16 range_equal=True E!=F=True |E-F|=2.721487 |det(V)|=1.000000
+2026-01-31 12:56:06,421 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.257131
+2026-01-31 12:56:06,425 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.257044
+2026-01-31 12:56:06,428 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.515017
+2026-01-31 12:56:06,431 [INFO] [rank=0] [TRACKING] iter=80, loss=1.257131, best=1.132569, evals=80/100
+2026-01-31 12:56:06,499 [INFO] [rank=0] [LOSS EVAL 81/100] Starting evaluation...
+2026-01-31 12:56:35,479 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.204718
+2026-01-31 12:56:35,483 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.204420
+2026-01-31 12:56:35,486 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.334824
+2026-01-31 12:56:35,489 [INFO] [rank=0] [TRACKING] iter=81, loss=1.204718, best=1.132569, evals=81/100
+2026-01-31 12:56:35,556 [INFO] [rank=0] [LOSS EVAL 82/100] Starting evaluation...
+2026-01-31 12:57:04,547 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.321561
+2026-01-31 12:57:04,551 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.321305
+2026-01-31 12:57:04,555 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.748308
+2026-01-31 12:57:04,558 [INFO] [rank=0] [TRACKING] iter=82, loss=1.321561, best=1.132569, evals=82/100
+2026-01-31 12:57:04,627 [INFO] [rank=0] [LOSS EVAL 83/100] Starting evaluation...
+2026-01-31 12:57:33,642 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.358890
+2026-01-31 12:57:33,646 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.358333
+2026-01-31 12:57:33,649 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.889704
+2026-01-31 12:57:33,652 [INFO] [rank=0] [TRACKING] iter=83, loss=1.358890, best=1.132569, evals=83/100
+2026-01-31 12:57:33,721 [INFO] [rank=0] [LOSS EVAL 84/100] Starting evaluation...
+2026-01-31 12:58:02,705 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.107462
+2026-01-31 12:58:02,708 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.107242
+2026-01-31 12:58:02,712 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.026000
+2026-01-31 12:58:02,716 [INFO] [rank=0] [TRACKER] New best! Loss=1.107462 at iter 84
+2026-01-31 12:58:02,718 [INFO] [rank=0] [TRACKING] iter=84, loss=1.107462, best=1.107462, evals=84/100
+2026-01-31 12:58:02,785 [INFO] [rank=0] [LOSS EVAL 85/100] Starting evaluation...
+2026-01-31 12:58:31,802 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.158836
+2026-01-31 12:58:31,806 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.158583
+2026-01-31 12:58:31,809 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.185418
+2026-01-31 12:58:31,812 [INFO] [rank=0] [TRACKING] iter=85, loss=1.158836, best=1.107462, evals=85/100
+2026-01-31 12:58:31,879 [INFO] [rank=0] [LOSS EVAL 86/100] Starting evaluation...
+2026-01-31 12:59:00,897 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.113827
+2026-01-31 12:59:00,900 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.113424
+2026-01-31 12:59:00,903 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.044767
+2026-01-31 12:59:00,906 [INFO] [rank=0] [TRACKING] iter=86, loss=1.113827, best=1.107462, evals=86/100
+2026-01-31 12:59:00,975 [INFO] [rank=0] [LOSS EVAL 87/100] Starting evaluation...
+2026-01-31 12:59:29,994 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.247645
+2026-01-31 12:59:29,998 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.247099
+2026-01-31 12:59:30,001 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.480232
+2026-01-31 12:59:30,004 [INFO] [rank=0] [TRACKING] iter=87, loss=1.247645, best=1.107462, evals=87/100
+2026-01-31 12:59:30,071 [INFO] [rank=0] [LOSS EVAL 88/100] Starting evaluation...
+2026-01-31 12:59:59,079 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.044258
+2026-01-31 12:59:59,083 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.043735
+2026-01-31 12:59:59,086 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 2.839803
+2026-01-31 12:59:59,090 [INFO] [rank=0] [TRACKER] New best! Loss=1.044258 at iter 88
+2026-01-31 12:59:59,093 [INFO] [rank=0] [TRACKING] iter=88, loss=1.044258, best=1.044258, evals=88/100
+2026-01-31 12:59:59,157 [INFO] [rank=0] [LOSS EVAL 89/100] Starting evaluation...
+2026-01-31 13:00:28,163 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.273979
+2026-01-31 13:00:28,167 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.273254
+2026-01-31 13:00:28,170 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.572458
+2026-01-31 13:00:28,173 [INFO] [rank=0] [TRACKING] iter=89, loss=1.273979, best=1.044258, evals=89/100
+2026-01-31 13:00:28,241 [INFO] [rank=0] [LOSS EVAL 90/100] Starting evaluation...
+2026-01-31 13:00:28,241 [INFO] [rank=0] [EMBEDDING] E delta L2=0.000000 V delta L2=0.000000 EtE=I:True VtV=I:True max_abs(EtE-I)=6.66e-16 max_abs(VtV-I)=4.44e-16 range_equal=True E!=F=True |E-F|=2.721487 |det(V)|=1.000000
+2026-01-31 13:00:57,235 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.086311
+2026-01-31 13:00:57,239 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.085198
+2026-01-31 13:00:57,242 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 2.960025
+2026-01-31 13:00:57,245 [INFO] [rank=0] [TRACKING] iter=90, loss=1.086311, best=1.044258, evals=90/100
+2026-01-31 13:00:57,313 [INFO] [rank=0] [LOSS EVAL 91/100] Starting evaluation...
+2026-01-31 13:01:26,324 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.338562
+2026-01-31 13:01:26,328 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.337647
+2026-01-31 13:01:26,331 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.810068
+2026-01-31 13:01:26,334 [INFO] [rank=0] [TRACKING] iter=91, loss=1.338562, best=1.044258, evals=91/100
+2026-01-31 13:01:26,402 [INFO] [rank=0] [LOSS EVAL 92/100] Starting evaluation...
+2026-01-31 13:01:55,410 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.201770
+2026-01-31 13:01:55,414 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.200595
+2026-01-31 13:01:55,417 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.322092
+2026-01-31 13:01:55,420 [INFO] [rank=0] [TRACKING] iter=92, loss=1.201770, best=1.044258, evals=92/100
+2026-01-31 13:01:55,488 [INFO] [rank=0] [LOSS EVAL 93/100] Starting evaluation...
+2026-01-31 13:02:24,479 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.260473
+2026-01-31 13:02:24,483 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.259639
+2026-01-31 13:02:24,486 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.524149
+2026-01-31 13:02:24,489 [INFO] [rank=0] [TRACKING] iter=93, loss=1.260473, best=1.044258, evals=93/100
+2026-01-31 13:02:24,557 [INFO] [rank=0] [LOSS EVAL 94/100] Starting evaluation...
+2026-01-31 13:02:53,553 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.175124
+2026-01-31 13:02:53,557 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.174918
+2026-01-31 13:02:53,560 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.237879
+2026-01-31 13:02:53,563 [INFO] [rank=0] [TRACKING] iter=94, loss=1.175124, best=1.044258, evals=94/100
+2026-01-31 13:02:53,631 [INFO] [rank=0] [LOSS EVAL 95/100] Starting evaluation...
+2026-01-31 13:03:22,601 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.271990
+2026-01-31 13:03:22,605 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.271242
+2026-01-31 13:03:22,608 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.565278
+2026-01-31 13:03:22,611 [INFO] [rank=0] [TRACKING] iter=95, loss=1.271990, best=1.044258, evals=95/100
+2026-01-31 13:03:22,679 [INFO] [rank=0] [LOSS EVAL 96/100] Starting evaluation...
+2026-01-31 13:03:51,647 [INFO] [rank=0] [TRAIN] Loss (circuito): 0.945613
+2026-01-31 13:03:51,651 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 0.945211
+2026-01-31 13:03:51,654 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 2.573357
+2026-01-31 13:03:51,659 [INFO] [rank=0] [TRACKER] New best! Loss=0.945613 at iter 96
+2026-01-31 13:03:51,662 [INFO] [rank=0] [TRACKING] iter=96, loss=0.945613, best=0.945613, evals=96/100
+2026-01-31 13:03:51,729 [INFO] [rank=0] [LOSS EVAL 97/100] Starting evaluation...
+2026-01-31 13:04:20,705 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.243010
+2026-01-31 13:04:20,709 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.242582
+2026-01-31 13:04:20,712 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.464549
+2026-01-31 13:04:20,715 [INFO] [rank=0] [TRACKING] iter=97, loss=1.243010, best=0.945613, evals=97/100
+2026-01-31 13:04:20,783 [INFO] [rank=0] [LOSS EVAL 98/100] Starting evaluation...
+2026-01-31 13:04:49,726 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.027633
+2026-01-31 13:04:49,730 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.027011
+2026-01-31 13:04:49,733 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 2.792706
+2026-01-31 13:04:49,736 [INFO] [rank=0] [TRACKING] iter=98, loss=1.027633, best=0.945613, evals=98/100
+2026-01-31 13:04:49,807 [INFO] [rank=0] [LOSS EVAL 99/100] Starting evaluation...
+2026-01-31 13:05:18,770 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.147074
+2026-01-31 13:05:18,774 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.146658
+2026-01-31 13:05:18,777 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 3.147657
+2026-01-31 13:05:18,780 [INFO] [rank=0] [TRACKING] iter=99, loss=1.147074, best=0.945613, evals=99/100
+2026-01-31 13:05:18,850 [INFO] [rank=0] [LOSS EVAL 100/100] Starting evaluation...
+2026-01-31 13:05:18,850 [INFO] [rank=0] [MAX EVALUATIONS REACHED] Stopping at 100 loss evaluations. This is the ONLY stopping condition (early stopping is DISABLED).
+2026-01-31 13:05:18,850 [INFO] [rank=0] ======================================================================
+2026-01-31 13:05:18,850 [INFO] [rank=0] [MAX EVALUATIONS] Training reached 100 loss evaluations
+2026-01-31 13:05:18,850 [INFO] [rank=0] [MAX EVALUATIONS] This is the intended stopping condition
+2026-01-31 13:05:18,850 [INFO] [rank=0] ======================================================================
+2026-01-31 13:05:18,850 [INFO] [rank=0] [FINAL PARAMS] Using best parameters found: loss=0.945613, iteration=96
+2026-01-31 13:05:18,850 [INFO] [rank=0] [STOPPING REASON] Reached max 100 loss evaluations
+2026-01-31 13:05:18,851 [INFO] [rank=0] [COBYLA] 🛑 Terminato per SMART EARLY STOPPING dopo 96 iterazioni
+2026-01-31 13:05:18,851 [INFO] [rank=0] [COBYLA] Reason: Reached max 100 loss evaluations
+2026-01-31 13:05:18,851 [INFO] [rank=0] [COBYLA] Final loss: 0.945613
+2026-01-31 13:05:18,851 [INFO] [rank=0] [SAVE] Inizio salvataggio TUTTE le matrici U, W, E, F...
+2026-01-31 13:05:18,863 [INFO] [rank=0] [SAVE] Salvataggio matrici in: results/run_20260131_130518_seed42
+2026-01-31 13:05:18,863 [INFO] [rank=0] [SAVE] Run ID: run_20260131_130518_seed42
+2026-01-31 13:05:18,907 [INFO] [rank=0] [SAVE] U shape: (16, 16) -> results/run_20260131_130518_seed42/matrices/U_matrix.npy
+2026-01-31 13:05:18,907 [INFO] [rank=0] [SAVE] W shape: (16, 16) -> results/run_20260131_130518_seed42/matrices/W_matrix.npy
+2026-01-31 13:05:18,907 [INFO] [rank=0] [SAVE] E shape: (22, 4) -> results/run_20260131_130518_seed42/matrices/E_matrix.npy
+2026-01-31 13:05:18,907 [INFO] [rank=0] [SAVE] F shape: (22, 4) -> results/run_20260131_130518_seed42/matrices/F_matrix.npy
+2026-01-31 13:05:18,908 [INFO] [rank=0] [SAVE] V_rotation shape: (4, 4) -> results/run_20260131_130518_seed42/matrices/V_rotation.npy
+2026-01-31 13:05:18,908 [INFO] [rank=0] [SAVE] Parametri theta: (584,) -> results/run_20260131_130518_seed42/matrices/best_params_native.npy
+2026-01-31 13:05:18,909 [INFO] [rank=0] [SAVE] Metadata salvato
+2026-01-31 13:05:18,909 [INFO] [rank=0] [SAVE] ✓ Tutte le matrici salvate in: results/run_20260131_130518_seed42
+2026-01-31 13:05:18,909 [INFO] [rank=0] [ANCILLAE] ⏭ Skip analisi ancillae (modalità FRASI TESTUALI)
+2026-01-31 13:05:18,909 [INFO] [rank=0] [EVAL] Inizio valutazione perplexity...
+2026-01-31 13:05:18,968 [INFO] [rank=0] [EVAL] Calcolo perplexity su 100 nuove frasi
+2026-01-31 13:05:18,971 [INFO] [rank=0] [EVAL] Matrici configurate:
+2026-01-31 13:05:18,971 [INFO] [rank=0] [EVAL]   E (embeddingMatrix): (22, 4)
+2026-01-31 13:05:18,971 [INFO] [rank=0] [EVAL]   V (rotationMatrix): (4, 4)
+2026-01-31 13:05:18,971 [INFO] [rank=0] [EVAL]   F (outputEmbeddingMatrix = E @ V): (22, 4)
+2026-01-31 13:05:18,971 [INFO] [rank=0] [EVAL] ✅ Tutte le 4 matrici (U, W, E, F) saranno usate nel test
+2026-01-31 13:42:23,983 [INFO] [rank=0] 
+================================================================================
+2026-01-31 13:42:23,983 [INFO] [rank=0] === TEST-ONLY MODE: SKIP TRAINING ===
+2026-01-31 13:42:23,984 [INFO] [rank=0] ================================================================================
+2026-01-31 13:42:23,984 [INFO] [rank=0] [TEST-ONLY] Caricamento matrici da: /leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superposition
+2026-01-31 13:42:23,994 [INFO] [rank=0] [TEST-ONLY] ✓ Matrici caricate:
+2026-01-31 13:42:23,994 [INFO] [rank=0] [TEST-ONLY]   - best_params_native: (584,)
+2026-01-31 13:42:23,995 [INFO] [rank=0] [TEST-ONLY]   - U_matrix: (16, 16)
+2026-01-31 13:42:23,995 [INFO] [rank=0] [TEST-ONLY]   - W_matrix: (16, 16)
+2026-01-31 13:42:23,995 [INFO] [rank=0] [TEST-ONLY]   - E_matrix: (22, 4)
+2026-01-31 13:42:23,995 [INFO] [rank=0] [TEST-ONLY]   - F_matrix: (22, 4)
+2026-01-31 13:42:23,995 [INFO] [rank=0] [TEST-ONLY]   - V_rotation: (4, 4)
+2026-01-31 13:42:23,995 [INFO] [rank=0] [TEST-ONLY]   - Metadata: {'run_id': 'run_20260131_130518_seed42', 'timestamp': '20260131_130518', 'seed': 42, 'num_layers': 5, 'num_qubits': 4, 'embedding_dim': 4, 'U_shape': (16, 16), 'W_shape': (16, 16), 'E_shape': (22, 4), 'F_shape': (22, 4)}
+2026-01-31 13:42:24,003 [INFO] [rank=0] [TEST-ONLY] ✓ Matrici copiate in: results/test_only_20260131_134223/matrices
+2026-01-31 13:42:24,003 [INFO] [rank=0] [TEST-ONLY] Inizio 3-fold cross-validation...
+2026-01-31 13:42:24,003 [INFO] [rank=0] 
+================================================================================
+2026-01-31 13:42:24,003 [INFO] [rank=0] === 3-FOLD CROSS VALIDATION (POST-TRAINING) ===
+2026-01-31 13:42:24,003 [INFO] [rank=0] ================================================================================
+2026-01-31 13:42:24,003 [INFO] [rank=0] [CV] Caricamento parametri da: results/test_only_20260131_134223
+2026-01-31 13:42:24,006 [INFO] [rank=0] [CV] ✓ U caricata: (16, 16)
+2026-01-31 13:42:24,006 [INFO] [rank=0] [CV] ✓ W caricata: (16, 16)
+2026-01-31 13:42:24,006 [INFO] [rank=0] [CV] ✓ E caricata: (22, 4)
+2026-01-31 13:42:24,006 [INFO] [rank=0] [CV] ✓ F caricata: (22, 4)
+2026-01-31 13:42:24,006 [INFO] [rank=0] [CV] ✓ V_rotation caricata: (4, 4)
+2026-01-31 13:42:24,006 [INFO] [rank=0] [CV] ✓ Parametri theta caricati: (584,)
+2026-01-31 13:42:24,006 [INFO] [rank=0] [CV] Run ID: run_20260131_130518_seed42
+2026-01-31 13:42:24,006 [INFO] [rank=0] [CV] Config: max_sentences=100, sentence_length=5
+2026-01-31 13:42:24,066 [INFO] [rank=0] [CV] Uso 100 frasi da dataset
+2026-01-31 13:42:24,066 [INFO] [rank=0] [CV] Frasi filtrate per lunghezza 5: 100
+2026-01-31 13:42:24,066 [INFO] [rank=0] [CV] Frasi test totali: 100
+2026-01-31 13:42:24,066 [INFO] [rank=0] 
+[CV] === Fold 1/3 === (33 frasi, 5 parole/frase)
+2026-01-31 13:42:24,075 [INFO] [rank=0] [CV] Fold 1 - Encoding configurato con E e V caricati
+2026-01-31 13:42:24,075 [INFO] [rank=0] [CV] Fold 1 - F calcolata: shape=(22, 4)
+2026-01-31 13:42:24,075 [INFO] [rank=0] [CV] Fold 1 - Verifica F: ||F_caricata - F_calcolata|| = 0.00e+00
+2026-01-31 13:42:24,075 [INFO] [rank=0] [CV] Fold 1 - ✅ TUTTE le 4 matrici (U, W, E, F) verranno usate nel test
+2026-01-31 13:55:32,580 [INFO] [rank=0] [CV] Fold 1 - Frasi: 33, Parole/frase: 5, Totale parole: 165
+2026-01-31 13:55:32,624 [INFO] [rank=0] [CV] Fold 1 - Loss (L=-2ln(mean_sqrt_p)): 1.877422
+2026-01-31 13:55:32,627 [INFO] [rank=0] [CV] Fold 1 - PPL (exp(L)): 6.536633
+2026-01-31 13:55:32,629 [INFO] [rank=0] [CV] Fold 1 - PPL ((mean_sqrt_p)^-2): 6.536633
+2026-01-31 13:55:32,632 [INFO] [rank=0] [CV] Fold 1 - Consistency check: True
+2026-01-31 13:55:32,634 [INFO] [rank=0] 
+[CV] === Fold 2/3 === (33 frasi, 5 parole/frase)
+2026-01-31 13:55:32,638 [INFO] [rank=0] [CV] Fold 2 - Encoding configurato con E e V caricati
+2026-01-31 13:55:32,641 [INFO] [rank=0] [CV] Fold 2 - F calcolata: shape=(22, 4)
+2026-01-31 13:55:32,643 [INFO] [rank=0] [CV] Fold 2 - Verifica F: ||F_caricata - F_calcolata|| = 0.00e+00
+2026-01-31 13:55:32,644 [INFO] [rank=0] [CV] Fold 2 - ✅ TUTTE le 4 matrici (U, W, E, F) verranno usate nel test
+2026-01-31 14:08:45,449 [INFO] [rank=0] [CV] Fold 2 - Frasi: 33, Parole/frase: 5, Totale parole: 165
+2026-01-31 14:08:45,546 [INFO] [rank=0] [CV] Fold 2 - Loss (L=-2ln(mean_sqrt_p)): 1.914665
+2026-01-31 14:08:45,549 [INFO] [rank=0] [CV] Fold 2 - PPL (exp(L)): 6.784666
+2026-01-31 14:08:45,551 [INFO] [rank=0] [CV] Fold 2 - PPL ((mean_sqrt_p)^-2): 6.784666
+2026-01-31 14:08:45,553 [INFO] [rank=0] [CV] Fold 2 - Consistency check: True
+2026-01-31 14:08:45,556 [INFO] [rank=0] 
+[CV] === Fold 3/3 === (34 frasi, 5 parole/frase)
+2026-01-31 14:08:45,560 [INFO] [rank=0] [CV] Fold 3 - Encoding configurato con E e V caricati
+2026-01-31 14:08:45,562 [INFO] [rank=0] [CV] Fold 3 - F calcolata: shape=(22, 4)
+2026-01-31 14:08:45,563 [INFO] [rank=0] [CV] Fold 3 - Verifica F: ||F_caricata - F_calcolata|| = 0.00e+00
+2026-01-31 14:08:45,565 [INFO] [rank=0] [CV] Fold 3 - ✅ TUTTE le 4 matrici (U, W, E, F) verranno usate nel test
+2026-01-31 14:22:24,560 [INFO] [rank=0] [CV] Fold 3 - Frasi: 34, Parole/frase: 5, Totale parole: 170
+2026-01-31 14:22:24,656 [INFO] [rank=0] [CV] Fold 3 - Loss (L=-2ln(mean_sqrt_p)): 1.938524
+2026-01-31 14:22:24,658 [INFO] [rank=0] [CV] Fold 3 - PPL (exp(L)): 6.948491
+2026-01-31 14:22:24,661 [INFO] [rank=0] [CV] Fold 3 - PPL ((mean_sqrt_p)^-2): 6.948491
+2026-01-31 14:22:24,663 [INFO] [rank=0] [CV] Fold 3 - Consistency check: True
+2026-01-31 14:22:24,666 [INFO] [rank=0] 
+[CV] Fold con dati validi: 3/3
+2026-01-31 14:22:24,669 [INFO] [rank=0] 
+================================================================================
+2026-01-31 14:22:24,671 [INFO] [rank=0] === 3-FOLD CV RESULTS ===
+2026-01-31 14:22:24,673 [INFO] [rank=0] ================================================================================
+2026-01-31 14:22:24,674 [INFO] [rank=0] Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+2026-01-31 14:22:24,677 [INFO] [rank=0] Formula PPL:  exp(L) = (mean_sqrt_p)^(-2)
+2026-01-31 14:22:24,679 [INFO] [rank=0] 
+2026-01-31 14:22:24,681 [INFO] [rank=0] Configurazione test:
+2026-01-31 14:22:24,684 [INFO] [rank=0]   - Numero frasi per fold: ~33
+2026-01-31 14:22:24,686 [INFO] [rank=0]   - Parole per frase: 5
+2026-01-31 14:22:24,689 [INFO] [rank=0]   - Totale frasi: 100
+2026-01-31 14:22:24,691 [INFO] [rank=0]   - Parametri usati: U, W, E, F (caricati da run_20260131_130518_seed42)
+2026-01-31 14:22:24,694 [INFO] [rank=0] 
+2026-01-31 14:22:24,695 [INFO] [rank=0] === LOSS E PPL PER FOLD ===
+2026-01-31 14:22:24,697 [INFO] [rank=0]   Fold 1: Loss=1.877422, PPL=6.536633
+2026-01-31 14:22:24,700 [INFO] [rank=0]   Fold 2: Loss=1.914665, PPL=6.784666
+2026-01-31 14:22:24,702 [INFO] [rank=0]   Fold 3: Loss=1.938524, PPL=6.948491
+2026-01-31 14:22:24,704 [INFO] [rank=0] 
+2026-01-31 14:22:24,706 [INFO] [rank=0] Risultati (3 fold validi):
+2026-01-31 14:22:24,708 [INFO] [rank=0]   Loss (media)  = 1.910204
+2026-01-31 14:22:24,711 [INFO] [rank=0]   Loss (std)    = 0.030794  
+2026-01-31 14:22:24,713 [INFO] [rank=0]   Loss (sem)    = 0.017779  
+2026-01-31 14:22:24,715 [INFO] [rank=0] 
+2026-01-31 14:22:24,717 [INFO] [rank=0]   PPL (media)   = 6.756596
+2026-01-31 14:22:24,719 [INFO] [rank=0]   PPL (std)     = 0.207359  
+2026-01-31 14:22:24,719 [INFO] [rank=0]   PPL (sem)     = 0.119719  
+2026-01-31 14:22:24,720 [INFO] [rank=0] 
+2026-01-31 14:22:24,722 [INFO] [rank=0] ================================================================================
+2026-01-31 14:22:24,723 [INFO] [rank=0] METRICHE STATISTICHE RICHIESTE:
+2026-01-31 14:22:24,723 [INFO] [rank=0] ================================================================================
+2026-01-31 14:22:24,723 [INFO] [rank=0]   📊 ERRORE MEDIO (std Loss)         = 0.030794  [n=3]
+2026-01-31 14:22:24,724 [INFO] [rank=0]   📊 DEVIAZIONE STANDARD (std PPL)   = 0.207359  [n=3]
+2026-01-31 14:22:24,724 [INFO] [rank=0]   📊 STANDARD ERROR MEAN (sem Loss)  = 0.017779  [n=3]
+2026-01-31 14:22:24,724 [INFO] [rank=0]   📊 STANDARD ERROR MEAN (sem PPL)   = 0.119719  [n=3]
+2026-01-31 14:22:24,724 [INFO] [rank=0] ================================================================================
+2026-01-31 14:22:24,724 [INFO] [rank=0] 
+2026-01-31 14:22:24,724 [INFO] [rank=0] Consistency check per fold:
+2026-01-31 14:22:24,724 [INFO] [rank=0]   Fold 1: exp(1.877422) = 6.536633 vs 6.536633 [exp: True, alt: True]
+2026-01-31 14:22:24,725 [INFO] [rank=0]   Fold 2: exp(1.914665) = 6.784666 vs 6.784666 [exp: True, alt: True]
+2026-01-31 14:22:24,725 [INFO] [rank=0]   Fold 3: exp(1.938524) = 6.948491 vs 6.948491 [exp: True, alt: True]
+2026-01-31 14:22:24,725 [INFO] [rank=0] ================================================================================
+
+2026-01-31 14:22:24,725 [INFO] [rank=0] [TEST-ONLY] ✓ Cross-validation completata: 3 folds
+2026-01-31 14:22:24,725 [INFO] [rank=0] 
+================================================================================
+2026-01-31 14:22:24,725 [INFO] [rank=0] === TEST-ONLY MODE COMPLETATO ===
+2026-01-31 14:22:24,725 [INFO] [rank=0] ================================================================================
+2026-01-31 16:11:02,252 [INFO] [rank=0] [QUANTUM] ========================================
+2026-01-31 16:11:02,253 [INFO] [rank=0] [QUANTUM] Modalità QUANTUM STATES attiva!
+2026-01-31 16:11:02,253 [INFO] [rank=0] [QUANTUM] ========================================
+2026-01-31 16:11:02,253 [INFO] [rank=0] [QUANTUM] Frasi quantistiche (num_states): 100
+2026-01-31 16:11:02,253 [INFO] [rank=0] [QUANTUM] Parole per frase (max_time): 5
+2026-01-31 16:11:02,253 [INFO] [rank=0] [QUANTUM] ✓ PROIEZIONE ABILITATA: 15 qubit -> 2 qubit
+2026-01-31 16:11:02,253 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert sorgente: 2^15 = 32768
+2026-01-31 16:11:02,254 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert target: 2^2 = 4
+2026-01-31 16:11:02,254 [INFO] [rank=0] [QUANTUM] MPI ranks: 100
+2026-01-31 16:11:02,254 [INFO] [rank=0] [QUANTUM] Frasi per rank: ~1
+2026-01-31 16:11:02,254 [INFO] [rank=0] [QUANTUM] Rank 0: Generazione 100 frasi quantistiche...
+2026-01-31 16:22:51,191 [INFO] [rank=0] [QUANTUM] ========================================
+2026-01-31 16:22:51,192 [INFO] [rank=0] [QUANTUM] Modalità QUANTUM STATES attiva!
+2026-01-31 16:22:51,192 [INFO] [rank=0] [QUANTUM] ========================================
+2026-01-31 16:22:51,192 [INFO] [rank=0] [QUANTUM] Frasi quantistiche (num_states): 100
+2026-01-31 16:22:51,192 [INFO] [rank=0] [QUANTUM] Parole per frase (max_time): 5
+2026-01-31 16:22:51,192 [INFO] [rank=0] [QUANTUM] ✓ PROIEZIONE ABILITATA: 10 qubit -> 2 qubit
+2026-01-31 16:22:51,192 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert sorgente: 2^10 = 1024
+2026-01-31 16:22:51,192 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert target: 2^2 = 4
+2026-01-31 16:22:51,192 [INFO] [rank=0] [QUANTUM] MPI ranks: 100
+2026-01-31 16:22:51,193 [INFO] [rank=0] [QUANTUM] Frasi per rank: ~1
+2026-01-31 16:22:51,193 [INFO] [rank=0] [QUANTUM] Rank 0: Generazione 100 frasi quantistiche...
+2026-01-31 16:22:53,048 [INFO] [rank=0] [QUANTUM] Generati 1/100 frasi quantistiche...
+2026-01-31 16:23:09,606 [INFO] [rank=0] [QUANTUM] Generati 10/100 frasi quantistiche...
+2026-01-31 16:23:27,971 [INFO] [rank=0] [QUANTUM] Generati 20/100 frasi quantistiche...
+2026-01-31 16:23:46,436 [INFO] [rank=0] [QUANTUM] Generati 30/100 frasi quantistiche...
+2026-01-31 16:24:05,129 [INFO] [rank=0] [QUANTUM] Generati 40/100 frasi quantistiche...
+2026-01-31 16:24:24,024 [INFO] [rank=0] [QUANTUM] Generati 50/100 frasi quantistiche...
+2026-01-31 16:24:41,644 [INFO] [rank=0] [QUANTUM] Generati 60/100 frasi quantistiche...
+2026-01-31 16:24:58,886 [INFO] [rank=0] [QUANTUM] Generati 70/100 frasi quantistiche...
+2026-01-31 16:25:16,324 [INFO] [rank=0] [QUANTUM] Generati 80/100 frasi quantistiche...
+2026-01-31 16:25:33,856 [INFO] [rank=0] [QUANTUM] Generati 90/100 frasi quantistiche...
+2026-01-31 16:25:51,372 [INFO] [rank=0] [QUANTUM] Generati 100/100 frasi quantistiche...
+2026-01-31 16:25:51,374 [INFO] [rank=0] [QUANTUM] ✓ Tutte le frasi generate: shape=(100, 5, 1024)
+2026-01-31 16:25:51,374 [INFO] [rank=0] [QUANTUM] Verifica diversità: ||frase_0 - frase_1|| = 3.160618
+2026-01-31 16:25:51,389 [INFO] [rank=0] [QUANTUM] Salvate in quantum_states_generated.npy
+2026-01-31 16:25:51,519 [INFO] [rank=0] [QUANTUM] Rank 0: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-01-31 16:25:51,519 [INFO] [rank=0] [QUANTUM] Rank 0: Assegnate 1 frasi (IDs: [0])
+2026-01-31 16:25:51,526 [INFO] [rank=0] [PROJECTION] ✓ Projector creato: 1024 -> 4
+2026-01-31 16:25:51,526 [INFO] [rank=0] [QUANTUM] P sostituisce E (embedding): (4, 1024)
+2026-01-31 16:25:51,526 [INFO] [rank=0] [QUANTUM] V non serve in quantum mode (target = stati proiettati)
+2026-01-31 16:25:51,526 [INFO] [rank=0] Parametri: quantum=480 embed=0 rot=0 proj=4096 tot=4576 shape_half=(5, 2, 2, 4, 3)
+2026-01-31 16:25:51,650 [INFO] [rank=0] Inizio ottimizzazione con COBYLA (NO early stopping): maxiter=150, tol=1e-05
+2026-01-31 16:25:51,650 [INFO] [rank=0] [STOPPING CONFIG] HARD CONSTRAINT: Stop ONLY at 100 loss evaluations
+2026-01-31 16:25:51,650 [INFO] [rank=0] [STOPPING CONFIG] All early stopping logic DISABLED
+2026-01-31 16:25:52,065 [INFO] [rank=0] [LOSS EVAL 1/100] Starting evaluation...
+2026-01-31 16:26:17,670 [INFO] [rank=0] [TRAIN] Loss (circuito): 5.041045
+2026-01-31 16:26:17,673 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 4.780336
+2026-01-31 16:26:17,674 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 119.144388
+2026-01-31 16:26:17,676 [INFO] [rank=0] [TRACKER] New best! Loss=5.041045 at iter 1
+2026-01-31 16:26:17,678 [INFO] [rank=0] [TRACKING] iter=1, loss=5.041045, best=5.041045, evals=1/100
+2026-01-31 16:26:18,406 [INFO] [rank=0] [LOSS EVAL 2/100] Starting evaluation...
+2026-01-31 16:26:45,406 [INFO] [rank=0] [TRAIN] Loss (circuito): 4.213036
+2026-01-31 16:26:45,410 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 4.089091
+2026-01-31 16:26:45,412 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 59.685613
+2026-01-31 16:26:45,415 [INFO] [rank=0] [TRACKER] New best! Loss=4.213036 at iter 2
+2026-01-31 16:26:45,417 [INFO] [rank=0] [TRACKING] iter=2, loss=4.213036, best=4.213036, evals=2/100
+2026-01-31 16:26:45,544 [INFO] [rank=0] [LOSS EVAL 3/100] Starting evaluation...
+2026-01-31 16:27:13,336 [INFO] [rank=0] [TRAIN] Loss (circuito): 5.169041
+2026-01-31 16:27:13,339 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 4.945751
+2026-01-31 16:27:13,342 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 140.576418
+2026-01-31 16:27:13,345 [INFO] [rank=0] [TRACKING] iter=3, loss=5.169041, best=4.213036, evals=3/100
+2026-01-31 16:27:13,480 [INFO] [rank=0] [LOSS EVAL 4/100] Starting evaluation...
+2026-01-31 16:27:42,246 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.532535
+2026-01-31 16:27:42,250 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.468637
+2026-01-31 16:27:42,253 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 32.092969
+2026-01-31 16:27:42,257 [INFO] [rank=0] [TRACKER] New best! Loss=3.532535 at iter 4
+2026-01-31 16:27:42,260 [INFO] [rank=0] [TRACKING] iter=4, loss=3.532535, best=3.532535, evals=4/100
+2026-01-31 16:27:42,399 [INFO] [rank=0] [LOSS EVAL 5/100] Starting evaluation...
+2026-01-31 16:28:11,033 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.157773
+2026-01-31 16:28:11,036 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.118968
+2026-01-31 16:28:11,040 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 22.623022
+2026-01-31 16:28:11,044 [INFO] [rank=0] [TRACKER] New best! Loss=3.157773 at iter 5
+2026-01-31 16:28:11,047 [INFO] [rank=0] [TRACKING] iter=5, loss=3.157773, best=3.157773, evals=5/100
+2026-01-31 16:28:11,187 [INFO] [rank=0] [LOSS EVAL 6/100] Starting evaluation...
+2026-01-31 16:28:40,012 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.995919
+2026-01-31 16:28:40,016 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.968526
+2026-01-31 16:28:40,019 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 19.463205
+2026-01-31 16:28:40,023 [INFO] [rank=0] [TRACKER] New best! Loss=2.995919 at iter 6
+2026-01-31 16:28:40,026 [INFO] [rank=0] [TRACKING] iter=6, loss=2.995919, best=2.995919, evals=6/100
+2026-01-31 16:28:40,165 [INFO] [rank=0] [LOSS EVAL 7/100] Starting evaluation...
+2026-01-31 16:29:08,947 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.716500
+2026-01-31 16:29:08,951 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.697013
+2026-01-31 16:29:08,954 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 14.835352
+2026-01-31 16:29:08,958 [INFO] [rank=0] [TRACKER] New best! Loss=2.716500 at iter 7
+2026-01-31 16:29:08,960 [INFO] [rank=0] [TRACKING] iter=7, loss=2.716500, best=2.716500, evals=7/100
+2026-01-31 16:29:09,102 [INFO] [rank=0] [LOSS EVAL 8/100] Starting evaluation...
+2026-01-31 16:29:37,918 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.152507
+2026-01-31 16:29:37,922 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.118359
+2026-01-31 16:29:37,925 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 22.609250
+2026-01-31 16:29:37,928 [INFO] [rank=0] [TRACKING] iter=8, loss=3.152507, best=2.716500, evals=8/100
+2026-01-31 16:29:38,071 [INFO] [rank=0] [LOSS EVAL 9/100] Starting evaluation...
+2026-01-31 16:30:06,881 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.059591
+2026-01-31 16:30:06,885 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.028603
+2026-01-31 16:30:06,888 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 20.668342
+2026-01-31 16:30:06,892 [INFO] [rank=0] [TRACKING] iter=9, loss=3.059591, best=2.716500, evals=9/100
+2026-01-31 16:30:07,035 [INFO] [rank=0] [LOSS EVAL 10/100] Starting evaluation...
+2026-01-31 16:30:07,038 [INFO] [rank=0] [PROJECTION] P matrix set: shape=(4, 1024), norm=116.4543
+2026-01-31 16:30:35,838 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.521393
+2026-01-31 16:30:35,841 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.503210
+2026-01-31 16:30:35,845 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 12.221657
+2026-01-31 16:30:35,848 [INFO] [rank=0] [TRACKER] New best! Loss=2.521393 at iter 10
+2026-01-31 16:30:35,851 [INFO] [rank=0] [TRACKING] iter=10, loss=2.521393, best=2.521393, evals=10/100
+2026-01-31 16:30:35,992 [INFO] [rank=0] [LOSS EVAL 11/100] Starting evaluation...
+2026-01-31 16:31:04,822 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.612567
+2026-01-31 16:31:04,826 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.591177
+2026-01-31 16:31:04,829 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 13.345467
+2026-01-31 16:31:04,832 [INFO] [rank=0] [TRACKING] iter=11, loss=2.612567, best=2.521393, evals=11/100
+2026-01-31 16:31:04,976 [INFO] [rank=0] [LOSS EVAL 12/100] Starting evaluation...
+2026-01-31 16:31:33,770 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.358889
+2026-01-31 16:31:33,774 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.340914
+2026-01-31 16:31:33,777 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.390725
+2026-01-31 16:31:33,782 [INFO] [rank=0] [TRACKER] New best! Loss=2.358889 at iter 12
+2026-01-31 16:31:33,784 [INFO] [rank=0] [TRACKING] iter=12, loss=2.358889, best=2.358889, evals=12/100
+2026-01-31 16:31:33,924 [INFO] [rank=0] [LOSS EVAL 13/100] Starting evaluation...
+2026-01-31 16:32:02,800 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.799012
+2026-01-31 16:32:02,804 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.771072
+2026-01-31 16:32:02,807 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 15.975757
+2026-01-31 16:32:02,810 [INFO] [rank=0] [TRACKING] iter=13, loss=2.799012, best=2.358889, evals=13/100
+2026-01-31 16:32:02,953 [INFO] [rank=0] [LOSS EVAL 14/100] Starting evaluation...
+2026-01-31 16:32:31,857 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.654738
+2026-01-31 16:32:31,861 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.630306
+2026-01-31 16:32:31,865 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 13.878017
+2026-01-31 16:32:31,868 [INFO] [rank=0] [TRACKING] iter=14, loss=2.654738, best=2.358889, evals=14/100
+2026-01-31 16:32:32,011 [INFO] [rank=0] [LOSS EVAL 15/100] Starting evaluation...
+2026-01-31 16:33:00,801 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.521711
+2026-01-31 16:33:00,805 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.500329
+2026-01-31 16:33:00,808 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 12.186500
+2026-01-31 16:33:00,811 [INFO] [rank=0] [TRACKING] iter=15, loss=2.521711, best=2.358889, evals=15/100
+2026-01-31 16:33:00,954 [INFO] [rank=0] [LOSS EVAL 16/100] Starting evaluation...
+2026-01-31 16:33:29,711 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.353495
+2026-01-31 16:33:29,715 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.335599
+2026-01-31 16:33:29,718 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.335653
+2026-01-31 16:33:29,723 [INFO] [rank=0] [TRACKER] New best! Loss=2.353495 at iter 16
+2026-01-31 16:33:29,724 [INFO] [rank=0] [TRACKING] iter=16, loss=2.353495, best=2.353495, evals=16/100
+2026-01-31 16:33:29,867 [INFO] [rank=0] [LOSS EVAL 17/100] Starting evaluation...
+2026-01-31 16:33:58,636 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.251873
+2026-01-31 16:33:58,640 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.236230
+2026-01-31 16:33:58,643 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.357987
+2026-01-31 16:33:58,647 [INFO] [rank=0] [TRACKER] New best! Loss=2.251873 at iter 17
+2026-01-31 16:33:58,650 [INFO] [rank=0] [TRACKING] iter=17, loss=2.251873, best=2.251873, evals=17/100
+2026-01-31 16:33:58,791 [INFO] [rank=0] [LOSS EVAL 18/100] Starting evaluation...
+2026-01-31 16:34:27,584 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.343391
+2026-01-31 16:34:27,588 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.323464
+2026-01-31 16:34:27,591 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.210986
+2026-01-31 16:34:27,594 [INFO] [rank=0] [TRACKING] iter=18, loss=2.343391, best=2.251873, evals=18/100
+2026-01-31 16:34:27,738 [INFO] [rank=0] [LOSS EVAL 19/100] Starting evaluation...
+2026-01-31 16:34:56,566 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.278077
+2026-01-31 16:34:56,570 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.263549
+2026-01-31 16:34:56,573 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.617162
+2026-01-31 16:34:56,576 [INFO] [rank=0] [TRACKING] iter=19, loss=2.278077, best=2.251873, evals=19/100
+2026-01-31 16:34:56,719 [INFO] [rank=0] [LOSS EVAL 20/100] Starting evaluation...
+2026-01-31 16:34:56,723 [INFO] [rank=0] [PROJECTION] P matrix set: shape=(4, 1024), norm=116.4543
+2026-01-31 16:35:25,513 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.324474
+2026-01-31 16:35:25,517 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.307778
+2026-01-31 16:35:25,520 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.052065
+2026-01-31 16:35:25,523 [INFO] [rank=0] [TRACKING] iter=20, loss=2.324474, best=2.251873, evals=20/100
+2026-01-31 16:35:25,667 [INFO] [rank=0] [LOSS EVAL 21/100] Starting evaluation...
+2026-01-31 16:35:54,542 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.228780
+2026-01-31 16:35:54,546 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.213449
+2026-01-31 16:35:54,549 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.147209
+2026-01-31 16:35:54,553 [INFO] [rank=0] [TRACKER] New best! Loss=2.228780 at iter 21
+2026-01-31 16:35:54,556 [INFO] [rank=0] [TRACKING] iter=21, loss=2.228780, best=2.228780, evals=21/100
+2026-01-31 16:35:54,697 [INFO] [rank=0] [LOSS EVAL 22/100] Starting evaluation...
+2026-01-31 16:36:23,599 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.424690
+2026-01-31 16:36:23,603 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.406238
+2026-01-31 16:36:23,606 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 11.092158
+2026-01-31 16:36:23,609 [INFO] [rank=0] [TRACKING] iter=22, loss=2.424690, best=2.228780, evals=22/100
+2026-01-31 16:36:23,753 [INFO] [rank=0] [LOSS EVAL 23/100] Starting evaluation...
+2026-01-31 16:36:52,671 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.507482
+2026-01-31 16:36:52,675 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.485672
+2026-01-31 16:36:52,678 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 12.009192
+2026-01-31 16:36:52,681 [INFO] [rank=0] [TRACKING] iter=23, loss=2.507482, best=2.228780, evals=23/100
+2026-01-31 16:36:52,825 [INFO] [rank=0] [LOSS EVAL 24/100] Starting evaluation...
+2026-01-31 16:37:21,749 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.565335
+2026-01-31 16:37:21,753 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.543140
+2026-01-31 16:37:21,756 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 12.719553
+2026-01-31 16:37:21,759 [INFO] [rank=0] [TRACKING] iter=24, loss=2.565335, best=2.228780, evals=24/100
+2026-01-31 16:37:21,904 [INFO] [rank=0] [LOSS EVAL 25/100] Starting evaluation...
+2026-01-31 16:37:50,794 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.373071
+2026-01-31 16:37:50,798 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.354855
+2026-01-31 16:37:50,801 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.536598
+2026-01-31 16:37:50,804 [INFO] [rank=0] [TRACKING] iter=25, loss=2.373071, best=2.228780, evals=25/100
+2026-01-31 16:37:50,949 [INFO] [rank=0] [LOSS EVAL 26/100] Starting evaluation...
+2026-01-31 16:38:19,886 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.256161
+2026-01-31 16:38:19,890 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.240531
+2026-01-31 16:38:19,893 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.398321
+2026-01-31 16:38:19,896 [INFO] [rank=0] [TRACKING] iter=26, loss=2.256161, best=2.228780, evals=26/100
+2026-01-31 16:38:20,040 [INFO] [rank=0] [LOSS EVAL 27/100] Starting evaluation...
+2026-01-31 16:38:48,971 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.390293
+2026-01-31 16:38:48,975 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.373160
+2026-01-31 16:38:48,979 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.731253
+2026-01-31 16:38:48,981 [INFO] [rank=0] [TRACKING] iter=27, loss=2.390293, best=2.228780, evals=27/100
+2026-01-31 16:38:49,126 [INFO] [rank=0] [LOSS EVAL 28/100] Starting evaluation...
+2026-01-31 16:39:18,057 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.234897
+2026-01-31 16:39:18,061 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.219482
+2026-01-31 16:39:18,064 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.202564
+2026-01-31 16:39:18,067 [INFO] [rank=0] [TRACKING] iter=28, loss=2.234897, best=2.228780, evals=28/100
+2026-01-31 16:39:18,212 [INFO] [rank=0] [LOSS EVAL 29/100] Starting evaluation...
+2026-01-31 16:39:47,149 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.280236
+2026-01-31 16:39:47,153 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.261801
+2026-01-31 16:39:47,156 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.600363
+2026-01-31 16:39:47,159 [INFO] [rank=0] [TRACKING] iter=29, loss=2.280236, best=2.228780, evals=29/100
+2026-01-31 16:39:47,304 [INFO] [rank=0] [LOSS EVAL 30/100] Starting evaluation...
+2026-01-31 16:39:47,306 [INFO] [rank=0] [PROJECTION] P matrix set: shape=(4, 1024), norm=116.4543
+2026-01-31 16:40:16,242 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.323031
+2026-01-31 16:40:16,246 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.306055
+2026-01-31 16:40:16,249 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.034763
+2026-01-31 16:40:16,252 [INFO] [rank=0] [TRACKING] iter=30, loss=2.323031, best=2.228780, evals=30/100
+2026-01-31 16:40:16,397 [INFO] [rank=0] [LOSS EVAL 31/100] Starting evaluation...
+2026-01-31 16:40:45,319 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.326642
+2026-01-31 16:40:45,323 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.308482
+2026-01-31 16:40:45,326 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.059148
+2026-01-31 16:40:45,329 [INFO] [rank=0] [TRACKING] iter=31, loss=2.326642, best=2.228780, evals=31/100
+2026-01-31 16:40:45,474 [INFO] [rank=0] [LOSS EVAL 32/100] Starting evaluation...
+2026-01-31 16:41:14,394 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.633160
+2026-01-31 16:41:14,398 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.611918
+2026-01-31 16:41:14,401 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 13.625166
+2026-01-31 16:41:14,404 [INFO] [rank=0] [TRACKING] iter=32, loss=2.633160, best=2.228780, evals=32/100
+2026-01-31 16:41:14,549 [INFO] [rank=0] [LOSS EVAL 33/100] Starting evaluation...
+2026-01-31 16:41:43,507 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.333155
+2026-01-31 16:41:43,511 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.313826
+2026-01-31 16:41:43,515 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.113044
+2026-01-31 16:41:43,518 [INFO] [rank=0] [TRACKING] iter=33, loss=2.333155, best=2.228780, evals=33/100
+2026-01-31 16:41:43,663 [INFO] [rank=0] [LOSS EVAL 34/100] Starting evaluation...
+2026-01-31 16:42:12,793 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.117656
+2026-01-31 16:42:12,797 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.103916
+2026-01-31 16:42:12,800 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.198209
+2026-01-31 16:42:12,804 [INFO] [rank=0] [TRACKER] New best! Loss=2.117656 at iter 34
+2026-01-31 16:42:12,807 [INFO] [rank=0] [TRACKING] iter=34, loss=2.117656, best=2.117656, evals=34/100
+2026-01-31 16:42:12,949 [INFO] [rank=0] [LOSS EVAL 35/100] Starting evaluation...
+2026-01-31 16:42:42,083 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.500449
+2026-01-31 16:42:42,087 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.479592
+2026-01-31 16:42:42,091 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 11.936399
+2026-01-31 16:42:42,094 [INFO] [rank=0] [TRACKING] iter=35, loss=2.500449, best=2.117656, evals=35/100
+2026-01-31 16:42:42,239 [INFO] [rank=0] [LOSS EVAL 36/100] Starting evaluation...
+2026-01-31 16:43:11,373 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.106041
+2026-01-31 16:43:11,377 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.092554
+2026-01-31 16:43:11,380 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.105592
+2026-01-31 16:43:11,385 [INFO] [rank=0] [TRACKER] New best! Loss=2.106041 at iter 36
+2026-01-31 16:43:11,388 [INFO] [rank=0] [TRACKING] iter=36, loss=2.106041, best=2.106041, evals=36/100
+2026-01-31 16:43:11,529 [INFO] [rank=0] [LOSS EVAL 37/100] Starting evaluation...
+2026-01-31 16:43:40,650 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.226878
+2026-01-31 16:43:40,654 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.211557
+2026-01-31 16:43:40,657 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.129917
+2026-01-31 16:43:40,660 [INFO] [rank=0] [TRACKING] iter=37, loss=2.226878, best=2.106041, evals=37/100
+2026-01-31 16:43:40,804 [INFO] [rank=0] [LOSS EVAL 38/100] Starting evaluation...
+2026-01-31 16:44:09,986 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.134689
+2026-01-31 16:44:09,990 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.119116
+2026-01-31 16:44:09,993 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.323777
+2026-01-31 16:44:09,996 [INFO] [rank=0] [TRACKING] iter=38, loss=2.134689, best=2.106041, evals=38/100
+2026-01-31 16:44:10,140 [INFO] [rank=0] [LOSS EVAL 39/100] Starting evaluation...
+2026-01-31 16:44:39,350 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.267448
+2026-01-31 16:44:39,354 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.251514
+2026-01-31 16:44:39,357 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.502115
+2026-01-31 16:44:39,360 [INFO] [rank=0] [TRACKING] iter=39, loss=2.267448, best=2.106041, evals=39/100
+2026-01-31 16:44:39,506 [INFO] [rank=0] [LOSS EVAL 40/100] Starting evaluation...
+2026-01-31 16:44:39,508 [INFO] [rank=0] [PROJECTION] P matrix set: shape=(4, 1024), norm=116.4543
+2026-01-31 16:45:08,671 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.016572
+2026-01-31 16:45:08,675 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.004205
+2026-01-31 16:45:08,678 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.420193
+2026-01-31 16:45:08,682 [INFO] [rank=0] [TRACKER] New best! Loss=2.016572 at iter 40
+2026-01-31 16:45:08,685 [INFO] [rank=0] [TRACKING] iter=40, loss=2.016572, best=2.016572, evals=40/100
+2026-01-31 16:45:08,828 [INFO] [rank=0] [LOSS EVAL 41/100] Starting evaluation...
+2026-01-31 16:45:38,013 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.123925
+2026-01-31 16:45:38,017 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.108889
+2026-01-31 16:45:38,020 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.239081
+2026-01-31 16:45:38,023 [INFO] [rank=0] [TRACKING] iter=41, loss=2.123925, best=2.016572, evals=41/100
+2026-01-31 16:45:38,169 [INFO] [rank=0] [LOSS EVAL 42/100] Starting evaluation...
+2026-01-31 16:46:07,379 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.147416
+2026-01-31 16:46:07,383 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.133373
+2026-01-31 16:46:07,386 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.443301
+2026-01-31 16:46:07,389 [INFO] [rank=0] [TRACKING] iter=42, loss=2.147416, best=2.016572, evals=42/100
+2026-01-31 16:46:07,535 [INFO] [rank=0] [LOSS EVAL 43/100] Starting evaluation...
+2026-01-31 16:46:36,722 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.000945
+2026-01-31 16:46:36,726 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.988859
+2026-01-31 16:46:36,730 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.307193
+2026-01-31 16:46:36,734 [INFO] [rank=0] [TRACKER] New best! Loss=2.000945 at iter 43
+2026-01-31 16:46:36,736 [INFO] [rank=0] [TRACKING] iter=43, loss=2.000945, best=2.000945, evals=43/100
+2026-01-31 16:46:36,879 [INFO] [rank=0] [LOSS EVAL 44/100] Starting evaluation...
+2026-01-31 16:47:06,078 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.205920
+2026-01-31 16:47:06,081 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.188142
+2026-01-31 16:47:06,085 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.918623
+2026-01-31 16:47:06,088 [INFO] [rank=0] [TRACKING] iter=44, loss=2.205920, best=2.000945, evals=44/100
+2026-01-31 16:47:06,233 [INFO] [rank=0] [LOSS EVAL 45/100] Starting evaluation...
+2026-01-31 16:47:35,429 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.059740
+2026-01-31 16:47:35,433 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.045153
+2026-01-31 16:47:35,437 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.730341
+2026-01-31 16:47:35,440 [INFO] [rank=0] [TRACKING] iter=45, loss=2.059740, best=2.000945, evals=45/100
+2026-01-31 16:47:35,585 [INFO] [rank=0] [LOSS EVAL 46/100] Starting evaluation...
+2026-01-31 16:48:04,806 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.203653
+2026-01-31 16:48:04,810 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.185455
+2026-01-31 16:48:04,813 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.894695
+2026-01-31 16:48:04,816 [INFO] [rank=0] [TRACKING] iter=46, loss=2.203653, best=2.000945, evals=46/100
+2026-01-31 16:48:04,962 [INFO] [rank=0] [LOSS EVAL 47/100] Starting evaluation...
+2026-01-31 16:48:34,198 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.136565
+2026-01-31 16:48:34,202 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.122712
+2026-01-31 16:48:34,205 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.353764
+2026-01-31 16:48:34,208 [INFO] [rank=0] [TRACKING] iter=47, loss=2.136565, best=2.000945, evals=47/100
+2026-01-31 16:48:34,354 [INFO] [rank=0] [LOSS EVAL 48/100] Starting evaluation...
+2026-01-31 16:49:03,545 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.134196
+2026-01-31 16:49:03,548 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.119242
+2026-01-31 16:49:03,552 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.324822
+2026-01-31 16:49:03,555 [INFO] [rank=0] [TRACKING] iter=48, loss=2.134196, best=2.000945, evals=48/100
+2026-01-31 16:49:03,701 [INFO] [rank=0] [LOSS EVAL 49/100] Starting evaluation...
+2026-01-31 16:49:32,898 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.081020
+2026-01-31 16:49:32,902 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.065788
+2026-01-31 16:49:32,905 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.891511
+2026-01-31 16:49:32,908 [INFO] [rank=0] [TRACKING] iter=49, loss=2.081020, best=2.000945, evals=49/100
+2026-01-31 16:49:33,054 [INFO] [rank=0] [LOSS EVAL 50/100] Starting evaluation...
+2026-01-31 16:49:33,057 [INFO] [rank=0] [PROJECTION] P matrix set: shape=(4, 1024), norm=116.4543
+2026-01-31 16:50:02,274 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.169337
+2026-01-31 16:50:02,278 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.153566
+2026-01-31 16:50:02,281 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.615524
+2026-01-31 16:50:02,283 [INFO] [rank=0] [TRACKING] iter=50, loss=2.169337, best=2.000945, evals=50/100
+2026-01-31 16:50:02,430 [INFO] [rank=0] [LOSS EVAL 51/100] Starting evaluation...
+2026-01-31 16:50:31,643 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.063258
+2026-01-31 16:50:31,647 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.048075
+2026-01-31 16:50:31,650 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.752959
+2026-01-31 16:50:31,653 [INFO] [rank=0] [TRACKING] iter=51, loss=2.063258, best=2.000945, evals=51/100
+2026-01-31 16:50:31,800 [INFO] [rank=0] [LOSS EVAL 52/100] Starting evaluation...
+2026-01-31 16:51:01,008 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.165480
+2026-01-31 16:51:01,011 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.149412
+2026-01-31 16:51:01,015 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.579815
+2026-01-31 16:51:01,018 [INFO] [rank=0] [TRACKING] iter=52, loss=2.165480, best=2.000945, evals=52/100
+2026-01-31 16:51:01,164 [INFO] [rank=0] [LOSS EVAL 53/100] Starting evaluation...
+2026-01-31 16:51:30,350 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.968642
+2026-01-31 16:51:30,354 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.956139
+2026-01-31 16:51:30,357 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.071968
+2026-01-31 16:51:30,361 [INFO] [rank=0] [TRACKER] New best! Loss=1.968642 at iter 53
+2026-01-31 16:51:30,364 [INFO] [rank=0] [TRACKING] iter=53, loss=1.968642, best=1.968642, evals=53/100
+2026-01-31 16:51:30,507 [INFO] [rank=0] [LOSS EVAL 54/100] Starting evaluation...
+2026-01-31 16:51:59,692 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.951496
+2026-01-31 16:51:59,696 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.939447
+2026-01-31 16:51:59,699 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.954900
+2026-01-31 16:51:59,704 [INFO] [rank=0] [TRACKER] New best! Loss=1.951496 at iter 54
+2026-01-31 16:51:59,707 [INFO] [rank=0] [TRACKING] iter=54, loss=1.951496, best=1.951496, evals=54/100
+2026-01-31 16:51:59,849 [INFO] [rank=0] [LOSS EVAL 55/100] Starting evaluation...
+2026-01-31 16:52:29,045 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.932522
+2026-01-31 16:52:29,049 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.920966
+2026-01-31 16:52:29,052 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.827553
+2026-01-31 16:52:29,057 [INFO] [rank=0] [TRACKER] New best! Loss=1.932522 at iter 55
+2026-01-31 16:52:29,060 [INFO] [rank=0] [TRACKING] iter=55, loss=1.932522, best=1.932522, evals=55/100
+2026-01-31 16:52:29,203 [INFO] [rank=0] [LOSS EVAL 56/100] Starting evaluation...
+2026-01-31 16:52:58,414 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.114291
+2026-01-31 16:52:58,418 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.101156
+2026-01-31 16:52:58,421 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.175614
+2026-01-31 16:52:58,424 [INFO] [rank=0] [TRACKING] iter=56, loss=2.114291, best=1.932522, evals=56/100
+2026-01-31 16:52:58,570 [INFO] [rank=0] [LOSS EVAL 57/100] Starting evaluation...
+2026-01-31 16:53:27,789 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.084815
+2026-01-31 16:53:27,793 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.070903
+2026-01-31 16:53:27,796 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.931985
+2026-01-31 16:53:27,799 [INFO] [rank=0] [TRACKING] iter=57, loss=2.084815, best=1.932522, evals=57/100
+2026-01-31 16:53:27,946 [INFO] [rank=0] [LOSS EVAL 58/100] Starting evaluation...
+2026-01-31 16:53:57,150 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.062741
+2026-01-31 16:53:57,154 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.048645
+2026-01-31 16:53:57,157 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.757382
+2026-01-31 16:53:57,160 [INFO] [rank=0] [TRACKING] iter=58, loss=2.062741, best=1.932522, evals=58/100
+2026-01-31 16:53:57,307 [INFO] [rank=0] [LOSS EVAL 59/100] Starting evaluation...
+2026-01-31 16:54:26,535 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.942451
+2026-01-31 16:54:26,538 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.930819
+2026-01-31 16:54:26,542 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.895157
+2026-01-31 16:54:26,545 [INFO] [rank=0] [TRACKING] iter=59, loss=1.942451, best=1.932522, evals=59/100
+2026-01-31 16:54:26,691 [INFO] [rank=0] [LOSS EVAL 60/100] Starting evaluation...
+2026-01-31 16:54:26,694 [INFO] [rank=0] [PROJECTION] P matrix set: shape=(4, 1024), norm=116.4543
+2026-01-31 16:54:55,894 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.826634
+2026-01-31 16:54:55,898 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.816906
+2026-01-31 16:54:55,901 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.152792
+2026-01-31 16:54:55,905 [INFO] [rank=0] [TRACKER] New best! Loss=1.826634 at iter 60
+2026-01-31 16:54:55,908 [INFO] [rank=0] [TRACKING] iter=60, loss=1.826634, best=1.826634, evals=60/100
+2026-01-31 16:54:56,051 [INFO] [rank=0] [LOSS EVAL 61/100] Starting evaluation...
+2026-01-31 16:55:25,258 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.853380
+2026-01-31 16:55:25,262 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.842279
+2026-01-31 16:55:25,265 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.310904
+2026-01-31 16:55:25,268 [INFO] [rank=0] [TRACKING] iter=61, loss=1.853380, best=1.826634, evals=61/100
+2026-01-31 16:55:25,414 [INFO] [rank=0] [LOSS EVAL 62/100] Starting evaluation...
+2026-01-31 16:55:54,587 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.995465
+2026-01-31 16:55:54,591 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.983708
+2026-01-31 16:55:54,594 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.269649
+2026-01-31 16:55:54,597 [INFO] [rank=0] [TRACKING] iter=62, loss=1.995465, best=1.826634, evals=62/100
+2026-01-31 16:55:54,744 [INFO] [rank=0] [LOSS EVAL 63/100] Starting evaluation...
+2026-01-31 16:56:23,952 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.766025
+2026-01-31 16:56:23,956 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.755838
+2026-01-31 16:56:23,959 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.788299
+2026-01-31 16:56:23,963 [INFO] [rank=0] [TRACKER] New best! Loss=1.766025 at iter 63
+2026-01-31 16:56:23,966 [INFO] [rank=0] [TRACKING] iter=63, loss=1.766025, best=1.766025, evals=63/100
+2026-01-31 16:56:24,109 [INFO] [rank=0] [LOSS EVAL 64/100] Starting evaluation...
+2026-01-31 16:56:53,273 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.750630
+2026-01-31 16:56:53,277 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.739315
+2026-01-31 16:56:53,280 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.693443
+2026-01-31 16:56:53,285 [INFO] [rank=0] [TRACKER] New best! Loss=1.750630 at iter 64
+2026-01-31 16:56:53,288 [INFO] [rank=0] [TRACKING] iter=64, loss=1.750630, best=1.750630, evals=64/100
+2026-01-31 16:56:53,430 [INFO] [rank=0] [LOSS EVAL 65/100] Starting evaluation...
+2026-01-31 16:57:22,626 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.939601
+2026-01-31 16:57:22,630 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.926951
+2026-01-31 16:57:22,633 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.868534
+2026-01-31 16:57:22,636 [INFO] [rank=0] [TRACKING] iter=65, loss=1.939601, best=1.750630, evals=65/100
+2026-01-31 16:57:22,784 [INFO] [rank=0] [LOSS EVAL 66/100] Starting evaluation...
+2026-01-31 16:57:51,979 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.810400
+2026-01-31 16:57:51,983 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.799082
+2026-01-31 16:57:51,986 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.044094
+2026-01-31 16:57:51,989 [INFO] [rank=0] [TRACKING] iter=66, loss=1.810400, best=1.750630, evals=66/100
+2026-01-31 16:57:52,137 [INFO] [rank=0] [LOSS EVAL 67/100] Starting evaluation...
+2026-01-31 16:58:21,405 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.726390
+2026-01-31 16:58:21,409 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.714315
+2026-01-31 16:58:21,412 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.552869
+2026-01-31 16:58:21,417 [INFO] [rank=0] [TRACKER] New best! Loss=1.726390 at iter 67
+2026-01-31 16:58:21,419 [INFO] [rank=0] [TRACKING] iter=67, loss=1.726390, best=1.726390, evals=67/100
+2026-01-31 16:58:21,563 [INFO] [rank=0] [LOSS EVAL 68/100] Starting evaluation...
+2026-01-31 16:58:50,768 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.809869
+2026-01-31 16:58:50,772 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.796096
+2026-01-31 16:58:50,775 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.026074
+2026-01-31 16:58:50,778 [INFO] [rank=0] [TRACKING] iter=68, loss=1.809869, best=1.726390, evals=68/100
+2026-01-31 16:58:50,924 [INFO] [rank=0] [LOSS EVAL 69/100] Starting evaluation...
+2026-01-31 16:59:20,137 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.736109
+2026-01-31 16:59:20,141 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.724639
+2026-01-31 16:59:20,144 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.610495
+2026-01-31 16:59:20,147 [INFO] [rank=0] [TRACKING] iter=69, loss=1.736109, best=1.726390, evals=69/100
+2026-01-31 16:59:20,295 [INFO] [rank=0] [LOSS EVAL 70/100] Starting evaluation...
+2026-01-31 16:59:20,299 [INFO] [rank=0] [PROJECTION] P matrix set: shape=(4, 1024), norm=116.4543
+2026-01-31 16:59:49,538 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.857385
+2026-01-31 16:59:49,542 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.842865
+2026-01-31 16:59:49,545 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.314603
+2026-01-31 16:59:49,548 [INFO] [rank=0] [TRACKING] iter=70, loss=1.857385, best=1.726390, evals=70/100
+2026-01-31 16:59:49,696 [INFO] [rank=0] [LOSS EVAL 71/100] Starting evaluation...
+2026-01-31 17:00:18,929 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.956702
+2026-01-31 17:00:18,933 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.940755
+2026-01-31 17:00:18,936 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.964006
+2026-01-31 17:00:18,938 [INFO] [rank=0] [TRACKING] iter=71, loss=1.956702, best=1.726390, evals=71/100
+2026-01-31 17:00:19,087 [INFO] [rank=0] [LOSS EVAL 72/100] Starting evaluation...
+2026-01-31 17:00:49,881 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.810582
+2026-01-31 17:00:49,885 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.798405
+2026-01-31 17:00:49,888 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.040006
+2026-01-31 17:00:49,891 [INFO] [rank=0] [TRACKING] iter=72, loss=1.810582, best=1.726390, evals=72/100
+2026-01-31 17:00:50,037 [INFO] [rank=0] [LOSS EVAL 73/100] Starting evaluation...
+2026-01-31 17:01:19,234 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.898460
+2026-01-31 17:01:19,238 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.883845
+2026-01-31 17:01:19,241 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.578749
+2026-01-31 17:01:19,244 [INFO] [rank=0] [TRACKING] iter=73, loss=1.898460, best=1.726390, evals=73/100
+2026-01-31 17:01:19,392 [INFO] [rank=0] [LOSS EVAL 74/100] Starting evaluation...
+2026-01-31 17:01:48,569 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.857398
+2026-01-31 17:01:48,573 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.844015
+2026-01-31 17:01:48,576 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.321868
+2026-01-31 17:01:48,579 [INFO] [rank=0] [TRACKING] iter=74, loss=1.857398, best=1.726390, evals=74/100
+2026-01-31 17:01:48,727 [INFO] [rank=0] [LOSS EVAL 75/100] Starting evaluation...
+2026-01-31 17:02:19,314 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.902990
+2026-01-31 17:02:19,318 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.888238
+2026-01-31 17:02:19,320 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.607713
+2026-01-31 17:02:19,323 [INFO] [rank=0] [TRACKING] iter=75, loss=1.902990, best=1.726390, evals=75/100
+2026-01-31 17:02:19,473 [INFO] [rank=0] [LOSS EVAL 76/100] Starting evaluation...
+2026-01-31 17:02:48,663 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.847794
+2026-01-31 17:02:48,666 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.834423
+2026-01-31 17:02:48,670 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.261517
+2026-01-31 17:02:48,673 [INFO] [rank=0] [TRACKING] iter=76, loss=1.847794, best=1.726390, evals=76/100
+2026-01-31 17:02:48,820 [INFO] [rank=0] [LOSS EVAL 77/100] Starting evaluation...
+2026-01-31 17:03:18,040 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.795587
+2026-01-31 17:03:18,044 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.785030
+2026-01-31 17:03:18,046 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.959759
+2026-01-31 17:03:18,049 [INFO] [rank=0] [TRACKING] iter=77, loss=1.795587, best=1.726390, evals=77/100
+2026-01-31 17:03:18,198 [INFO] [rank=0] [LOSS EVAL 78/100] Starting evaluation...
+2026-01-31 17:03:47,404 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.847759
+2026-01-31 17:03:47,407 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.833522
+2026-01-31 17:03:47,411 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.255882
+2026-01-31 17:03:47,414 [INFO] [rank=0] [TRACKING] iter=78, loss=1.847759, best=1.726390, evals=78/100
+2026-01-31 17:03:47,561 [INFO] [rank=0] [LOSS EVAL 79/100] Starting evaluation...
+2026-01-31 17:04:16,742 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.816197
+2026-01-31 17:04:16,746 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.805296
+2026-01-31 17:04:16,750 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.081771
+2026-01-31 17:04:16,753 [INFO] [rank=0] [TRACKING] iter=79, loss=1.816197, best=1.726390, evals=79/100
+2026-01-31 17:04:16,901 [INFO] [rank=0] [LOSS EVAL 80/100] Starting evaluation...
+2026-01-31 17:04:16,903 [INFO] [rank=0] [PROJECTION] P matrix set: shape=(4, 1024), norm=116.4543
+2026-01-31 17:04:46,125 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.899799
+2026-01-31 17:04:46,129 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.885970
+2026-01-31 17:04:46,132 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.592749
+2026-01-31 17:04:46,135 [INFO] [rank=0] [TRACKING] iter=80, loss=1.899799, best=1.726390, evals=80/100
+2026-01-31 17:04:46,283 [INFO] [rank=0] [LOSS EVAL 81/100] Starting evaluation...
+2026-01-31 17:05:15,520 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.871689
+2026-01-31 17:05:15,524 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.858831
+2026-01-31 17:05:15,527 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.416234
+2026-01-31 17:05:15,530 [INFO] [rank=0] [TRACKING] iter=81, loss=1.871689, best=1.726390, evals=81/100
+2026-01-31 17:05:15,679 [INFO] [rank=0] [LOSS EVAL 82/100] Starting evaluation...
+2026-01-31 17:05:44,959 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.865997
+2026-01-31 17:05:44,963 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.851902
+2026-01-31 17:05:44,966 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.371927
+2026-01-31 17:05:44,969 [INFO] [rank=0] [TRACKING] iter=82, loss=1.865997, best=1.726390, evals=82/100
+2026-01-31 17:05:45,118 [INFO] [rank=0] [LOSS EVAL 83/100] Starting evaluation...
+2026-01-31 17:06:14,344 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.877272
+2026-01-31 17:06:14,348 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.864833
+2026-01-31 17:06:14,351 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.454860
+2026-01-31 17:06:14,354 [INFO] [rank=0] [TRACKING] iter=83, loss=1.877272, best=1.726390, evals=83/100
+2026-01-31 17:06:14,503 [INFO] [rank=0] [LOSS EVAL 84/100] Starting evaluation...
+2026-01-31 17:06:43,669 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.867171
+2026-01-31 17:06:43,673 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.852510
+2026-01-31 17:06:43,676 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.375804
+2026-01-31 17:06:43,679 [INFO] [rank=0] [TRACKING] iter=84, loss=1.867171, best=1.726390, evals=84/100
+2026-01-31 17:06:43,830 [INFO] [rank=0] [LOSS EVAL 85/100] Starting evaluation...
+2026-01-31 17:07:13,016 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.864510
+2026-01-31 17:07:13,020 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.848829
+2026-01-31 17:07:13,023 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.352376
+2026-01-31 17:07:13,025 [INFO] [rank=0] [TRACKING] iter=85, loss=1.864510, best=1.726390, evals=85/100
+2026-01-31 17:07:13,179 [INFO] [rank=0] [LOSS EVAL 86/100] Starting evaluation...
+2026-01-31 17:07:42,331 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.638912
+2026-01-31 17:07:42,335 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.629497
+2026-01-31 17:07:42,339 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.101309
+2026-01-31 17:07:42,343 [INFO] [rank=0] [TRACKER] New best! Loss=1.638912 at iter 86
+2026-01-31 17:07:42,346 [INFO] [rank=0] [TRACKING] iter=86, loss=1.638912, best=1.638912, evals=86/100
+2026-01-31 17:07:42,494 [INFO] [rank=0] [LOSS EVAL 87/100] Starting evaluation...
+2026-01-31 17:08:11,587 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.877460
+2026-01-31 17:08:11,591 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.865488
+2026-01-31 17:08:11,595 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.459090
+2026-01-31 17:08:11,598 [INFO] [rank=0] [TRACKING] iter=87, loss=1.877460, best=1.638912, evals=87/100
+2026-01-31 17:08:11,749 [INFO] [rank=0] [LOSS EVAL 88/100] Starting evaluation...
+2026-01-31 17:08:40,832 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.742608
+2026-01-31 17:08:40,836 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.733389
+2026-01-31 17:08:40,839 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.659804
+2026-01-31 17:08:40,842 [INFO] [rank=0] [TRACKING] iter=88, loss=1.742608, best=1.638912, evals=88/100
+2026-01-31 17:08:40,994 [INFO] [rank=0] [LOSS EVAL 89/100] Starting evaluation...
+2026-01-31 17:09:10,084 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.735146
+2026-01-31 17:09:10,088 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.724665
+2026-01-31 17:09:10,092 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.610644
+2026-01-31 17:09:10,095 [INFO] [rank=0] [TRACKING] iter=89, loss=1.735146, best=1.638912, evals=89/100
+2026-01-31 17:09:10,247 [INFO] [rank=0] [LOSS EVAL 90/100] Starting evaluation...
+2026-01-31 17:09:10,249 [INFO] [rank=0] [PROJECTION] P matrix set: shape=(4, 1024), norm=116.4543
+2026-01-31 17:09:39,341 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.733100
+2026-01-31 17:09:39,345 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.722024
+2026-01-31 17:09:39,348 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.595843
+2026-01-31 17:09:39,351 [INFO] [rank=0] [TRACKING] iter=90, loss=1.733100, best=1.638912, evals=90/100
+2026-01-31 17:09:39,503 [INFO] [rank=0] [LOSS EVAL 91/100] Starting evaluation...
+2026-01-31 17:10:08,579 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.795727
+2026-01-31 17:10:08,583 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.784268
+2026-01-31 17:10:08,587 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.955216
+2026-01-31 17:10:08,590 [INFO] [rank=0] [TRACKING] iter=91, loss=1.795727, best=1.638912, evals=91/100
+2026-01-31 17:10:08,742 [INFO] [rank=0] [LOSS EVAL 92/100] Starting evaluation...
+2026-01-31 17:10:37,918 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.890320
+2026-01-31 17:10:37,922 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.877001
+2026-01-31 17:10:37,925 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.533883
+2026-01-31 17:10:37,928 [INFO] [rank=0] [TRACKING] iter=92, loss=1.890320, best=1.638912, evals=92/100
+2026-01-31 17:10:38,080 [INFO] [rank=0] [LOSS EVAL 93/100] Starting evaluation...
+2026-01-31 17:11:07,249 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.704695
+2026-01-31 17:11:07,253 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.696340
+2026-01-31 17:11:07,256 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.453950
+2026-01-31 17:11:07,259 [INFO] [rank=0] [TRACKING] iter=93, loss=1.704695, best=1.638912, evals=93/100
+2026-01-31 17:11:07,412 [INFO] [rank=0] [LOSS EVAL 94/100] Starting evaluation...
+2026-01-31 17:11:36,591 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.700805
+2026-01-31 17:11:36,595 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.691720
+2026-01-31 17:11:36,599 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.428808
+2026-01-31 17:11:36,602 [INFO] [rank=0] [TRACKING] iter=94, loss=1.700805, best=1.638912, evals=94/100
+2026-01-31 17:11:36,755 [INFO] [rank=0] [LOSS EVAL 95/100] Starting evaluation...
+2026-01-31 17:12:05,951 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.916664
+2026-01-31 17:12:05,955 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.904040
+2026-01-31 17:12:05,959 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.712960
+2026-01-31 17:12:05,962 [INFO] [rank=0] [TRACKING] iter=95, loss=1.916664, best=1.638912, evals=95/100
+2026-01-31 17:12:06,114 [INFO] [rank=0] [LOSS EVAL 96/100] Starting evaluation...
+2026-01-31 17:12:35,292 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.775412
+2026-01-31 17:12:35,296 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.765330
+2026-01-31 17:12:35,300 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.843500
+2026-01-31 17:12:35,303 [INFO] [rank=0] [TRACKING] iter=96, loss=1.775412, best=1.638912, evals=96/100
+2026-01-31 17:12:35,455 [INFO] [rank=0] [LOSS EVAL 97/100] Starting evaluation...
+2026-01-31 17:13:04,653 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.953768
+2026-01-31 17:13:04,657 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.940164
+2026-01-31 17:13:04,660 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.959890
+2026-01-31 17:13:04,664 [INFO] [rank=0] [TRACKING] iter=97, loss=1.953768, best=1.638912, evals=97/100
+2026-01-31 17:13:04,816 [INFO] [rank=0] [LOSS EVAL 98/100] Starting evaluation...
+2026-01-31 17:13:34,013 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.722663
+2026-01-31 17:13:34,018 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.713565
+2026-01-31 17:13:34,021 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.548705
+2026-01-31 17:13:34,024 [INFO] [rank=0] [TRACKING] iter=98, loss=1.722663, best=1.638912, evals=98/100
+2026-01-31 17:13:34,177 [INFO] [rank=0] [LOSS EVAL 99/100] Starting evaluation...
+2026-01-31 17:14:03,387 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.953456
+2026-01-31 17:14:03,391 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.940829
+2026-01-31 17:14:03,394 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.964523
+2026-01-31 17:14:03,396 [INFO] [rank=0] [TRACKING] iter=99, loss=1.953456, best=1.638912, evals=99/100
+2026-01-31 17:14:03,549 [INFO] [rank=0] [LOSS EVAL 100/100] Starting evaluation...
+2026-01-31 17:14:03,549 [INFO] [rank=0] [MAX EVALUATIONS REACHED] Stopping at 100 loss evaluations. This is the ONLY stopping condition (early stopping is DISABLED).
+2026-01-31 17:14:03,549 [INFO] [rank=0] ======================================================================
+2026-01-31 17:14:03,549 [INFO] [rank=0] [MAX EVALUATIONS] Training reached 100 loss evaluations
+2026-01-31 17:14:03,549 [INFO] [rank=0] [MAX EVALUATIONS] This is the intended stopping condition
+2026-01-31 17:14:03,550 [INFO] [rank=0] ======================================================================
+2026-01-31 17:14:03,550 [INFO] [rank=0] [FINAL PARAMS] Using best parameters found: loss=1.638912, iteration=86
+2026-01-31 17:14:03,550 [INFO] [rank=0] [STOPPING REASON] Reached max 100 loss evaluations
+2026-01-31 17:14:03,569 [INFO] [rank=0] [COBYLA] 🛑 Terminato per SMART EARLY STOPPING dopo 86 iterazioni
+2026-01-31 17:14:03,569 [INFO] [rank=0] [COBYLA] Reason: Reached max 100 loss evaluations
+2026-01-31 17:14:03,569 [INFO] [rank=0] [COBYLA] Final loss: 1.638912
+2026-01-31 17:14:03,570 [INFO] [rank=0] [SAVE] Inizio salvataggio TUTTE le matrici U, W, E, F, P...
+2026-01-31 17:14:03,608 [INFO] [rank=0] [SAVE] Salvataggio matrici in: results/run_20260131_171403_seed42
+2026-01-31 17:14:03,609 [INFO] [rank=0] [SAVE] Run ID: run_20260131_171403_seed42
+2026-01-31 17:14:03,684 [INFO] [rank=0] [SAVE] U shape: (16, 16) -> results/run_20260131_171403_seed42/matrices/U_matrix.npy
+2026-01-31 17:14:03,684 [INFO] [rank=0] [SAVE] W shape: (16, 16) -> results/run_20260131_171403_seed42/matrices/W_matrix.npy
+2026-01-31 17:14:03,685 [INFO] [rank=0] [SAVE] E shape: (0,) -> results/run_20260131_171403_seed42/matrices/E_matrix.npy
+2026-01-31 17:14:03,685 [INFO] [rank=0] [SAVE] F shape: (0,) -> results/run_20260131_171403_seed42/matrices/F_matrix.npy
+2026-01-31 17:14:03,685 [INFO] [rank=0] [SAVE] V_rotation shape: (0,) -> results/run_20260131_171403_seed42/matrices/V_rotation.npy
+2026-01-31 17:14:03,685 [INFO] [rank=0] [SAVE] P shape: (4, 1024) -> results/run_20260131_171403_seed42/matrices/P_matrix.npy
+2026-01-31 17:14:03,685 [INFO] [rank=0] [SAVE] Parametri theta: (4576,) -> results/run_20260131_171403_seed42/matrices/best_params_native.npy
+2026-01-31 17:14:03,686 [INFO] [rank=0] [SAVE] Metadata salvato
+2026-01-31 17:14:03,686 [INFO] [rank=0] [SAVE] ✓ Tutte le matrici salvate in: results/run_20260131_171403_seed42
+2026-01-31 17:14:03,686 [INFO] [rank=0] [ANCILLAE] ⏭ Analisi registro C skippata (disabilitata)
+2026-01-31 17:14:03,686 [INFO] [rank=0] [CV] Inizio 3-fold cross validation...
+2026-01-31 17:14:03,687 [INFO] [rank=0] 
+================================================================================
+2026-01-31 17:14:03,687 [INFO] [rank=0] === 3-FOLD CROSS VALIDATION (POST-TRAINING) ===
+2026-01-31 17:14:03,687 [INFO] [rank=0] ================================================================================
+2026-01-31 17:14:03,687 [INFO] [rank=0] [CV] Caricamento parametri da: results/run_20260131_171403_seed42
+2026-01-31 17:14:03,690 [INFO] [rank=0] [CV] ✓ U caricata: (16, 16)
+2026-01-31 17:14:03,691 [INFO] [rank=0] [CV] ✓ W caricata: (16, 16)
+2026-01-31 17:14:03,691 [INFO] [rank=0] [CV] ✓ E caricata: (0,)
+2026-01-31 17:14:03,691 [INFO] [rank=0] [CV] ✓ F caricata: (0,)
+2026-01-31 17:14:03,691 [INFO] [rank=0] [CV] ✓ V_rotation caricata: (0,)
+2026-01-31 17:14:03,691 [INFO] [rank=0] [CV] ✓ P caricata: (4, 1024)
+2026-01-31 17:14:03,691 [INFO] [rank=0] [CV] ✓ Parametri theta caricati: (4576,)
+2026-01-31 17:14:03,691 [INFO] [rank=0] [CV] Run ID: run_20260131_171403_seed42
+2026-01-31 17:14:03,691 [INFO] [rank=0] [CV] ✓ Projector configurato: 1024 -> 4
+2026-01-31 17:14:03,691 [INFO] [rank=0] [CV] Config: max_sentences=100, sentence_length=5
+2026-01-31 17:14:03,692 [INFO] [rank=0] [CV] Generazione 100 stati quantistici test (D=10, max_time=5)
+2026-01-31 17:17:03,042 [INFO] [rank=0] [CV] Frasi test totali: 100
+2026-01-31 17:17:03,042 [INFO] [rank=0] 
+[CV] === Fold 1/3 === (33 frasi, 5 parole/frase)
+2026-01-31 17:17:03,042 [INFO] [rank=0] [CV] Fold 1 - Usa stati quantistici, encoding=None
+2026-01-31 17:30:03,825 [INFO] [rank=0] [CV] Fold 1 - Frasi: 33, Parole/frase: 5, Totale parole: 165
+2026-01-31 17:30:03,863 [INFO] [rank=0] [CV] Fold 1 - Loss (L=-2ln(mean_sqrt_p)): 1.642393
+2026-01-31 17:30:03,866 [INFO] [rank=0] [CV] Fold 1 - PPL (exp(L)): 5.167518
+2026-01-31 17:30:03,868 [INFO] [rank=0] [CV] Fold 1 - PPL ((mean_sqrt_p)^-2): 5.167518
+2026-01-31 17:30:03,871 [INFO] [rank=0] [CV] Fold 1 - Consistency check: True
+2026-01-31 17:30:03,873 [INFO] [rank=0] 
+[CV] === Fold 2/3 === (33 frasi, 5 parole/frase)
+2026-01-31 17:30:03,876 [INFO] [rank=0] [CV] Fold 2 - Usa stati quantistici, encoding=None
+2026-01-31 17:43:06,000 [INFO] [rank=0] [CV] Fold 2 - Frasi: 33, Parole/frase: 5, Totale parole: 165
+2026-01-31 17:43:06,097 [INFO] [rank=0] [CV] Fold 2 - Loss (L=-2ln(mean_sqrt_p)): 1.600342
+2026-01-31 17:43:06,099 [INFO] [rank=0] [CV] Fold 2 - PPL (exp(L)): 4.954727
+2026-01-31 17:43:06,102 [INFO] [rank=0] [CV] Fold 2 - PPL ((mean_sqrt_p)^-2): 4.954727
+2026-01-31 17:43:06,104 [INFO] [rank=0] [CV] Fold 2 - Consistency check: True
+2026-01-31 17:43:06,107 [INFO] [rank=0] 
+[CV] === Fold 3/3 === (34 frasi, 5 parole/frase)
+2026-01-31 17:43:06,109 [INFO] [rank=0] [CV] Fold 3 - Usa stati quantistici, encoding=None
+2026-01-31 17:56:38,262 [INFO] [rank=0] [CV] Fold 3 - Frasi: 34, Parole/frase: 5, Totale parole: 170
+2026-01-31 17:56:38,351 [INFO] [rank=0] [CV] Fold 3 - Loss (L=-2ln(mean_sqrt_p)): 1.637141
+2026-01-31 17:56:38,354 [INFO] [rank=0] [CV] Fold 3 - PPL (exp(L)): 5.140454
+2026-01-31 17:56:38,356 [INFO] [rank=0] [CV] Fold 3 - PPL ((mean_sqrt_p)^-2): 5.140454
+2026-01-31 17:56:38,358 [INFO] [rank=0] [CV] Fold 3 - Consistency check: True
+2026-01-31 17:56:38,361 [INFO] [rank=0] 
+[CV] Fold con dati validi: 3/3
+2026-01-31 17:56:38,363 [INFO] [rank=0] 
+================================================================================
+2026-01-31 17:56:38,366 [INFO] [rank=0] === 3-FOLD CV RESULTS ===
+2026-01-31 17:56:38,367 [INFO] [rank=0] ================================================================================
+2026-01-31 17:56:38,367 [INFO] [rank=0] Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+2026-01-31 17:56:38,369 [INFO] [rank=0] Formula PPL:  exp(L) = (mean_sqrt_p)^(-2)
+2026-01-31 17:56:38,371 [INFO] [rank=0] 
+2026-01-31 17:56:38,371 [INFO] [rank=0] Configurazione test:
+2026-01-31 17:56:38,372 [INFO] [rank=0]   - Numero frasi per fold: ~33
+2026-01-31 17:56:38,375 [INFO] [rank=0]   - Parole per frase: 5
+2026-01-31 17:56:38,376 [INFO] [rank=0]   - Totale frasi: 100
+2026-01-31 17:56:38,377 [INFO] [rank=0]   - Parametri usati: U, W, E, F (caricati da run_20260131_171403_seed42)
+2026-01-31 17:56:38,379 [INFO] [rank=0] 
+2026-01-31 17:56:38,382 [INFO] [rank=0] === LOSS E PPL PER FOLD ===
+2026-01-31 17:56:38,384 [INFO] [rank=0]   Fold 1: Loss=1.642393, PPL=5.167518
+2026-01-31 17:56:38,386 [INFO] [rank=0]   Fold 2: Loss=1.600342, PPL=4.954727
+2026-01-31 17:56:38,388 [INFO] [rank=0]   Fold 3: Loss=1.637141, PPL=5.140454
+2026-01-31 17:56:38,391 [INFO] [rank=0] 
+2026-01-31 17:56:38,392 [INFO] [rank=0] Risultati (3 fold validi):
+2026-01-31 17:56:38,393 [INFO] [rank=0]   Loss (media)  = 1.626625
+2026-01-31 17:56:38,394 [INFO] [rank=0]   Loss (std)    = 0.022913  
+2026-01-31 17:56:38,397 [INFO] [rank=0]   Loss (sem)    = 0.013229  
+2026-01-31 17:56:38,397 [INFO] [rank=0] 
+2026-01-31 17:56:38,400 [INFO] [rank=0]   PPL (media)   = 5.087567
+2026-01-31 17:56:38,402 [INFO] [rank=0]   PPL (std)     = 0.115836  
+2026-01-31 17:56:38,404 [INFO] [rank=0]   PPL (sem)     = 0.066878  
+2026-01-31 17:56:38,406 [INFO] [rank=0] 
+2026-01-31 17:56:38,408 [INFO] [rank=0] ================================================================================
+2026-01-31 17:56:38,410 [INFO] [rank=0] METRICHE STATISTICHE RICHIESTE:
+2026-01-31 17:56:38,412 [INFO] [rank=0] ================================================================================
+2026-01-31 17:56:38,414 [INFO] [rank=0]   📊 ERRORE MEDIO (std Loss)         = 0.022913  [n=3]
+2026-01-31 17:56:38,415 [INFO] [rank=0]   📊 DEVIAZIONE STANDARD (std PPL)   = 0.115836  [n=3]
+2026-01-31 17:56:38,416 [INFO] [rank=0]   📊 STANDARD ERROR MEAN (sem Loss)  = 0.013229  [n=3]
+2026-01-31 17:56:38,417 [INFO] [rank=0]   📊 STANDARD ERROR MEAN (sem PPL)   = 0.066878  [n=3]
+2026-01-31 17:56:38,417 [INFO] [rank=0] ================================================================================
+2026-01-31 17:56:38,417 [INFO] [rank=0] 
+2026-01-31 17:56:38,417 [INFO] [rank=0] Consistency check per fold:
+2026-01-31 17:56:38,417 [INFO] [rank=0]   Fold 1: exp(1.642393) = 5.167518 vs 5.167518 [exp: True, alt: True]
+2026-01-31 17:56:38,417 [INFO] [rank=0]   Fold 2: exp(1.600342) = 4.954727 vs 4.954727 [exp: True, alt: True]
+2026-01-31 17:56:38,418 [INFO] [rank=0]   Fold 3: exp(1.637141) = 5.140454 vs 5.140454 [exp: True, alt: True]
+2026-01-31 17:56:38,418 [INFO] [rank=0] ================================================================================
+
+2026-01-31 17:56:38,418 [INFO] [rank=0] [CV] ✓ Cross validation completata: 3 folds
+2026-01-31 17:56:38,418 [INFO] [rank=0] 
+================================================================================
+2026-01-31 17:56:38,418 [INFO] [rank=0] === TRAINING SUMMARY ===
+2026-01-31 17:56:38,418 [INFO] [rank=0] ================================================================================
+2026-01-31 17:56:38,418 [INFO] [rank=0] 
+[FORMULE]
+2026-01-31 17:56:38,419 [INFO] [rank=0]   Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+2026-01-31 17:56:38,419 [INFO] [rank=0]   PPL:  exp(L)
+2026-01-31 17:56:38,419 [INFO] [rank=0] 
+[LOSS EVALUATIONS]
+2026-01-31 17:56:38,419 [INFO] [rank=0]   Total loss evaluations: 100
+2026-01-31 17:56:38,419 [INFO] [rank=0]   Maximum allowed: 100
+2026-01-31 17:56:38,419 [INFO] [rank=0]   Stopping condition: Reached max evaluations
+2026-01-31 17:56:38,419 [INFO] [rank=0] 
+[FINAL LOSS]
+2026-01-31 17:56:38,419 [INFO] [rank=0]   Final loss (last evaluation): 1.63891185
+2026-01-31 17:56:38,419 [INFO] [rank=0]   Best loss seen: 1.63891185
+2026-01-31 17:56:38,419 [INFO] [rank=0]   Final PPL = exp(1.63891185) = 5.14956298
+2026-01-31 17:56:38,419 [INFO] [rank=0]   Best PPL  = exp(1.63891185) = 5.14956298
+2026-01-31 17:56:38,420 [INFO] [rank=0] 
+[FINAL PARAMETERS]
+2026-01-31 17:56:38,421 [INFO] [rank=0]   Total parameters: 4576
+2026-01-31 17:56:38,421 [INFO] [rank=0]   U parameters (Query): 240 (shape: (5, 2, 2, 4, 3))
+2026-01-31 17:56:38,421 [INFO] [rank=0]   W parameters (Key): 240 (shape: (5, 2, 2, 4, 3))
+2026-01-31 17:56:38,421 [INFO] [rank=0]   P parameters (Projection): 4096
+2026-01-31 17:56:38,421 [INFO] [rank=0]   P shape: 4 x 1024 (2^2 x 2^10)
+2026-01-31 17:56:38,421 [INFO] [rank=0]   E parameters: 0 (not used in quantum mode)
+2026-01-31 17:56:38,421 [INFO] [rank=0]   V parameters: 0 (not used in quantum mode)
+2026-01-31 17:56:38,421 [INFO] [rank=0] 
+[QUANTUM REGISTERS]
+2026-01-31 17:56:38,421 [INFO] [rank=0]   Total qubits: 7
+2026-01-31 17:56:38,422 [INFO] [rank=0]   Target qubits (A+B registers): 4
+2026-01-31 17:56:38,422 [INFO] [rank=0]   Control qubits (C register/ancillae): 3
+2026-01-31 17:56:38,422 [INFO] [rank=0]   Embedding dimension: 4
+2026-01-31 17:56:38,422 [INFO] [rank=0]   Sentence length: 5
+2026-01-31 17:56:38,422 [INFO] [rank=0]   Hilbert space dimension: 128
+2026-01-31 17:56:38,422 [INFO] [rank=0] 
+[PERPLEXITY ON TEST DATA]
+2026-01-31 17:56:38,422 [INFO] [rank=0]   Test Loss: 1.62662536
+2026-01-31 17:56:38,422 [INFO] [rank=0]   Test PPL = exp(1.62662536) = 5.08756652
+2026-01-31 17:56:38,422 [INFO] [rank=0]   Test sentences used: 100/100
+2026-01-31 17:56:38,422 [INFO] [rank=0]   Verifica consistency: exp(L) == PPL
+2026-01-31 17:56:38,423 [INFO] [rank=0]   Consistency check: False
+2026-01-31 17:56:38,423 [INFO] [rank=0] 
+[METADATA]
+2026-01-31 17:56:38,423 [INFO] [rank=0]   Timestamp: 20260131_171403
+2026-01-31 17:56:38,423 [INFO] [rank=0]   Optimizer: COBYLA
+2026-01-31 17:56:38,423 [INFO] [rank=0]   Number of layers: 5
+2026-01-31 17:56:38,423 [INFO] [rank=0]   Qubits per ansatz: 4
+2026-01-31 17:56:38,423 [INFO] [rank=0]   Early stopping: DISABLED (HARD CONSTRAINT)
+2026-01-31 17:56:38,423 [INFO] [rank=0]   Stopping criterion: 100 loss evaluations ONLY
+2026-01-31 17:56:38,423 [INFO] [rank=0] 
+================================================================================
+2026-01-31 17:56:38,423 [INFO] [rank=0] === END OF TRAINING SUMMARY ===
+2026-01-31 17:56:38,423 [INFO] [rank=0] ================================================================================
+
+2026-01-31 17:56:38,550 [INFO] [rank=0] [SAVE] Parametri salvati in results/run_20260131_171403_seed42/parameters/theta_finali_native.npy
+2026-01-31 17:56:38,559 [INFO] [rank=0] [SAVE] Summary salvato in results/run_20260131_171403_seed42/summaries/training_summary.txt
+2026-01-31 17:56:38,564 [INFO] [rank=0] [SAVE] Storia loss salvata in results/run_20260131_171403_seed42/summaries/loss_history.txt
+2026-01-31 17:56:39,422 [INFO] [rank=0] [SAVE] ✓ Grafico training loss salvato in results/run_20260131_171403_seed42/plots/training_loss.png
+2026-01-31 17:56:39,423 [INFO] [rank=0] [COMPLETE] Ottimizzazione completata. Loss media finale: 1.638912
+2026-01-31 17:56:39,423 [INFO] [rank=0] [COMPLETE] Tutti i file salvati in: results/run_20260131_171403_seed42
+2026-01-31 17:56:39,423 [INFO] [rank=0] [COMPLETE] - Parametri: results/run_20260131_171403_seed42/parameters
+2026-01-31 17:56:39,423 [INFO] [rank=0] [COMPLETE] - Summaries: results/run_20260131_171403_seed42/summaries
+2026-01-31 17:56:39,423 [INFO] [rank=0] [COMPLETE] - Plots: results/run_20260131_171403_seed42/plots
+2026-01-31 17:56:39,423 [INFO] [rank=0] [COMPLETE] - Matrici: results/run_20260131_171403_seed42/matrices
+2026-02-02 10:49:22,890 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-02 10:49:22,901 [INFO] [rank=0] [QUANTUM] Modalità QUANTUM STATES attiva!
+2026-02-02 10:49:22,901 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-02 10:49:22,901 [INFO] [rank=0] [QUANTUM] Frasi quantistiche (num_states): 100
+2026-02-02 10:49:22,901 [INFO] [rank=0] [QUANTUM] Parole per frase (max_time): 5
+2026-02-02 10:49:22,901 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert: 2^2 = 4
+2026-02-02 10:49:22,901 [INFO] [rank=0] [QUANTUM] MPI ranks: 100
+2026-02-02 10:49:22,901 [INFO] [rank=0] [QUANTUM] Frasi per rank: ~1
+2026-02-02 10:49:22,901 [INFO] [rank=0] [QUANTUM] Rank 0: Generazione 100 frasi quantistiche...
+2026-02-02 10:49:22,952 [INFO] [rank=0] [QUANTUM] Generati 1/100 frasi quantistiche...
+2026-02-02 10:49:22,954 [INFO] [rank=0] [QUANTUM] Generati 10/100 frasi quantistiche...
+2026-02-02 10:49:22,957 [INFO] [rank=0] [QUANTUM] Generati 20/100 frasi quantistiche...
+2026-02-02 10:49:22,960 [INFO] [rank=0] [QUANTUM] Generati 30/100 frasi quantistiche...
+2026-02-02 10:49:22,963 [INFO] [rank=0] [QUANTUM] Generati 40/100 frasi quantistiche...
+2026-02-02 10:49:22,965 [INFO] [rank=0] [QUANTUM] Generati 50/100 frasi quantistiche...
+2026-02-02 10:49:22,968 [INFO] [rank=0] [QUANTUM] Generati 60/100 frasi quantistiche...
+2026-02-02 10:49:22,971 [INFO] [rank=0] [QUANTUM] Generati 70/100 frasi quantistiche...
+2026-02-02 10:49:22,973 [INFO] [rank=0] [QUANTUM] Generati 80/100 frasi quantistiche...
+2026-02-02 10:49:22,976 [INFO] [rank=0] [QUANTUM] Generati 90/100 frasi quantistiche...
+2026-02-02 10:49:22,979 [INFO] [rank=0] [QUANTUM] Generati 100/100 frasi quantistiche...
+2026-02-02 10:49:22,979 [INFO] [rank=0] [QUANTUM] ✓ Tutte le frasi generate: shape=(100, 5, 4)
+2026-02-02 10:49:22,979 [INFO] [rank=0] [QUANTUM] Verifica diversità: ||frase_0 - frase_1|| = 2.873212
+2026-02-02 10:49:22,981 [INFO] [rank=0] [QUANTUM] Salvate in quantum_states_generated.npy
+2026-02-02 10:49:23,108 [INFO] [rank=0] [QUANTUM] Rank 0: Ricevute frasi quantistiche, shape=(100, 5, 4)
+2026-02-02 10:49:23,109 [INFO] [rank=0] [QUANTUM] Rank 0: Assegnate 1 frasi (IDs: [0])
+2026-02-02 10:49:23,125 [INFO] [rank=0] Parametri: quantum=480 embed=0 rot=0 proj=0 tot=480 shape_half=(5, 2, 2, 4, 3)
+2026-02-02 10:49:23,232 [INFO] [rank=0] Inizio ottimizzazione con COBYLA (NO early stopping): maxiter=150, tol=1e-05
+2026-02-02 10:49:23,232 [INFO] [rank=0] [STOPPING CONFIG] HARD CONSTRAINT: Stop ONLY at 3 loss evaluations
+2026-02-02 10:49:23,232 [INFO] [rank=0] [STOPPING CONFIG] All early stopping logic DISABLED
+2026-02-02 10:49:23,589 [INFO] [rank=0] [LOSS EVAL 1/3] Starting evaluation...
+2026-02-02 10:49:49,940 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.943494
+2026-02-02 10:49:49,942 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.853552
+2026-02-02 10:49:49,945 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 47.160295
+2026-02-02 10:49:49,947 [INFO] [rank=0] [TRACKER] New best! Loss=3.943494 at iter 1
+2026-02-02 10:49:49,950 [INFO] [rank=0] [TRACKING] iter=1, loss=3.943494, best=3.943494, evals=1/3
+2026-02-02 10:49:49,990 [INFO] [rank=0] [LOSS EVAL 2/3] Starting evaluation...
+2026-02-02 10:50:16,861 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.618723
+2026-02-02 10:50:16,865 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.470011
+2026-02-02 10:50:16,868 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 32.137109
+2026-02-02 10:50:16,872 [INFO] [rank=0] [TRACKER] New best! Loss=3.618723 at iter 2
+2026-02-02 10:50:16,873 [INFO] [rank=0] [TRACKING] iter=2, loss=3.618723, best=3.618723, evals=2/3
+2026-02-02 10:50:16,915 [INFO] [rank=0] [LOSS EVAL 3/3] Starting evaluation...
+2026-02-02 10:50:16,915 [INFO] [rank=0] [MAX EVALUATIONS REACHED] Stopping at 3 loss evaluations. This is the ONLY stopping condition (early stopping is DISABLED).
+2026-02-02 10:50:16,915 [INFO] [rank=0] ======================================================================
+2026-02-02 10:50:16,915 [INFO] [rank=0] [MAX EVALUATIONS] Training reached 3 loss evaluations
+2026-02-02 10:50:16,915 [INFO] [rank=0] [MAX EVALUATIONS] This is the intended stopping condition
+2026-02-02 10:50:16,915 [INFO] [rank=0] ======================================================================
+2026-02-02 10:50:16,916 [INFO] [rank=0] [FINAL PARAMS] Using best parameters found: loss=3.618723, iteration=2
+2026-02-02 10:50:16,916 [INFO] [rank=0] [STOPPING REASON] Reached max 3 loss evaluations
+2026-02-02 10:50:16,916 [INFO] [rank=0] [COBYLA] 🛑 Terminato per SMART EARLY STOPPING dopo 2 iterazioni
+2026-02-02 10:50:16,916 [INFO] [rank=0] [COBYLA] Reason: Reached max 3 loss evaluations
+2026-02-02 10:50:16,916 [INFO] [rank=0] [COBYLA] Final loss: 3.618723
+2026-02-02 10:50:16,916 [INFO] [rank=0] [SAVE] Inizio salvataggio TUTTE le matrici U, W, E, F, P...
+2026-02-02 10:50:16,918 [INFO] [rank=0] [SAVE] Salvataggio matrici in: results/run_20260202_105016_seed42
+2026-02-02 10:50:16,918 [INFO] [rank=0] [SAVE] Run ID: run_20260202_105016_seed42
+2026-02-02 10:50:16,963 [INFO] [rank=0] [SAVE] U shape: (16, 16) -> results/run_20260202_105016_seed42/matrices/U_matrix.npy
+2026-02-02 10:50:16,963 [INFO] [rank=0] [SAVE] W shape: (16, 16) -> results/run_20260202_105016_seed42/matrices/W_matrix.npy
+2026-02-02 10:50:16,963 [INFO] [rank=0] [SAVE] E shape: (0,) -> results/run_20260202_105016_seed42/matrices/E_matrix.npy
+2026-02-02 10:50:16,963 [INFO] [rank=0] [SAVE] F shape: (0,) -> results/run_20260202_105016_seed42/matrices/F_matrix.npy
+2026-02-02 10:50:16,963 [INFO] [rank=0] [SAVE] V_rotation shape: (0,) -> results/run_20260202_105016_seed42/matrices/V_rotation.npy
+2026-02-02 10:50:16,963 [INFO] [rank=0] [SAVE] P shape: (0,) -> results/run_20260202_105016_seed42/matrices/P_matrix.npy
+2026-02-02 10:50:16,963 [INFO] [rank=0] [SAVE] Parametri theta: (480,) -> results/run_20260202_105016_seed42/matrices/best_params_native.npy
+2026-02-02 10:50:16,965 [INFO] [rank=0] [SAVE] Metadata salvato
+2026-02-02 10:50:16,965 [INFO] [rank=0] [SAVE] ✓ Tutte le matrici salvate in: results/run_20260202_105016_seed42
+2026-02-02 10:50:16,965 [INFO] [rank=0] [ANCILLAE] ⏭ Analisi registro C skippata (disabilitata)
+2026-02-02 10:50:16,965 [INFO] [rank=0] [CV] Inizio 3-fold cross validation...
+2026-02-02 10:50:16,965 [INFO] [rank=0] 
+================================================================================
+2026-02-02 10:50:16,965 [INFO] [rank=0] === 3-FOLD CROSS VALIDATION (POST-TRAINING) ===
+2026-02-02 10:50:16,965 [INFO] [rank=0] ================================================================================
+2026-02-02 10:50:16,965 [INFO] [rank=0] [CV] Caricamento parametri da: results/run_20260202_105016_seed42
+2026-02-02 10:50:16,969 [INFO] [rank=0] [CV] ✓ U caricata: (16, 16)
+2026-02-02 10:50:16,969 [INFO] [rank=0] [CV] ✓ W caricata: (16, 16)
+2026-02-02 10:50:16,969 [INFO] [rank=0] [CV] ✓ E caricata: (0,)
+2026-02-02 10:50:16,969 [INFO] [rank=0] [CV] ✓ F caricata: (0,)
+2026-02-02 10:50:16,969 [INFO] [rank=0] [CV] ✓ V_rotation caricata: (0,)
+2026-02-02 10:50:16,969 [INFO] [rank=0] [CV] ✓ P caricata: (0,)
+2026-02-02 10:50:16,970 [INFO] [rank=0] [CV] ✓ Parametri theta caricati: (480,)
+2026-02-02 10:50:16,970 [INFO] [rank=0] [CV] Run ID: run_20260202_105016_seed42
+2026-02-02 10:50:16,970 [INFO] [rank=0] [CV] Config: max_sentences=100, sentence_length=5
+2026-02-02 10:50:16,970 [INFO] [rank=0] [CV] Generazione 100 stati quantistici test (D=2, max_time=5)
+2026-02-02 10:50:16,996 [INFO] [rank=0] [CV] Frasi test totali: 100
+2026-02-02 10:50:16,997 [INFO] [rank=0] 
+[CV] === Fold 1/3 === (33 frasi, 5 parole/frase)
+2026-02-02 10:50:16,997 [INFO] [rank=0] [CV] Fold 1 - Usa stati quantistici, encoding=None
+2026-02-02 10:56:10,655 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-02 10:56:10,656 [INFO] [rank=0] [QUANTUM] Modalità QUANTUM STATES attiva!
+2026-02-02 10:56:10,656 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-02 10:56:10,656 [INFO] [rank=0] [QUANTUM] Frasi quantistiche (num_states): 100
+2026-02-02 10:56:10,656 [INFO] [rank=0] [QUANTUM] Parole per frase (max_time): 5
+2026-02-02 10:56:10,656 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert: 2^2 = 4
+2026-02-02 10:56:10,656 [INFO] [rank=0] [QUANTUM] MPI ranks: 100
+2026-02-02 10:56:10,656 [INFO] [rank=0] [QUANTUM] Frasi per rank: ~1
+2026-02-02 10:56:10,656 [INFO] [rank=0] [QUANTUM] Rank 0: Generazione 100 frasi quantistiche...
+2026-02-02 10:56:10,714 [INFO] [rank=0] [QUANTUM] Generati 1/100 frasi quantistiche...
+2026-02-02 10:56:10,716 [INFO] [rank=0] [QUANTUM] Generati 10/100 frasi quantistiche...
+2026-02-02 10:56:10,719 [INFO] [rank=0] [QUANTUM] Generati 20/100 frasi quantistiche...
+2026-02-02 10:56:10,722 [INFO] [rank=0] [QUANTUM] Generati 30/100 frasi quantistiche...
+2026-02-02 10:56:10,725 [INFO] [rank=0] [QUANTUM] Generati 40/100 frasi quantistiche...
+2026-02-02 10:56:10,727 [INFO] [rank=0] [QUANTUM] Generati 50/100 frasi quantistiche...
+2026-02-02 10:56:10,730 [INFO] [rank=0] [QUANTUM] Generati 60/100 frasi quantistiche...
+2026-02-02 10:56:10,733 [INFO] [rank=0] [QUANTUM] Generati 70/100 frasi quantistiche...
+2026-02-02 10:56:10,735 [INFO] [rank=0] [QUANTUM] Generati 80/100 frasi quantistiche...
+2026-02-02 10:56:10,738 [INFO] [rank=0] [QUANTUM] Generati 90/100 frasi quantistiche...
+2026-02-02 10:56:10,741 [INFO] [rank=0] [QUANTUM] Generati 100/100 frasi quantistiche...
+2026-02-02 10:56:10,741 [INFO] [rank=0] [QUANTUM] ✓ Tutte le frasi generate: shape=(100, 5, 4)
+2026-02-02 10:56:10,742 [INFO] [rank=0] [QUANTUM] Verifica diversità: ||frase_0 - frase_1|| = 2.717682
+2026-02-02 10:56:10,744 [INFO] [rank=0] [QUANTUM] Salvate in quantum_states_generated.npy
+2026-02-02 10:56:11,168 [INFO] [rank=0] [QUANTUM] Rank 0: Ricevute frasi quantistiche, shape=(100, 5, 4)
+2026-02-02 10:56:11,168 [INFO] [rank=0] [QUANTUM] Rank 0: Assegnate 1 frasi (IDs: [0])
+2026-02-02 10:56:11,170 [INFO] [rank=0] Parametri: quantum=480 embed=0 rot=0 proj=0 tot=480 shape_half=(5, 2, 2, 4, 3)
+2026-02-02 10:56:11,541 [INFO] [rank=0] Inizio ottimizzazione con COBYLA (NO early stopping): maxiter=150, tol=1e-05
+2026-02-02 10:56:11,541 [INFO] [rank=0] [STOPPING CONFIG] HARD CONSTRAINT: Stop ONLY at 100 loss evaluations
+2026-02-02 10:56:11,541 [INFO] [rank=0] [STOPPING CONFIG] All early stopping logic DISABLED
+2026-02-02 10:56:11,869 [INFO] [rank=0] [LOSS EVAL 1/100] Starting evaluation...
+2026-02-02 10:56:37,301 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.927738
+2026-02-02 10:56:37,304 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.828513
+2026-02-02 10:56:37,306 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 45.994092
+2026-02-02 10:56:37,310 [INFO] [rank=0] [TRACKER] New best! Loss=3.927738 at iter 1
+2026-02-02 10:56:37,312 [INFO] [rank=0] [TRACKING] iter=1, loss=3.927738, best=3.927738, evals=1/100
+2026-02-02 10:56:37,361 [INFO] [rank=0] [LOSS EVAL 2/100] Starting evaluation...
+2026-02-02 10:57:04,182 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.632453
+2026-02-02 10:57:04,186 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 3.479073
+2026-02-02 10:57:04,189 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 32.429660
+2026-02-02 10:57:04,193 [INFO] [rank=0] [TRACKER] New best! Loss=3.632453 at iter 2
+2026-02-02 10:57:04,196 [INFO] [rank=0] [TRACKING] iter=2, loss=3.632453, best=3.632453, evals=2/100
+2026-02-02 10:57:04,237 [INFO] [rank=0] [LOSS EVAL 3/100] Starting evaluation...
+2026-02-02 10:57:31,938 [INFO] [rank=0] [TRAIN] Loss (circuito): 4.763420
+2026-02-02 10:57:31,942 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 4.398559
+2026-02-02 10:57:31,945 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 81.333584
+2026-02-02 10:57:31,948 [INFO] [rank=0] [TRACKING] iter=3, loss=4.763420, best=3.632453, evals=3/100
+2026-02-02 10:57:31,998 [INFO] [rank=0] [LOSS EVAL 4/100] Starting evaluation...
+2026-02-02 10:58:00,699 [INFO] [rank=0] [TRAIN] Loss (circuito): 3.017115
+2026-02-02 10:58:00,703 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.952929
+2026-02-02 10:58:00,706 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 19.162005
+2026-02-02 10:58:00,708 [INFO] [rank=0] [TRACKER] New best! Loss=3.017115 at iter 4
+2026-02-02 10:58:00,711 [INFO] [rank=0] [TRACKING] iter=4, loss=3.017115, best=3.017115, evals=4/100
+2026-02-02 10:58:00,766 [INFO] [rank=0] [LOSS EVAL 5/100] Starting evaluation...
+2026-02-02 10:58:29,444 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.780716
+2026-02-02 10:58:29,448 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.749123
+2026-02-02 10:58:29,452 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 15.628924
+2026-02-02 10:58:29,456 [INFO] [rank=0] [TRACKER] New best! Loss=2.780716 at iter 5
+2026-02-02 10:58:29,459 [INFO] [rank=0] [TRACKING] iter=5, loss=2.780716, best=2.780716, evals=5/100
+2026-02-02 10:58:29,515 [INFO] [rank=0] [LOSS EVAL 6/100] Starting evaluation...
+2026-02-02 10:58:58,454 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.833109
+2026-02-02 10:58:58,458 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.806372
+2026-02-02 10:58:58,462 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 16.549760
+2026-02-02 10:58:58,465 [INFO] [rank=0] [TRACKING] iter=6, loss=2.833109, best=2.780716, evals=6/100
+2026-02-02 10:58:58,528 [INFO] [rank=0] [LOSS EVAL 7/100] Starting evaluation...
+2026-02-02 10:59:27,492 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.613921
+2026-02-02 10:59:27,496 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.584882
+2026-02-02 10:59:27,499 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 13.261728
+2026-02-02 10:59:27,503 [INFO] [rank=0] [TRACKER] New best! Loss=2.613921 at iter 7
+2026-02-02 10:59:27,506 [INFO] [rank=0] [TRACKING] iter=7, loss=2.613921, best=2.613921, evals=7/100
+2026-02-02 10:59:27,565 [INFO] [rank=0] [LOSS EVAL 8/100] Starting evaluation...
+2026-02-02 10:59:56,471 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.855555
+2026-02-02 10:59:56,475 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.819275
+2026-02-02 10:59:56,478 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 16.764684
+2026-02-02 10:59:56,481 [INFO] [rank=0] [TRACKING] iter=8, loss=2.855555, best=2.613921, evals=8/100
+2026-02-02 10:59:56,544 [INFO] [rank=0] [LOSS EVAL 9/100] Starting evaluation...
+2026-02-02 11:00:25,468 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.949189
+2026-02-02 11:00:25,472 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.900508
+2026-02-02 11:00:25,476 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 18.183385
+2026-02-02 11:00:25,479 [INFO] [rank=0] [TRACKING] iter=9, loss=2.949189, best=2.613921, evals=9/100
+2026-02-02 11:00:25,542 [INFO] [rank=0] [LOSS EVAL 10/100] Starting evaluation...
+2026-02-02 11:00:54,503 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.608596
+2026-02-02 11:00:54,508 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.575443
+2026-02-02 11:00:54,511 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 13.137137
+2026-02-02 11:00:54,515 [INFO] [rank=0] [TRACKER] New best! Loss=2.608596 at iter 10
+2026-02-02 11:00:54,517 [INFO] [rank=0] [TRACKING] iter=10, loss=2.608596, best=2.608596, evals=10/100
+2026-02-02 11:00:54,578 [INFO] [rank=0] [LOSS EVAL 11/100] Starting evaluation...
+2026-02-02 11:01:23,529 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.787587
+2026-02-02 11:01:23,533 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.718983
+2026-02-02 11:01:23,536 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 15.164890
+2026-02-02 11:01:23,539 [INFO] [rank=0] [TRACKING] iter=11, loss=2.787587, best=2.608596, evals=11/100
+2026-02-02 11:01:23,603 [INFO] [rank=0] [LOSS EVAL 12/100] Starting evaluation...
+2026-02-02 11:01:52,576 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.345867
+2026-02-02 11:01:52,580 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.323244
+2026-02-02 11:01:52,584 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.208734
+2026-02-02 11:01:52,586 [INFO] [rank=0] [TRACKER] New best! Loss=2.345867 at iter 12
+2026-02-02 11:01:52,589 [INFO] [rank=0] [TRACKING] iter=12, loss=2.345867, best=2.345867, evals=12/100
+2026-02-02 11:01:52,651 [INFO] [rank=0] [LOSS EVAL 13/100] Starting evaluation...
+2026-02-02 11:02:21,555 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.971986
+2026-02-02 11:02:21,559 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.926901
+2026-02-02 11:02:21,562 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 18.669686
+2026-02-02 11:02:21,565 [INFO] [rank=0] [TRACKING] iter=13, loss=2.971986, best=2.345867, evals=13/100
+2026-02-02 11:02:21,628 [INFO] [rank=0] [LOSS EVAL 14/100] Starting evaluation...
+2026-02-02 11:02:50,538 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.698986
+2026-02-02 11:02:50,542 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.666511
+2026-02-02 11:02:50,545 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 14.389681
+2026-02-02 11:02:50,548 [INFO] [rank=0] [TRACKING] iter=14, loss=2.698986, best=2.345867, evals=14/100
+2026-02-02 11:02:50,611 [INFO] [rank=0] [LOSS EVAL 15/100] Starting evaluation...
+2026-02-02 11:03:19,552 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.478657
+2026-02-02 11:03:19,556 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.440845
+2026-02-02 11:03:19,560 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 11.482736
+2026-02-02 11:03:19,563 [INFO] [rank=0] [TRACKING] iter=15, loss=2.478657, best=2.345867, evals=15/100
+2026-02-02 11:03:19,626 [INFO] [rank=0] [LOSS EVAL 16/100] Starting evaluation...
+2026-02-02 11:03:48,554 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.337309
+2026-02-02 11:03:48,558 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.314368
+2026-02-02 11:03:48,561 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.118521
+2026-02-02 11:03:48,565 [INFO] [rank=0] [TRACKER] New best! Loss=2.337309 at iter 16
+2026-02-02 11:03:48,568 [INFO] [rank=0] [TRACKING] iter=16, loss=2.337309, best=2.337309, evals=16/100
+2026-02-02 11:03:48,628 [INFO] [rank=0] [LOSS EVAL 17/100] Starting evaluation...
+2026-02-02 11:04:17,600 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.281457
+2026-02-02 11:04:17,604 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.256742
+2026-02-02 11:04:17,607 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.551922
+2026-02-02 11:04:17,611 [INFO] [rank=0] [TRACKER] New best! Loss=2.281457 at iter 17
+2026-02-02 11:04:17,614 [INFO] [rank=0] [TRACKING] iter=17, loss=2.281457, best=2.281457, evals=17/100
+2026-02-02 11:04:17,674 [INFO] [rank=0] [LOSS EVAL 18/100] Starting evaluation...
+2026-02-02 11:04:46,584 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.460654
+2026-02-02 11:04:46,588 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.442081
+2026-02-02 11:04:46,591 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 11.496943
+2026-02-02 11:04:46,594 [INFO] [rank=0] [TRACKING] iter=18, loss=2.460654, best=2.281457, evals=18/100
+2026-02-02 11:04:46,658 [INFO] [rank=0] [LOSS EVAL 19/100] Starting evaluation...
+2026-02-02 11:05:15,571 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.346914
+2026-02-02 11:05:15,575 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.325048
+2026-02-02 11:05:15,579 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.227168
+2026-02-02 11:05:15,582 [INFO] [rank=0] [TRACKING] iter=19, loss=2.346914, best=2.281457, evals=19/100
+2026-02-02 11:05:15,646 [INFO] [rank=0] [LOSS EVAL 20/100] Starting evaluation...
+2026-02-02 11:05:44,557 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.386471
+2026-02-02 11:05:44,561 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.363613
+2026-02-02 11:05:44,564 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.629285
+2026-02-02 11:05:44,567 [INFO] [rank=0] [TRACKING] iter=20, loss=2.386471, best=2.281457, evals=20/100
+2026-02-02 11:05:44,631 [INFO] [rank=0] [LOSS EVAL 21/100] Starting evaluation...
+2026-02-02 11:06:13,574 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.259195
+2026-02-02 11:06:13,578 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.233503
+2026-02-02 11:06:13,582 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.332500
+2026-02-02 11:06:13,586 [INFO] [rank=0] [TRACKER] New best! Loss=2.259195 at iter 21
+2026-02-02 11:06:13,588 [INFO] [rank=0] [TRACKING] iter=21, loss=2.259195, best=2.259195, evals=21/100
+2026-02-02 11:06:13,649 [INFO] [rank=0] [LOSS EVAL 22/100] Starting evaluation...
+2026-02-02 11:06:42,595 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.417786
+2026-02-02 11:06:42,599 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.385993
+2026-02-02 11:06:42,602 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.869848
+2026-02-02 11:06:42,605 [INFO] [rank=0] [TRACKING] iter=22, loss=2.417786, best=2.259195, evals=22/100
+2026-02-02 11:06:42,669 [INFO] [rank=0] [LOSS EVAL 23/100] Starting evaluation...
+2026-02-02 11:07:11,622 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.524515
+2026-02-02 11:07:11,626 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.498878
+2026-02-02 11:07:11,629 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 12.168839
+2026-02-02 11:07:11,632 [INFO] [rank=0] [TRACKING] iter=23, loss=2.524515, best=2.259195, evals=23/100
+2026-02-02 11:07:11,696 [INFO] [rank=0] [LOSS EVAL 24/100] Starting evaluation...
+2026-02-02 11:07:40,627 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.623053
+2026-02-02 11:07:40,631 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.596036
+2026-02-02 11:07:40,634 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 13.410480
+2026-02-02 11:07:40,637 [INFO] [rank=0] [TRACKING] iter=24, loss=2.623053, best=2.259195, evals=24/100
+2026-02-02 11:07:40,702 [INFO] [rank=0] [LOSS EVAL 25/100] Starting evaluation...
+2026-02-02 11:08:09,560 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.419504
+2026-02-02 11:08:09,564 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.393998
+2026-02-02 11:08:09,567 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.957215
+2026-02-02 11:08:09,569 [INFO] [rank=0] [TRACKING] iter=25, loss=2.419504, best=2.259195, evals=25/100
+2026-02-02 11:08:09,634 [INFO] [rank=0] [LOSS EVAL 26/100] Starting evaluation...
+2026-02-02 11:08:38,539 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.265887
+2026-02-02 11:08:38,544 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.248280
+2026-02-02 11:08:38,547 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.471431
+2026-02-02 11:08:38,550 [INFO] [rank=0] [TRACKING] iter=26, loss=2.265887, best=2.259195, evals=26/100
+2026-02-02 11:08:38,614 [INFO] [rank=0] [LOSS EVAL 27/100] Starting evaluation...
+2026-02-02 11:09:07,526 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.343388
+2026-02-02 11:09:07,530 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.315439
+2026-02-02 11:09:07,533 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.129365
+2026-02-02 11:09:07,535 [INFO] [rank=0] [TRACKING] iter=27, loss=2.343388, best=2.259195, evals=27/100
+2026-02-02 11:09:07,601 [INFO] [rank=0] [LOSS EVAL 28/100] Starting evaluation...
+2026-02-02 11:09:36,537 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.256438
+2026-02-02 11:09:36,541 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.237134
+2026-02-02 11:09:36,544 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.366452
+2026-02-02 11:09:36,548 [INFO] [rank=0] [TRACKER] New best! Loss=2.256438 at iter 28
+2026-02-02 11:09:36,551 [INFO] [rank=0] [TRACKING] iter=28, loss=2.256438, best=2.256438, evals=28/100
+2026-02-02 11:09:36,612 [INFO] [rank=0] [LOSS EVAL 29/100] Starting evaluation...
+2026-02-02 11:10:05,542 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.440508
+2026-02-02 11:10:05,546 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.414046
+2026-02-02 11:10:05,550 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 11.179103
+2026-02-02 11:10:05,553 [INFO] [rank=0] [TRACKING] iter=29, loss=2.440508, best=2.256438, evals=29/100
+2026-02-02 11:10:05,618 [INFO] [rank=0] [LOSS EVAL 30/100] Starting evaluation...
+2026-02-02 11:10:34,438 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.235182
+2026-02-02 11:10:34,442 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.221141
+2026-02-02 11:10:34,444 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.217843
+2026-02-02 11:10:34,449 [INFO] [rank=0] [TRACKER] New best! Loss=2.235182 at iter 30
+2026-02-02 11:10:34,452 [INFO] [rank=0] [TRACKING] iter=30, loss=2.235182, best=2.235182, evals=30/100
+2026-02-02 11:10:34,514 [INFO] [rank=0] [LOSS EVAL 31/100] Starting evaluation...
+2026-02-02 11:11:03,411 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.375455
+2026-02-02 11:11:03,415 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.357663
+2026-02-02 11:11:03,419 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.566230
+2026-02-02 11:11:03,422 [INFO] [rank=0] [TRACKING] iter=31, loss=2.375455, best=2.235182, evals=31/100
+2026-02-02 11:11:03,487 [INFO] [rank=0] [LOSS EVAL 32/100] Starting evaluation...
+2026-02-02 11:11:32,378 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.789680
+2026-02-02 11:11:32,382 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.765514
+2026-02-02 11:11:32,386 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 15.887210
+2026-02-02 11:11:32,389 [INFO] [rank=0] [TRACKING] iter=32, loss=2.789680, best=2.235182, evals=32/100
+2026-02-02 11:11:32,454 [INFO] [rank=0] [LOSS EVAL 33/100] Starting evaluation...
+2026-02-02 11:12:01,337 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.374208
+2026-02-02 11:12:01,341 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.350686
+2026-02-02 11:12:01,345 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.492768
+2026-02-02 11:12:01,348 [INFO] [rank=0] [TRACKING] iter=33, loss=2.374208, best=2.235182, evals=33/100
+2026-02-02 11:12:01,413 [INFO] [rank=0] [LOSS EVAL 34/100] Starting evaluation...
+2026-02-02 11:12:30,274 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.977357
+2026-02-02 11:12:30,278 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.967744
+2026-02-02 11:12:30,282 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.154516
+2026-02-02 11:12:30,286 [INFO] [rank=0] [TRACKER] New best! Loss=1.977357 at iter 34
+2026-02-02 11:12:30,288 [INFO] [rank=0] [TRACKING] iter=34, loss=1.977357, best=1.977357, evals=34/100
+2026-02-02 11:12:30,350 [INFO] [rank=0] [LOSS EVAL 35/100] Starting evaluation...
+2026-02-02 11:12:59,234 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.118261
+2026-02-02 11:12:59,238 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.103898
+2026-02-02 11:12:59,241 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.198062
+2026-02-02 11:12:59,244 [INFO] [rank=0] [TRACKING] iter=35, loss=2.118261, best=1.977357, evals=35/100
+2026-02-02 11:12:59,309 [INFO] [rank=0] [LOSS EVAL 36/100] Starting evaluation...
+2026-02-02 11:13:28,262 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.987071
+2026-02-02 11:13:28,266 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.976400
+2026-02-02 11:13:28,269 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.216715
+2026-02-02 11:13:28,272 [INFO] [rank=0] [TRACKING] iter=36, loss=1.987071, best=1.977357, evals=36/100
+2026-02-02 11:13:28,337 [INFO] [rank=0] [LOSS EVAL 37/100] Starting evaluation...
+2026-02-02 11:13:57,240 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.084222
+2026-02-02 11:13:57,244 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.075389
+2026-02-02 11:13:57,248 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.967649
+2026-02-02 11:13:57,251 [INFO] [rank=0] [TRACKING] iter=37, loss=2.084222, best=1.977357, evals=37/100
+2026-02-02 11:13:57,314 [INFO] [rank=0] [LOSS EVAL 38/100] Starting evaluation...
+2026-02-02 11:14:26,175 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.113618
+2026-02-02 11:14:26,179 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.103768
+2026-02-02 11:14:26,182 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.197000
+2026-02-02 11:14:26,185 [INFO] [rank=0] [TRACKING] iter=38, loss=2.113618, best=1.977357, evals=38/100
+2026-02-02 11:14:26,250 [INFO] [rank=0] [LOSS EVAL 39/100] Starting evaluation...
+2026-02-02 11:14:55,135 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.236808
+2026-02-02 11:14:55,139 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.224105
+2026-02-02 11:14:55,143 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.245201
+2026-02-02 11:14:55,146 [INFO] [rank=0] [TRACKING] iter=39, loss=2.236808, best=1.977357, evals=39/100
+2026-02-02 11:14:55,211 [INFO] [rank=0] [LOSS EVAL 40/100] Starting evaluation...
+2026-02-02 11:15:24,096 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.139351
+2026-02-02 11:15:24,100 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.126430
+2026-02-02 11:15:24,103 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.384879
+2026-02-02 11:15:24,106 [INFO] [rank=0] [TRACKING] iter=40, loss=2.139351, best=1.977357, evals=40/100
+2026-02-02 11:15:24,172 [INFO] [rank=0] [LOSS EVAL 41/100] Starting evaluation...
+2026-02-02 11:15:53,061 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.994757
+2026-02-02 11:15:53,065 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.985726
+2026-02-02 11:15:53,068 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.284331
+2026-02-02 11:15:53,071 [INFO] [rank=0] [TRACKING] iter=41, loss=1.994757, best=1.977357, evals=41/100
+2026-02-02 11:15:53,137 [INFO] [rank=0] [LOSS EVAL 42/100] Starting evaluation...
+2026-02-02 11:16:21,992 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.920910
+2026-02-02 11:16:21,996 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.912118
+2026-02-02 11:16:22,000 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.767409
+2026-02-02 11:16:22,003 [INFO] [rank=0] [TRACKER] New best! Loss=1.920910 at iter 42
+2026-02-02 11:16:22,006 [INFO] [rank=0] [TRACKING] iter=42, loss=1.920910, best=1.920910, evals=42/100
+2026-02-02 11:16:22,069 [INFO] [rank=0] [LOSS EVAL 43/100] Starting evaluation...
+2026-02-02 11:16:50,968 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.035981
+2026-02-02 11:16:50,972 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.026145
+2026-02-02 11:16:50,975 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.584794
+2026-02-02 11:16:50,978 [INFO] [rank=0] [TRACKING] iter=43, loss=2.035981, best=1.920910, evals=43/100
+2026-02-02 11:16:51,044 [INFO] [rank=0] [LOSS EVAL 44/100] Starting evaluation...
+2026-02-02 11:17:20,053 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.894713
+2026-02-02 11:17:20,057 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.887604
+2026-02-02 11:17:20,060 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.603530
+2026-02-02 11:17:20,065 [INFO] [rank=0] [TRACKER] New best! Loss=1.894713 at iter 44
+2026-02-02 11:17:20,068 [INFO] [rank=0] [TRACKING] iter=44, loss=1.894713, best=1.894713, evals=44/100
+2026-02-02 11:17:20,129 [INFO] [rank=0] [LOSS EVAL 45/100] Starting evaluation...
+2026-02-02 11:17:49,071 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.083992
+2026-02-02 11:17:49,074 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.073482
+2026-02-02 11:17:49,077 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.952464
+2026-02-02 11:17:49,080 [INFO] [rank=0] [TRACKING] iter=45, loss=2.083992, best=1.894713, evals=45/100
+2026-02-02 11:17:49,146 [INFO] [rank=0] [LOSS EVAL 46/100] Starting evaluation...
+2026-02-02 11:18:18,099 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.242175
+2026-02-02 11:18:18,103 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.230875
+2026-02-02 11:18:18,107 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.308007
+2026-02-02 11:18:18,110 [INFO] [rank=0] [TRACKING] iter=46, loss=2.242175, best=1.894713, evals=46/100
+2026-02-02 11:18:18,176 [INFO] [rank=0] [LOSS EVAL 47/100] Starting evaluation...
+2026-02-02 11:18:47,125 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.999639
+2026-02-02 11:18:47,129 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.990946
+2026-02-02 11:18:47,132 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.322455
+2026-02-02 11:18:47,135 [INFO] [rank=0] [TRACKING] iter=47, loss=1.999639, best=1.894713, evals=47/100
+2026-02-02 11:18:47,201 [INFO] [rank=0] [LOSS EVAL 48/100] Starting evaluation...
+2026-02-02 11:19:16,137 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.902822
+2026-02-02 11:19:16,141 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.894780
+2026-02-02 11:19:16,145 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.651087
+2026-02-02 11:19:16,148 [INFO] [rank=0] [TRACKING] iter=48, loss=1.902822, best=1.894713, evals=48/100
+2026-02-02 11:19:16,214 [INFO] [rank=0] [LOSS EVAL 49/100] Starting evaluation...
+2026-02-02 11:19:45,231 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.919180
+2026-02-02 11:19:45,235 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.911638
+2026-02-02 11:19:45,238 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.764157
+2026-02-02 11:19:45,242 [INFO] [rank=0] [TRACKING] iter=49, loss=1.919180, best=1.894713, evals=49/100
+2026-02-02 11:19:45,308 [INFO] [rank=0] [LOSS EVAL 50/100] Starting evaluation...
+2026-02-02 11:20:14,285 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.934609
+2026-02-02 11:20:14,288 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.926586
+2026-02-02 11:20:14,291 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.866029
+2026-02-02 11:20:14,294 [INFO] [rank=0] [TRACKING] iter=50, loss=1.934609, best=1.894713, evals=50/100
+2026-02-02 11:20:14,361 [INFO] [rank=0] [LOSS EVAL 51/100] Starting evaluation...
+2026-02-02 11:20:43,297 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.161338
+2026-02-02 11:20:43,301 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.152195
+2026-02-02 11:20:43,304 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.603720
+2026-02-02 11:20:43,307 [INFO] [rank=0] [TRACKING] iter=51, loss=2.161338, best=1.894713, evals=51/100
+2026-02-02 11:20:43,374 [INFO] [rank=0] [LOSS EVAL 52/100] Starting evaluation...
+2026-02-02 11:21:12,361 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.921921
+2026-02-02 11:21:12,365 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.914696
+2026-02-02 11:21:12,368 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.784879
+2026-02-02 11:21:12,371 [INFO] [rank=0] [TRACKING] iter=52, loss=1.921921, best=1.894713, evals=52/100
+2026-02-02 11:21:12,437 [INFO] [rank=0] [LOSS EVAL 53/100] Starting evaluation...
+2026-02-02 11:21:41,343 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.968490
+2026-02-02 11:21:41,347 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.961344
+2026-02-02 11:21:41,350 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.108875
+2026-02-02 11:21:41,353 [INFO] [rank=0] [TRACKING] iter=53, loss=1.968490, best=1.894713, evals=53/100
+2026-02-02 11:21:41,420 [INFO] [rank=0] [LOSS EVAL 54/100] Starting evaluation...
+2026-02-02 11:22:10,369 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.916452
+2026-02-02 11:22:10,373 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.909514
+2026-02-02 11:22:10,376 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.749809
+2026-02-02 11:22:10,378 [INFO] [rank=0] [TRACKING] iter=54, loss=1.916452, best=1.894713, evals=54/100
+2026-02-02 11:22:10,447 [INFO] [rank=0] [LOSS EVAL 55/100] Starting evaluation...
+2026-02-02 11:22:39,413 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.104479
+2026-02-02 11:22:39,417 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.093845
+2026-02-02 11:22:39,420 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.116063
+2026-02-02 11:22:39,423 [INFO] [rank=0] [TRACKING] iter=55, loss=2.104479, best=1.894713, evals=55/100
+2026-02-02 11:22:39,489 [INFO] [rank=0] [LOSS EVAL 56/100] Starting evaluation...
+2026-02-02 11:23:08,456 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.094861
+2026-02-02 11:23:08,460 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.085304
+2026-02-02 11:23:08,464 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.047036
+2026-02-02 11:23:08,467 [INFO] [rank=0] [TRACKING] iter=56, loss=2.094861, best=1.894713, evals=56/100
+2026-02-02 11:23:08,533 [INFO] [rank=0] [LOSS EVAL 57/100] Starting evaluation...
+2026-02-02 11:23:37,495 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.211799
+2026-02-02 11:23:37,500 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.202385
+2026-02-02 11:23:37,503 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.046565
+2026-02-02 11:23:37,506 [INFO] [rank=0] [TRACKING] iter=57, loss=2.211799, best=1.894713, evals=57/100
+2026-02-02 11:23:37,572 [INFO] [rank=0] [LOSS EVAL 58/100] Starting evaluation...
+2026-02-02 11:24:06,554 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.929132
+2026-02-02 11:24:06,558 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.920865
+2026-02-02 11:24:06,561 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.826863
+2026-02-02 11:24:06,564 [INFO] [rank=0] [TRACKING] iter=58, loss=1.929132, best=1.894713, evals=58/100
+2026-02-02 11:24:06,631 [INFO] [rank=0] [LOSS EVAL 59/100] Starting evaluation...
+2026-02-02 11:24:35,620 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.213705
+2026-02-02 11:24:35,624 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.199346
+2026-02-02 11:24:35,627 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 9.019113
+2026-02-02 11:24:35,631 [INFO] [rank=0] [TRACKING] iter=59, loss=2.213705, best=1.894713, evals=59/100
+2026-02-02 11:24:35,698 [INFO] [rank=0] [LOSS EVAL 60/100] Starting evaluation...
+2026-02-02 11:25:04,701 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.031705
+2026-02-02 11:25:04,705 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.022777
+2026-02-02 11:25:04,708 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.559292
+2026-02-02 11:25:04,711 [INFO] [rank=0] [TRACKING] iter=60, loss=2.031705, best=1.894713, evals=60/100
+2026-02-02 11:25:04,778 [INFO] [rank=0] [LOSS EVAL 61/100] Starting evaluation...
+2026-02-02 11:25:33,718 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.113713
+2026-02-02 11:25:33,722 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.099444
+2026-02-02 11:25:33,725 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.161631
+2026-02-02 11:25:33,728 [INFO] [rank=0] [TRACKING] iter=61, loss=2.113713, best=1.894713, evals=61/100
+2026-02-02 11:25:33,795 [INFO] [rank=0] [LOSS EVAL 62/100] Starting evaluation...
+2026-02-02 11:26:02,749 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.968891
+2026-02-02 11:26:02,752 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.959188
+2026-02-02 11:26:02,755 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.093566
+2026-02-02 11:26:02,758 [INFO] [rank=0] [TRACKING] iter=62, loss=1.968891, best=1.894713, evals=62/100
+2026-02-02 11:26:02,825 [INFO] [rank=0] [LOSS EVAL 63/100] Starting evaluation...
+2026-02-02 11:26:31,809 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.916975
+2026-02-02 11:26:31,813 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.908877
+2026-02-02 11:26:31,816 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.745509
+2026-02-02 11:26:31,819 [INFO] [rank=0] [TRACKING] iter=63, loss=1.916975, best=1.894713, evals=63/100
+2026-02-02 11:26:31,886 [INFO] [rank=0] [LOSS EVAL 64/100] Starting evaluation...
+2026-02-02 11:27:00,856 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.003715
+2026-02-02 11:27:00,860 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.992728
+2026-02-02 11:27:00,863 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.335519
+2026-02-02 11:27:00,866 [INFO] [rank=0] [TRACKING] iter=64, loss=2.003715, best=1.894713, evals=64/100
+2026-02-02 11:27:00,933 [INFO] [rank=0] [LOSS EVAL 65/100] Starting evaluation...
+2026-02-02 11:27:29,906 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.120480
+2026-02-02 11:27:29,910 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.110621
+2026-02-02 11:27:29,913 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.253368
+2026-02-02 11:27:29,916 [INFO] [rank=0] [TRACKING] iter=65, loss=2.120480, best=1.894713, evals=65/100
+2026-02-02 11:27:29,984 [INFO] [rank=0] [LOSS EVAL 66/100] Starting evaluation...
+2026-02-02 11:27:58,944 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.883803
+2026-02-02 11:27:58,948 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.876037
+2026-02-02 11:27:58,952 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.527584
+2026-02-02 11:27:58,956 [INFO] [rank=0] [TRACKER] New best! Loss=1.883803 at iter 66
+2026-02-02 11:27:58,959 [INFO] [rank=0] [TRACKING] iter=66, loss=1.883803, best=1.883803, evals=66/100
+2026-02-02 11:27:59,021 [INFO] [rank=0] [LOSS EVAL 67/100] Starting evaluation...
+2026-02-02 11:28:27,975 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.897667
+2026-02-02 11:28:27,978 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.888873
+2026-02-02 11:28:27,982 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.611912
+2026-02-02 11:28:27,985 [INFO] [rank=0] [TRACKING] iter=67, loss=1.897667, best=1.883803, evals=67/100
+2026-02-02 11:28:28,052 [INFO] [rank=0] [LOSS EVAL 68/100] Starting evaluation...
+2026-02-02 11:28:57,037 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.894965
+2026-02-02 11:28:57,041 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.884723
+2026-02-02 11:28:57,044 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.584530
+2026-02-02 11:28:57,048 [INFO] [rank=0] [TRACKING] iter=68, loss=1.894965, best=1.883803, evals=68/100
+2026-02-02 11:28:57,113 [INFO] [rank=0] [LOSS EVAL 69/100] Starting evaluation...
+2026-02-02 11:29:26,070 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.375360
+2026-02-02 11:29:26,074 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.363765
+2026-02-02 11:29:26,077 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 10.630902
+2026-02-02 11:29:26,080 [INFO] [rank=0] [TRACKING] iter=69, loss=2.375360, best=1.883803, evals=69/100
+2026-02-02 11:29:26,147 [INFO] [rank=0] [LOSS EVAL 70/100] Starting evaluation...
+2026-02-02 11:29:55,121 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.933277
+2026-02-02 11:29:55,125 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.922298
+2026-02-02 11:29:55,128 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.836653
+2026-02-02 11:29:55,131 [INFO] [rank=0] [TRACKING] iter=70, loss=1.933277, best=1.883803, evals=70/100
+2026-02-02 11:29:55,198 [INFO] [rank=0] [LOSS EVAL 71/100] Starting evaluation...
+2026-02-02 11:30:24,156 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.944765
+2026-02-02 11:30:24,161 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.936511
+2026-02-02 11:30:24,163 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.934517
+2026-02-02 11:30:24,166 [INFO] [rank=0] [TRACKING] iter=71, loss=1.944765, best=1.883803, evals=71/100
+2026-02-02 11:30:24,234 [INFO] [rank=0] [LOSS EVAL 72/100] Starting evaluation...
+2026-02-02 11:30:53,165 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.864622
+2026-02-02 11:30:53,169 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.857203
+2026-02-02 11:30:53,173 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.405796
+2026-02-02 11:30:53,177 [INFO] [rank=0] [TRACKER] New best! Loss=1.864622 at iter 72
+2026-02-02 11:30:53,180 [INFO] [rank=0] [TRACKING] iter=72, loss=1.864622, best=1.864622, evals=72/100
+2026-02-02 11:30:53,243 [INFO] [rank=0] [LOSS EVAL 73/100] Starting evaluation...
+2026-02-02 11:31:22,196 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.933985
+2026-02-02 11:31:22,200 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.925604
+2026-02-02 11:31:22,203 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.859289
+2026-02-02 11:31:22,206 [INFO] [rank=0] [TRACKING] iter=73, loss=1.933985, best=1.864622, evals=73/100
+2026-02-02 11:31:22,274 [INFO] [rank=0] [LOSS EVAL 74/100] Starting evaluation...
+2026-02-02 11:31:51,231 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.181065
+2026-02-02 11:31:51,235 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.166185
+2026-02-02 11:31:51,238 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.724931
+2026-02-02 11:31:51,241 [INFO] [rank=0] [TRACKING] iter=74, loss=2.181065, best=1.864622, evals=74/100
+2026-02-02 11:31:51,308 [INFO] [rank=0] [LOSS EVAL 75/100] Starting evaluation...
+2026-02-02 11:32:20,258 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.853860
+2026-02-02 11:32:20,263 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.847082
+2026-02-02 11:32:20,266 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.341287
+2026-02-02 11:32:20,270 [INFO] [rank=0] [TRACKER] New best! Loss=1.853860 at iter 75
+2026-02-02 11:32:20,273 [INFO] [rank=0] [TRACKING] iter=75, loss=1.853860, best=1.853860, evals=75/100
+2026-02-02 11:32:20,337 [INFO] [rank=0] [LOSS EVAL 76/100] Starting evaluation...
+2026-02-02 11:32:49,264 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.077885
+2026-02-02 11:32:49,269 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.065140
+2026-02-02 11:32:49,272 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.886398
+2026-02-02 11:32:49,275 [INFO] [rank=0] [TRACKING] iter=76, loss=2.077885, best=1.853860, evals=76/100
+2026-02-02 11:32:49,344 [INFO] [rank=0] [LOSS EVAL 77/100] Starting evaluation...
+2026-02-02 11:33:18,313 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.997679
+2026-02-02 11:33:18,317 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.987077
+2026-02-02 11:33:18,320 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.294185
+2026-02-02 11:33:18,323 [INFO] [rank=0] [TRACKING] iter=77, loss=1.997679, best=1.853860, evals=77/100
+2026-02-02 11:33:18,392 [INFO] [rank=0] [LOSS EVAL 78/100] Starting evaluation...
+2026-02-02 11:33:47,365 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.052542
+2026-02-02 11:33:47,369 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.041614
+2026-02-02 11:33:47,372 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.703028
+2026-02-02 11:33:47,375 [INFO] [rank=0] [TRACKING] iter=78, loss=2.052542, best=1.853860, evals=78/100
+2026-02-02 11:33:47,444 [INFO] [rank=0] [LOSS EVAL 79/100] Starting evaluation...
+2026-02-02 11:34:16,475 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.953372
+2026-02-02 11:34:16,479 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.943937
+2026-02-02 11:34:16,482 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.986199
+2026-02-02 11:34:16,485 [INFO] [rank=0] [TRACKING] iter=79, loss=1.953372, best=1.853860, evals=79/100
+2026-02-02 11:34:16,554 [INFO] [rank=0] [LOSS EVAL 80/100] Starting evaluation...
+2026-02-02 11:34:45,562 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.996386
+2026-02-02 11:34:45,566 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.986819
+2026-02-02 11:34:45,569 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.292301
+2026-02-02 11:34:45,572 [INFO] [rank=0] [TRACKING] iter=80, loss=1.996386, best=1.853860, evals=80/100
+2026-02-02 11:34:45,641 [INFO] [rank=0] [LOSS EVAL 81/100] Starting evaluation...
+2026-02-02 11:35:14,731 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.031004
+2026-02-02 11:35:14,735 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.021824
+2026-02-02 11:35:14,739 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.552086
+2026-02-02 11:35:14,742 [INFO] [rank=0] [TRACKING] iter=81, loss=2.031004, best=1.853860, evals=81/100
+2026-02-02 11:35:14,811 [INFO] [rank=0] [LOSS EVAL 82/100] Starting evaluation...
+2026-02-02 11:35:43,780 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.993906
+2026-02-02 11:35:43,784 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.986689
+2026-02-02 11:35:43,787 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.291354
+2026-02-02 11:35:43,790 [INFO] [rank=0] [TRACKING] iter=82, loss=1.993906, best=1.853860, evals=82/100
+2026-02-02 11:35:43,859 [INFO] [rank=0] [LOSS EVAL 83/100] Starting evaluation...
+2026-02-02 11:36:12,921 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.059291
+2026-02-02 11:36:12,925 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.050513
+2026-02-02 11:36:12,928 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.771890
+2026-02-02 11:36:12,932 [INFO] [rank=0] [TRACKING] iter=83, loss=2.059291, best=1.853860, evals=83/100
+2026-02-02 11:36:13,001 [INFO] [rank=0] [LOSS EVAL 84/100] Starting evaluation...
+2026-02-02 11:36:42,136 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.040284
+2026-02-02 11:36:42,140 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.029576
+2026-02-02 11:36:42,144 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.610857
+2026-02-02 11:36:42,147 [INFO] [rank=0] [TRACKING] iter=84, loss=2.040284, best=1.853860, evals=84/100
+2026-02-02 11:36:42,216 [INFO] [rank=0] [LOSS EVAL 85/100] Starting evaluation...
+2026-02-02 11:37:11,275 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.980327
+2026-02-02 11:37:11,279 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.971708
+2026-02-02 11:37:11,283 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.182933
+2026-02-02 11:37:11,286 [INFO] [rank=0] [TRACKING] iter=85, loss=1.980327, best=1.853860, evals=85/100
+2026-02-02 11:37:11,355 [INFO] [rank=0] [LOSS EVAL 86/100] Starting evaluation...
+2026-02-02 11:37:40,385 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.043273
+2026-02-02 11:37:40,389 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.034747
+2026-02-02 11:37:40,393 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.650313
+2026-02-02 11:37:40,396 [INFO] [rank=0] [TRACKING] iter=86, loss=2.043273, best=1.853860, evals=86/100
+2026-02-02 11:37:40,465 [INFO] [rank=0] [LOSS EVAL 87/100] Starting evaluation...
+2026-02-02 11:38:09,488 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.086495
+2026-02-02 11:38:09,493 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.076941
+2026-02-02 11:38:09,496 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.980024
+2026-02-02 11:38:09,499 [INFO] [rank=0] [TRACKING] iter=87, loss=2.086495, best=1.853860, evals=87/100
+2026-02-02 11:38:09,569 [INFO] [rank=0] [LOSS EVAL 88/100] Starting evaluation...
+2026-02-02 11:38:38,578 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.014669
+2026-02-02 11:38:38,582 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.005850
+2026-02-02 11:38:38,585 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.432407
+2026-02-02 11:38:38,588 [INFO] [rank=0] [TRACKING] iter=88, loss=2.014669, best=1.853860, evals=88/100
+2026-02-02 11:38:38,657 [INFO] [rank=0] [LOSS EVAL 89/100] Starting evaluation...
+2026-02-02 11:39:07,654 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.944896
+2026-02-02 11:39:07,658 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.936459
+2026-02-02 11:39:07,662 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.934153
+2026-02-02 11:39:07,665 [INFO] [rank=0] [TRACKING] iter=89, loss=1.944896, best=1.853860, evals=89/100
+2026-02-02 11:39:07,735 [INFO] [rank=0] [LOSS EVAL 90/100] Starting evaluation...
+2026-02-02 11:39:36,798 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.071101
+2026-02-02 11:39:36,803 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.062290
+2026-02-02 11:39:36,806 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.863956
+2026-02-02 11:39:36,809 [INFO] [rank=0] [TRACKING] iter=90, loss=2.071101, best=1.853860, evals=90/100
+2026-02-02 11:39:36,878 [INFO] [rank=0] [LOSS EVAL 91/100] Starting evaluation...
+2026-02-02 11:40:05,969 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.017162
+2026-02-02 11:40:05,973 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.008374
+2026-02-02 11:40:05,976 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.451196
+2026-02-02 11:40:05,979 [INFO] [rank=0] [TRACKING] iter=91, loss=2.017162, best=1.853860, evals=91/100
+2026-02-02 11:40:06,049 [INFO] [rank=0] [LOSS EVAL 92/100] Starting evaluation...
+2026-02-02 11:40:35,093 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.788645
+2026-02-02 11:40:35,097 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.782739
+2026-02-02 11:40:35,100 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 5.946118
+2026-02-02 11:40:35,105 [INFO] [rank=0] [TRACKER] New best! Loss=1.788645 at iter 92
+2026-02-02 11:40:35,107 [INFO] [rank=0] [TRACKING] iter=92, loss=1.788645, best=1.788645, evals=92/100
+2026-02-02 11:40:35,173 [INFO] [rank=0] [LOSS EVAL 93/100] Starting evaluation...
+2026-02-02 11:41:04,194 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.940323
+2026-02-02 11:41:04,199 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.934037
+2026-02-02 11:41:04,202 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.917379
+2026-02-02 11:41:04,205 [INFO] [rank=0] [TRACKING] iter=93, loss=1.940323, best=1.788645, evals=93/100
+2026-02-02 11:41:04,275 [INFO] [rank=0] [LOSS EVAL 94/100] Starting evaluation...
+2026-02-02 11:41:33,282 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.851781
+2026-02-02 11:41:33,287 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.845132
+2026-02-02 11:41:33,290 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.328934
+2026-02-02 11:41:33,293 [INFO] [rank=0] [TRACKING] iter=94, loss=1.851781, best=1.788645, evals=94/100
+2026-02-02 11:41:33,362 [INFO] [rank=0] [LOSS EVAL 95/100] Starting evaluation...
+2026-02-02 11:42:02,369 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.138769
+2026-02-02 11:42:02,373 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.128688
+2026-02-02 11:42:02,376 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.403835
+2026-02-02 11:42:02,379 [INFO] [rank=0] [TRACKING] iter=95, loss=2.138769, best=1.788645, evals=95/100
+2026-02-02 11:42:02,449 [INFO] [rank=0] [LOSS EVAL 96/100] Starting evaluation...
+2026-02-02 11:42:33,358 [INFO] [rank=0] [TRAIN] Loss (circuito): 1.812986
+2026-02-02 11:42:33,362 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 1.807254
+2026-02-02 11:42:33,366 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 6.093691
+2026-02-02 11:42:33,369 [INFO] [rank=0] [TRACKING] iter=96, loss=1.812986, best=1.788645, evals=96/100
+2026-02-02 11:42:33,440 [INFO] [rank=0] [LOSS EVAL 97/100] Starting evaluation...
+2026-02-02 11:43:02,474 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.165396
+2026-02-02 11:43:02,478 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.155032
+2026-02-02 11:43:02,481 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.628165
+2026-02-02 11:43:02,484 [INFO] [rank=0] [TRACKING] iter=97, loss=2.165396, best=1.788645, evals=97/100
+2026-02-02 11:43:02,555 [INFO] [rank=0] [LOSS EVAL 98/100] Starting evaluation...
+2026-02-02 11:43:31,581 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.031484
+2026-02-02 11:43:31,585 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.023173
+2026-02-02 11:43:31,588 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 7.562279
+2026-02-02 11:43:31,592 [INFO] [rank=0] [TRACKING] iter=98, loss=2.031484, best=1.788645, evals=98/100
+2026-02-02 11:43:31,661 [INFO] [rank=0] [LOSS EVAL 99/100] Starting evaluation...
+2026-02-02 11:44:00,708 [INFO] [rank=0] [TRAIN] Loss (circuito): 2.170617
+2026-02-02 11:44:00,712 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 2.161101
+2026-02-02 11:44:00,715 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 8.680688
+2026-02-02 11:44:00,718 [INFO] [rank=0] [TRACKING] iter=99, loss=2.170617, best=1.788645, evals=99/100
+2026-02-02 11:44:00,786 [INFO] [rank=0] [LOSS EVAL 100/100] Starting evaluation...
+2026-02-02 11:44:00,787 [INFO] [rank=0] [MAX EVALUATIONS REACHED] Stopping at 100 loss evaluations. This is the ONLY stopping condition (early stopping is DISABLED).
+2026-02-02 11:44:00,787 [INFO] [rank=0] ======================================================================
+2026-02-02 11:44:00,787 [INFO] [rank=0] [MAX EVALUATIONS] Training reached 100 loss evaluations
+2026-02-02 11:44:00,787 [INFO] [rank=0] [MAX EVALUATIONS] This is the intended stopping condition
+2026-02-02 11:44:00,787 [INFO] [rank=0] ======================================================================
+2026-02-02 11:44:00,787 [INFO] [rank=0] [FINAL PARAMS] Using best parameters found: loss=1.788645, iteration=92
+2026-02-02 11:44:00,787 [INFO] [rank=0] [STOPPING REASON] Reached max 100 loss evaluations
+2026-02-02 11:44:00,788 [INFO] [rank=0] [COBYLA] 🛑 Terminato per SMART EARLY STOPPING dopo 92 iterazioni
+2026-02-02 11:44:00,788 [INFO] [rank=0] [COBYLA] Reason: Reached max 100 loss evaluations
+2026-02-02 11:44:00,788 [INFO] [rank=0] [COBYLA] Final loss: 1.788645
+2026-02-02 11:44:00,788 [INFO] [rank=0] [SAVE] Inizio salvataggio TUTTE le matrici U, W, E, F, P...
+2026-02-02 11:44:01,104 [INFO] [rank=0] [SAVE] Salvataggio matrici in: results/run_20260202_114400_seed42
+2026-02-02 11:44:01,104 [INFO] [rank=0] [SAVE] Run ID: run_20260202_114400_seed42
+2026-02-02 11:44:01,169 [INFO] [rank=0] [SAVE] U shape: (16, 16) -> results/run_20260202_114400_seed42/matrices/U_matrix.npy
+2026-02-02 11:44:01,170 [INFO] [rank=0] [SAVE] W shape: (16, 16) -> results/run_20260202_114400_seed42/matrices/W_matrix.npy
+2026-02-02 11:44:01,170 [INFO] [rank=0] [SAVE] E shape: (0,) -> results/run_20260202_114400_seed42/matrices/E_matrix.npy
+2026-02-02 11:44:01,170 [INFO] [rank=0] [SAVE] F shape: (0,) -> results/run_20260202_114400_seed42/matrices/F_matrix.npy
+2026-02-02 11:44:01,170 [INFO] [rank=0] [SAVE] V_rotation shape: (0,) -> results/run_20260202_114400_seed42/matrices/V_rotation.npy
+2026-02-02 11:44:01,170 [INFO] [rank=0] [SAVE] P shape: (0,) -> results/run_20260202_114400_seed42/matrices/P_matrix.npy
+2026-02-02 11:44:01,170 [INFO] [rank=0] [SAVE] Parametri theta: (480,) -> results/run_20260202_114400_seed42/matrices/best_params_native.npy
+2026-02-02 11:44:01,175 [INFO] [rank=0] [SAVE] Metadata salvato
+2026-02-02 11:44:01,176 [INFO] [rank=0] [SAVE] ✓ Tutte le matrici salvate in: results/run_20260202_114400_seed42
+2026-02-02 11:44:01,176 [INFO] [rank=0] [ANCILLAE] ⏭ Analisi registro C skippata (disabilitata)
+2026-02-02 11:44:01,176 [INFO] [rank=0] [CV] Inizio 3-fold cross validation...
+2026-02-02 11:44:01,176 [INFO] [rank=0] 
+================================================================================
+2026-02-02 11:44:01,176 [INFO] [rank=0] === 3-FOLD CROSS VALIDATION (POST-TRAINING) ===
+2026-02-02 11:44:01,176 [INFO] [rank=0] ================================================================================
+2026-02-02 11:44:01,176 [INFO] [rank=0] [CV] Caricamento parametri da: results/run_20260202_114400_seed42
+2026-02-02 11:44:01,188 [INFO] [rank=0] [CV] ✓ U caricata: (16, 16)
+2026-02-02 11:44:01,188 [INFO] [rank=0] [CV] ✓ W caricata: (16, 16)
+2026-02-02 11:44:01,188 [INFO] [rank=0] [CV] ✓ E caricata: (0,)
+2026-02-02 11:44:01,188 [INFO] [rank=0] [CV] ✓ F caricata: (0,)
+2026-02-02 11:44:01,188 [INFO] [rank=0] [CV] ✓ V_rotation caricata: (0,)
+2026-02-02 11:44:01,188 [INFO] [rank=0] [CV] ✓ P caricata: (0,)
+2026-02-02 11:44:01,188 [INFO] [rank=0] [CV] ✓ Parametri theta caricati: (480,)
+2026-02-02 11:44:01,188 [INFO] [rank=0] [CV] Run ID: run_20260202_114400_seed42
+2026-02-02 11:44:01,189 [INFO] [rank=0] [CV] Config: max_sentences=100, sentence_length=5
+2026-02-02 11:44:01,189 [INFO] [rank=0] [CV] Generazione 100 stati quantistici test (D=2, max_time=5)
+2026-02-02 11:44:01,227 [INFO] [rank=0] [CV] Frasi test totali: 100
+2026-02-02 11:44:01,238 [INFO] [rank=0] 
+[CV] === Fold 1/3 === (33 frasi, 5 parole/frase)
+2026-02-02 11:44:01,238 [INFO] [rank=0] [CV] Fold 1 - Usa stati quantistici, encoding=None
+2026-02-02 11:57:15,059 [INFO] [rank=0] [CV] Fold 1 - Frasi: 33, Parole/frase: 5, Totale parole: 165
+2026-02-02 11:57:15,115 [INFO] [rank=0] [CV] Fold 1 - Loss (L=-2ln(mean_sqrt_p)): 1.731857
+2026-02-02 11:57:15,118 [INFO] [rank=0] [CV] Fold 1 - PPL (exp(L)): 5.651140
+2026-02-02 11:57:15,120 [INFO] [rank=0] [CV] Fold 1 - PPL ((mean_sqrt_p)^-2): 5.651140
+2026-02-02 11:57:15,123 [INFO] [rank=0] [CV] Fold 1 - Consistency check: True
+2026-02-02 11:57:15,125 [INFO] [rank=0] 
+[CV] === Fold 2/3 === (33 frasi, 5 parole/frase)
+2026-02-02 11:57:15,128 [INFO] [rank=0] [CV] Fold 2 - Usa stati quantistici, encoding=None
+2026-02-02 12:10:27,428 [INFO] [rank=0] [CV] Fold 2 - Frasi: 33, Parole/frase: 5, Totale parole: 165
+2026-02-02 12:10:27,431 [INFO] [rank=0] [CV] Fold 2 - Loss (L=-2ln(mean_sqrt_p)): 1.821677
+2026-02-02 12:10:27,434 [INFO] [rank=0] [CV] Fold 2 - PPL (exp(L)): 6.182218
+2026-02-02 12:10:27,436 [INFO] [rank=0] [CV] Fold 2 - PPL ((mean_sqrt_p)^-2): 6.182218
+2026-02-02 12:10:27,439 [INFO] [rank=0] [CV] Fold 2 - Consistency check: True
+2026-02-02 12:10:27,441 [INFO] [rank=0] 
+[CV] === Fold 3/3 === (34 frasi, 5 parole/frase)
+2026-02-02 12:10:27,444 [INFO] [rank=0] [CV] Fold 3 - Usa stati quantistici, encoding=None
+2026-02-02 12:24:01,739 [INFO] [rank=0] [CV] Fold 3 - Frasi: 34, Parole/frase: 5, Totale parole: 170
+2026-02-02 12:24:01,836 [INFO] [rank=0] [CV] Fold 3 - Loss (L=-2ln(mean_sqrt_p)): 1.768120
+2026-02-02 12:24:01,838 [INFO] [rank=0] [CV] Fold 3 - PPL (exp(L)): 5.859827
+2026-02-02 12:24:01,841 [INFO] [rank=0] [CV] Fold 3 - PPL ((mean_sqrt_p)^-2): 5.859827
+2026-02-02 12:24:01,843 [INFO] [rank=0] [CV] Fold 3 - Consistency check: True
+2026-02-02 12:24:01,846 [INFO] [rank=0] 
+[CV] Fold con dati validi: 3/3
+2026-02-02 12:24:01,848 [INFO] [rank=0] 
+================================================================================
+2026-02-02 12:24:01,851 [INFO] [rank=0] === 3-FOLD CV RESULTS ===
+2026-02-02 12:24:01,853 [INFO] [rank=0] ================================================================================
+2026-02-02 12:24:01,855 [INFO] [rank=0] Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+2026-02-02 12:24:01,857 [INFO] [rank=0] Formula PPL:  exp(L) = (mean_sqrt_p)^(-2)
+2026-02-02 12:24:01,859 [INFO] [rank=0] 
+2026-02-02 12:24:01,861 [INFO] [rank=0] Configurazione test:
+2026-02-02 12:24:01,863 [INFO] [rank=0]   - Numero frasi per fold: ~33
+2026-02-02 12:24:01,865 [INFO] [rank=0]   - Parole per frase: 5
+2026-02-02 12:24:01,868 [INFO] [rank=0]   - Totale frasi: 100
+2026-02-02 12:24:01,870 [INFO] [rank=0]   - Parametri usati: U, W, E, F (caricati da run_20260202_114400_seed42)
+2026-02-02 12:24:01,873 [INFO] [rank=0] 
+2026-02-02 12:24:01,875 [INFO] [rank=0] === LOSS E PPL PER FOLD ===
+2026-02-02 12:24:01,877 [INFO] [rank=0]   Fold 1: Loss=1.731857, PPL=5.651140
+2026-02-02 12:24:01,879 [INFO] [rank=0]   Fold 2: Loss=1.821677, PPL=6.182218
+2026-02-02 12:24:01,881 [INFO] [rank=0]   Fold 3: Loss=1.768120, PPL=5.859827
+2026-02-02 12:24:01,883 [INFO] [rank=0] 
+2026-02-02 12:24:01,886 [INFO] [rank=0] Risultati (3 fold validi):
+2026-02-02 12:24:01,888 [INFO] [rank=0]   Loss (media)  = 1.773885
+2026-02-02 12:24:01,890 [INFO] [rank=0]   Loss (std)    = 0.045187  
+2026-02-02 12:24:01,892 [INFO] [rank=0]   Loss (sem)    = 0.026088  
+2026-02-02 12:24:01,893 [INFO] [rank=0] 
+2026-02-02 12:24:01,894 [INFO] [rank=0]   PPL (media)   = 5.897728
+2026-02-02 12:24:01,896 [INFO] [rank=0]   PPL (std)     = 0.267560  
+2026-02-02 12:24:01,899 [INFO] [rank=0]   PPL (sem)     = 0.154476  
+2026-02-02 12:24:01,900 [INFO] [rank=0] 
+2026-02-02 12:24:01,902 [INFO] [rank=0] ================================================================================
+2026-02-02 12:24:01,903 [INFO] [rank=0] METRICHE STATISTICHE RICHIESTE:
+2026-02-02 12:24:01,904 [INFO] [rank=0] ================================================================================
+2026-02-02 12:24:01,904 [INFO] [rank=0]   📊 ERRORE MEDIO (std Loss)         = 0.045187  [n=3]
+2026-02-02 12:24:01,904 [INFO] [rank=0]   📊 DEVIAZIONE STANDARD (std PPL)   = 0.267560  [n=3]
+2026-02-02 12:24:01,904 [INFO] [rank=0]   📊 STANDARD ERROR MEAN (sem Loss)  = 0.026088  [n=3]
+2026-02-02 12:24:01,904 [INFO] [rank=0]   📊 STANDARD ERROR MEAN (sem PPL)   = 0.154476  [n=3]
+2026-02-02 12:24:01,904 [INFO] [rank=0] ================================================================================
+2026-02-02 12:24:01,904 [INFO] [rank=0] 
+2026-02-02 12:24:01,904 [INFO] [rank=0] Consistency check per fold:
+2026-02-02 12:24:01,905 [INFO] [rank=0]   Fold 1: exp(1.731857) = 5.651140 vs 5.651140 [exp: True, alt: True]
+2026-02-02 12:24:01,905 [INFO] [rank=0]   Fold 2: exp(1.821677) = 6.182218 vs 6.182218 [exp: True, alt: True]
+2026-02-02 12:24:01,905 [INFO] [rank=0]   Fold 3: exp(1.768120) = 5.859827 vs 5.859827 [exp: True, alt: True]
+2026-02-02 12:24:01,905 [INFO] [rank=0] ================================================================================
+
+2026-02-02 12:24:01,905 [INFO] [rank=0] [CV] ✓ Cross validation completata: 3 folds
+2026-02-02 12:24:01,905 [INFO] [rank=0] 
+================================================================================
+2026-02-02 12:24:01,905 [INFO] [rank=0] === TRAINING SUMMARY ===
+2026-02-02 12:24:01,906 [INFO] [rank=0] ================================================================================
+2026-02-02 12:24:01,906 [INFO] [rank=0] 
+[FORMULE]
+2026-02-02 12:24:01,906 [INFO] [rank=0]   Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
+2026-02-02 12:24:01,906 [INFO] [rank=0]   PPL:  exp(L)
+2026-02-02 12:24:01,906 [INFO] [rank=0] 
+[LOSS EVALUATIONS]
+2026-02-02 12:24:01,906 [INFO] [rank=0]   Total loss evaluations: 100
+2026-02-02 12:24:01,906 [INFO] [rank=0]   Maximum allowed: 100
+2026-02-02 12:24:01,906 [INFO] [rank=0]   Stopping condition: Reached max evaluations
+2026-02-02 12:24:01,906 [INFO] [rank=0] 
+[FINAL LOSS]
+2026-02-02 12:24:01,906 [INFO] [rank=0]   Final loss (last evaluation): 1.78864501
+2026-02-02 12:24:01,907 [INFO] [rank=0]   Best loss seen: 1.78864501
+2026-02-02 12:24:01,907 [INFO] [rank=0]   Final PPL = exp(1.78864501) = 5.98134231
+2026-02-02 12:24:01,907 [INFO] [rank=0]   Best PPL  = exp(1.78864501) = 5.98134231
+2026-02-02 12:24:01,907 [INFO] [rank=0] 
+[FINAL PARAMETERS]
+2026-02-02 12:24:01,908 [INFO] [rank=0]   Total parameters: 480
+2026-02-02 12:24:01,908 [INFO] [rank=0]   U parameters (Query): 240 (shape: (5, 2, 2, 4, 3))
+2026-02-02 12:24:01,908 [INFO] [rank=0]   W parameters (Key): 240 (shape: (5, 2, 2, 4, 3))
+2026-02-02 12:24:01,908 [INFO] [rank=0] 
+[QUANTUM REGISTERS]
+2026-02-02 12:24:01,908 [INFO] [rank=0]   Total qubits: 7
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Target qubits (A+B registers): 4
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Control qubits (C register/ancillae): 3
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Embedding dimension: 4
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Sentence length: 5
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Hilbert space dimension: 128
+2026-02-02 12:24:01,909 [INFO] [rank=0] 
+[PERPLEXITY ON TEST DATA]
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Test Loss: 1.77388483
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Test PPL = exp(1.77388483) = 5.89772834
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Test sentences used: 100/100
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Verifica consistency: exp(L) == PPL
+2026-02-02 12:24:01,909 [INFO] [rank=0]   Consistency check: False
+2026-02-02 12:24:01,910 [INFO] [rank=0] 
+[METADATA]
+2026-02-02 12:24:01,910 [INFO] [rank=0]   Timestamp: 20260202_114400
+2026-02-02 12:24:01,910 [INFO] [rank=0]   Optimizer: COBYLA
+2026-02-02 12:24:01,910 [INFO] [rank=0]   Number of layers: 5
+2026-02-02 12:24:01,910 [INFO] [rank=0]   Qubits per ansatz: 4
+2026-02-02 12:24:01,910 [INFO] [rank=0]   Early stopping: DISABLED (HARD CONSTRAINT)
+2026-02-02 12:24:01,910 [INFO] [rank=0]   Stopping criterion: 100 loss evaluations ONLY
+2026-02-02 12:24:01,910 [INFO] [rank=0] 
+================================================================================
+2026-02-02 12:24:01,910 [INFO] [rank=0] === END OF TRAINING SUMMARY ===
+2026-02-02 12:24:01,910 [INFO] [rank=0] ================================================================================
+
+2026-02-02 12:24:01,983 [INFO] [rank=0] [SAVE] Parametri salvati in results/run_20260202_114400_seed42/parameters/theta_finali_native.npy
+2026-02-02 12:24:01,996 [INFO] [rank=0] [SAVE] Summary salvato in results/run_20260202_114400_seed42/summaries/training_summary.txt
+2026-02-02 12:24:02,019 [INFO] [rank=0] [SAVE] Storia loss salvata in results/run_20260202_114400_seed42/summaries/loss_history.txt
+2026-02-02 12:24:02,925 [INFO] [rank=0] [SAVE] ✓ Grafico training loss salvato in results/run_20260202_114400_seed42/plots/training_loss.png
+2026-02-02 12:24:02,925 [INFO] [rank=0] [COMPLETE] Ottimizzazione completata. Loss media finale: 1.788645
+2026-02-02 12:24:02,925 [INFO] [rank=0] [COMPLETE] Tutti i file salvati in: results/run_20260202_114400_seed42
+2026-02-02 12:24:02,926 [INFO] [rank=0] [COMPLETE] - Parametri: results/run_20260202_114400_seed42/parameters
+2026-02-02 12:24:02,926 [INFO] [rank=0] [COMPLETE] - Summaries: results/run_20260202_114400_seed42/summaries
+2026-02-02 12:24:02,926 [INFO] [rank=0] [COMPLETE] - Plots: results/run_20260202_114400_seed42/plots
+2026-02-02 12:24:02,926 [INFO] [rank=0] [COMPLETE] - Matrici: results/run_20260202_114400_seed42/matrices
