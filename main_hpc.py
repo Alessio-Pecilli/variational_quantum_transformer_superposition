@@ -875,7 +875,8 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
         'use_quantum_states': use_quantum_states,
         'source_qubits': qs_cfg.get('source_qubits', None),
         'target_qubits': qs_cfg.get('target_qubits', None),
-        'use_projection': qs_cfg.get('use_projection', False)
+        'use_projection': qs_cfg.get('use_projection', False),
+        'use_Projector': qs_cfg.get('use_Projector', True)
     }
     np.save(matrices_dir / "metadata.npy", metadata)
     logger.info(f"[SAVE] Metadata salvato")
@@ -1026,8 +1027,10 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
     # Determina se siamo in quantum mode con proiezione
     use_quantum_states = QUANTUM_STATES_CONFIG.get('use_quantum_states', False)
     use_projection = QUANTUM_STATES_CONFIG.get('use_projection', False)
+    use_projector = QUANTUM_STATES_CONFIG.get('use_Projector', True)
+    projection_mode_active = use_quantum_states and use_projection and use_projector
     
-    if use_quantum_states and use_projection:
+    if projection_mode_active:
         # QUANTUM MODE: mostra P invece di E/V
         source_qubits = QUANTUM_STATES_CONFIG.get('source_qubits', 10)
         target_qubits = QUANTUM_STATES_CONFIG.get('target_qubits', 2)
@@ -1038,6 +1041,8 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
         logger.info(f"  P shape: {target_dim} x {source_dim} (2^{target_qubits} x 2^{source_qubits})")
         logger.info(f"  E parameters: 0 (not used in quantum mode)")
         logger.info(f"  V parameters: 0 (not used in quantum mode)")
+    elif use_quantum_states and use_projection and not use_projector:
+        logger.info("  Projector is disabled via use_Projector=False; quantum states feed directly to the circuit.")
     elif extra_params > 0:
         # TEXT MODE: mostra E e V
         logger.info(f"  E parameters (Embedding): {embedding_params}")
@@ -1138,7 +1143,8 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     
     # Setup del projector se in quantum states mode con proiezione
     projector = None
-    if use_quantum_states and P_matrix.size > 0:
+    use_projector_cfg = QUANTUM_STATES_CONFIG.get('use_Projector', True)
+    if use_quantum_states and P_matrix.size > 0 and use_projector_cfg:
         from quantum_projection import QuantumStateProjector
         projection_shape = P_matrix.shape
         projector = QuantumStateProjector(
@@ -1163,7 +1169,7 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
         qs_cfg = QUANTUM_STATES_CONFIG
         num_states = min(max_test_sentences, qs_cfg.get('num_states', 9))
         # Usa source_qubits se c'è proiezione, altrimenti num_qubits
-        use_projection_qs = qs_cfg.get('use_projection', False) and P_matrix.size > 0
+        use_projection_qs = qs_cfg.get('use_projection', False) and use_projector_cfg and P_matrix.size > 0
         num_qubits_qs = qs_cfg.get('source_qubits', qs_cfg.get('num_qubits', 2)) if use_projection_qs else qs_cfg.get('num_qubits', 2)
         # max_time determina il numero di "parole" (stati temporali)
         max_time = sentence_length  # Usa sentence_length da config
@@ -1587,7 +1593,8 @@ def main():
             sentence_length_quantum = int(qs_cfg.get('max_time', 10))  # M "parole" per frase
             
             # Supporto per proiezione: usa source_qubits se abilitata
-            use_projection_qs = qs_cfg.get('use_projection', False)
+            use_projector_cfg = qs_cfg.get('use_Projector', True)
+            use_projection_qs = qs_cfg.get('use_projection', False) and use_projector_cfg
             source_qubits = qs_cfg.get('source_qubits', 10)  # D = qubit sorgente (default 10)
             target_qubits = qs_cfg.get('target_qubits', qs_cfg.get('num_qubits', 2))  # d = qubit target
             num_qubits_qs = source_qubits if use_projection_qs else qs_cfg.get('num_qubits', 2)
@@ -1604,6 +1611,8 @@ def main():
                     logger.info(f"[QUANTUM] Dimensione Hilbert sorgente: 2^{source_qubits} = {2**source_qubits}")
                     logger.info(f"[QUANTUM] Dimensione Hilbert target: 2^{target_qubits} = {2**target_qubits}")
                 else:
+                    if qs_cfg.get('use_projection', False) and not use_projector_cfg:
+                        logger.info("[QUANTUM] ⚠ use_Projector=False → salto P, gli stati vanno direttamente al circuito.")
                     logger.info(f"[QUANTUM] Dimensione Hilbert: 2^{num_qubits_qs} = {2**num_qubits_qs}")
                 logger.info(f"[QUANTUM] MPI ranks: {size}")
                 logger.info(f"[QUANTUM] Frasi per rank: ~{num_quantum_sentences // size}")

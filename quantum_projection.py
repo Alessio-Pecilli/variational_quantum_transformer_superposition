@@ -178,8 +178,9 @@ def create_projector_from_config(cfg: dict) -> Optional[QuantumStateProjector]:
     """
     use_quantum_states = cfg.get('use_quantum_states', False)
     use_projection = cfg.get('use_projection', True)
+    use_projector = cfg.get('use_Projector', True)
     
-    if not use_quantum_states or not use_projection:
+    if not use_quantum_states or not use_projection or not use_projector:
         return None
     
     source_qubits = cfg.get('source_qubits', 10)  # D = large qubits (e.g., 10)
@@ -207,8 +208,9 @@ def get_projection_shape(cfg: dict) -> Optional[Tuple[int, int]]:
     """
     use_quantum_states = cfg.get('use_quantum_states', False)
     use_projection = cfg.get('use_projection', True)
+    use_projector = cfg.get('use_Projector', True)
     
-    if not use_quantum_states or not use_projection:
+    if not use_quantum_states or not use_projection or not use_projector:
         return None
     
     source_qubits = cfg.get('source_qubits', 10)
