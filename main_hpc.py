@@ -1180,18 +1180,25 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
         
         logger.info(f"[CV] Generazione {num_states} stati quantistici test (D={num_qubits_qs}, max_time={max_time})")
         
+        # USA LA NUOVA MODALITÀ: stati base casuali senza rimpiazzo
+        from quantum_annealing import TFIMHamiltonian
+        
+        # Crea Hamiltoniana TFIM per test (seed diverso dal training)
+        hamiltonian_test = TFIMHamiltonian(
+            num_qubits=num_qubits_qs,
+            seed=cfg.get('seed', 42) + 999  # Seed diverso per test
+        )
+        
+        # Genera stati test usando stati base diversi
+        test_quantum_sentences_array = hamiltonian_test.generate_sentences(
+            num_sentences=num_states,
+            max_time=int(max_time),
+            seed=cfg.get('seed', 42) + 999
+        )
+        
+        # Converti in formato compatibile
         for i in range(num_states):
-            random_real = rng.standard_normal(hilbert_dim)
-            random_imag = rng.standard_normal(hilbert_dim)
-            initial_state = random_real + 1j * random_imag
-            initial_state = initial_state / np.linalg.norm(initial_state)
-            quantum_sentence = generate_quantum_states(
-                num_states=int(max_time),
-                num_qubits=num_qubits_qs,
-                max_time=float(max_time),
-                initial_state=initial_state,
-                use_test_mode=True
-            )
+            quantum_sentence = test_quantum_sentences_array[i]  # Shape: (max_time, 2^num_qubits_qs)
             test_sentences_all.append((f"quantum_test_{i}", quantum_sentence))
     else:
         # Usa frasi testuali - genera un test set SEPARATO
@@ -1621,33 +1628,32 @@ def main():
             if rank == 0:
                 logger.info(f"[QUANTUM] Rank 0: Generazione {num_quantum_sentences} frasi quantistiche...")
                 
-                # RNG per generare stati iniziali DIVERSI per ogni frase
-                rng_quantum = np.random.default_rng(cfg.get('seed', 42))
-                hilbert_dim = 2 ** num_qubits_qs
+                # USA LA NUOVA MODALITÀ: stati base casuali senza rimpiazzo
+                from quantum_annealing import TFIMHamiltonian
                 
+                # Crea Hamiltoniana TFIM
+                hamiltonian = TFIMHamiltonian(
+                    num_qubits=num_qubits_qs,
+                    seed=cfg.get('seed', 42)
+                )
+                
+                # Genera N frasi usando N stati base diversi (senza rimpiazzo)
+                # Ogni frase ha M evoluzioni temporali
+                all_quantum_sentences_array = hamiltonian.generate_sentences(
+                    num_sentences=num_quantum_sentences,  # N frasi
+                    max_time=sentence_length_quantum,     # M parole per frase
+                    seed=cfg.get('seed', 42)
+                )
+                # Shape: (N, M, 2^D) = (num_quantum_sentences, sentence_length_quantum, 2^num_qubits_qs)
+                
+                # Converti in lista di array per compatibilità
                 all_quantum_sentences = []
                 for i in range(num_quantum_sentences):
-                    # IMPORTANTE: Ogni frase parte da uno stato iniziale DIVERSO
-                    # altrimenti tutte le frasi sarebbero identiche!
-                    # Genera stato iniziale random normalizzato
-                    random_real = rng_quantum.standard_normal(hilbert_dim)
-                    random_imag = rng_quantum.standard_normal(hilbert_dim)
-                    initial_state = random_real + 1j * random_imag
-                    initial_state = initial_state / np.linalg.norm(initial_state)
-                    
-                    # Ogni "frase quantistica" = evoluzione temporale con sentence_length_quantum stati
-                    quantum_sentence = generate_quantum_states(
-                        num_states=sentence_length_quantum,  # M "parole"
-                        num_qubits=num_qubits_qs,
-                        max_time=float(sentence_length_quantum),
-                        initial_state=initial_state,  # Stato iniziale UNICO per questa frase
-                        use_test_mode=use_test_mode
-                    )
-                    # quantum_sentence ha shape (sentence_length_quantum, 2^num_qubits)
+                    quantum_sentence = all_quantum_sentences_array[i]  # Shape: (M, 2^D)
                     all_quantum_sentences.append(quantum_sentence)
                     
                     if (i + 1) % 10 == 0 or i == 0:
-                        logger.info(f"[QUANTUM] Generati {i+1}/{num_quantum_sentences} frasi quantistiche...")
+                        logger.info(f"[QUANTUM] Processati {i+1}/{num_quantum_sentences} frasi quantistiche...")
                 
                 # Array: (N, M, dim) = (num_sentences, sentence_length, hilbert_dim)
                 quantum_states = np.array(all_quantum_sentences)

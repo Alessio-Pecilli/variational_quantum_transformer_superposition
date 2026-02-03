@@ -258,6 +258,98 @@ class TFIMHamiltonian:
         
         return states, times
     
+    def generate_sentences(self, num_sentences: int, max_time: int = 5, 
+                          seed: Optional[int] = None) -> np.ndarray:
+        """
+        Genera N "frasi" quantistiche usando stati base casuali SENZA rimpiazzo.
+        
+        Ogni "frase" è una sequenza di M stati ottenuti per evoluzione temporale
+        da un diverso stato base computazionale |i⟩ scelto casualmente.
+        
+        Procedura:
+        1. Sceglie N stati base diversi dai 2^D possibili (senza rimpiazzo)
+        2. Per ogni stato base |i⟩, genera M stati usando evoluzione temporale
+        3. Risultato: array (N, M, 2^D) = (frasi, parole, dim_Hilbert)
+        
+        Args:
+            num_sentences: N = numero di "frasi" (stati base diversi)
+            max_time: M = numero di "parole" per frase (evoluzioni temporali)  
+            seed: Seed per riproducibilità della selezione casuale
+            
+        Returns:
+            np.ndarray: Stati quantistici shape (N, M, 2^D)
+                       - N = numero di frasi (stati base diversi)
+                       - M = numero di parole per frase (tempi)
+                       - 2^D = dimensione spazio di Hilbert
+        """
+        if seed is not None:
+            rng = np.random.default_rng(seed)
+        else:
+            rng = np.random.default_rng()
+        
+        total_basis_states = self.dim  # 2^D
+        
+        # Gestisci il caso N > 2^D con replacement ciclico
+        if num_sentences <= total_basis_states:
+            # Caso normale: senza replacement
+            selected_indices = rng.choice(total_basis_states, size=num_sentences, replace=False)
+            actual_sentences = num_sentences
+            use_replacement = False
+        else:
+            # Caso speciale: usa tutti gli stati + replacement ciclico
+            selected_indices = np.tile(np.arange(total_basis_states), 
+                                     (num_sentences // total_basis_states) + 1)[:num_sentences]
+            rng.shuffle(selected_indices)
+            actual_sentences = num_sentences
+            use_replacement = True
+        
+        # Stampa informazioni con bella formattazione
+        print(f"\n[FixedH] Generazione sequenze con input variabile:")
+        print(f"         - Possibili basis states: {total_basis_states} (2^{self.num_qubits})")
+        print(f"         - N richiesti: {num_sentences}  ")
+        print(f"         - N generati: {actual_sentences} ✓")
+        
+        if use_replacement:
+            print(f"         - ⚠️  N > 2^D: usato replacement ciclico")
+        else:
+            print(f"         - ✅ N ≤ 2^D: nessun replacement")
+        
+        # Mostra gli stati base selezionati in notazione |xxx⟩
+        print(f"[FixedH] 📊 BASIS STATES SELEZIONATI:")
+        basis_display = []
+        for idx in selected_indices:
+            # Converti indice in stringa binaria
+            binary_str = format(idx, f'0{self.num_qubits}b')
+            basis_display.append(f"|{binary_str}⟩")
+        
+        # Stampa fino a 8 stati per riga per leggibilità
+        line = "         "
+        for i, state in enumerate(basis_display):
+            line += state + " "
+            if (i + 1) % 8 == 0 or i == len(basis_display) - 1:
+                print(line)
+                line = "         "
+        
+        # Genera le sequenze per ogni stato base
+        sentences = np.zeros((actual_sentences, max_time, self.dim), dtype=complex)
+        
+        for i, basis_idx in enumerate(selected_indices):
+            # Crea stato base |i⟩
+            initial_state = np.zeros(self.dim, dtype=complex)
+            initial_state[basis_idx] = 1.0
+            
+            # Genera sequenza temporale da questo stato base
+            states, _ = self.generate_sequential_states(
+                num_states=max_time,
+                max_time=10.0,  # Tempo totale fisso
+                initial_state=initial_state
+            )
+            
+            sentences[i] = states
+        
+        print(f"[FixedH] ✅ Generate {actual_sentences} frasi × {max_time} parole = {actual_sentences * max_time} stati totali")
+        return sentences
+    
     @classmethod
     def create_from_config(cls, config: dict) -> 'TFIMHamiltonian':
         """
@@ -687,9 +779,20 @@ def generate_quantum_states(num_states: int, num_qubits: int = 2,
                             max_time: float = 10.0,
                             initial_state: np.ndarray = None,
                             use_test_mode: bool = True,
-                            seed: Optional[int] = None) -> np.ndarray:
+                            seed: Optional[int] = None,
+                            use_random_basis: bool = False,
+                            num_time_steps: int = 5) -> np.ndarray:
     """
-    Funzione principale per generare N stati quantistici sequenziali.
+    Funzione principale per generare N stati quantistici.
+    
+    Due modalità:
+    1. SEQUENTIAL (use_random_basis=False): 
+       Evoluzione temporale da stato iniziale fisso
+       Returns: shape (num_states, 2^num_qubits)
+       
+    2. RANDOM BASIS (use_random_basis=True):
+       N stati base casuali senza rimpiazzo, ognuno evoluto M volte
+       Returns: shape (num_states, num_time_steps, 2^num_qubits)
     
     USA SEMPRE TFIMHamiltonian con:
         H = Σᵢ Xᵢ + Σ⟨i,j⟩ Jᵢⱼ ZᵢZⱼ
@@ -700,34 +803,43 @@ def generate_quantum_states(num_states: int, num_qubits: int = 2,
         - Coefficiente interazione Ising = +1 (fisso, segno positivo)
         - Jᵢⱼ ~ Uniform[0,1]
     
-    Uso semplice:
-        states = generate_quantum_states(N)
-    
     Args:
-        num_states: Numero di stati da generare (= numero di "parole")
+        num_states: Numero di stati/frasi da generare
         num_qubits: Numero di qubit (default: 2, → dim=4)
         max_time: Tempo massimo di evoluzione (default: 10.0)
-        initial_state: Stato iniziale custom (default: |000...0⟩)
+        initial_state: Stato iniziale custom (solo per sequential)
         use_test_mode: IGNORATO - mantenuto per retrocompatibilità
-        seed: Seed per riproducibilità dei Jᵢⱼ random
+        seed: Seed per riproducibilità
+        use_random_basis: True = modalità frasi (random basis), False = sequential
+        num_time_steps: Numero di step temporali per ogni frase (solo random basis)
         
     Returns:
-        np.ndarray: Array di stati quantistici, shape (num_states, 2^num_qubits)
+        np.ndarray: Stati quantistici
+                   - Sequential: shape (num_states, 2^num_qubits)
+                   - Random basis: shape (num_states, num_time_steps, 2^num_qubits)
     """
     # USA SEMPRE TFIMHamiltonian (ignora use_test_mode)
     hamiltonian = TFIMHamiltonian(num_qubits=num_qubits, seed=seed)
     
-    # Stato iniziale di default: |000...0⟩ (non autostato → evoluzione interessante)
-    if initial_state is None:
-        initial_state = np.zeros(2**num_qubits, dtype=complex)
-        initial_state[0] = 1.0
-    
-    # Genera stati
-    states, times = hamiltonian.generate_sequential_states(
-        num_states, max_time=max_time, initial_state=initial_state
-    )
-    
-    return states
+    if use_random_basis:
+        # Modalità RANDOM BASIS: genera frasi con stati base diversi
+        return hamiltonian.generate_sentences(
+            num_sentences=num_states,
+            max_time=num_time_steps,
+            seed=seed
+        )
+    else:
+        # Modalità SEQUENTIAL: evoluzione da stato iniziale fisso
+        if initial_state is None:
+            initial_state = np.zeros(2**num_qubits, dtype=complex)
+            initial_state[0] = 1.0
+        
+        # Genera stati
+        states, times = hamiltonian.generate_sequential_states(
+            num_states, max_time=max_time, initial_state=initial_state
+        )
+        
+        return states
 
 
 def generate_tfim_states(num_states: int, num_qubits: int = 2,
