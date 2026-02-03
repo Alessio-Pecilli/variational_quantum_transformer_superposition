@@ -88,14 +88,14 @@ DATASET_CONFIG = {
 # Quantum States settings (alternativa a sentences testuali)
 QUANTUM_STATES_CONFIG = {
     'use_quantum_states': True,    # True = usa stati quantistici, False = usa sentences testuali
-    'num_states': 99,                # N = numero di "frasi quantistiche" (serve almeno 6 per 3-fold CV)
-    'num_qubits': 4,                # Qubit del circuito QSA (escluse ancille)
-    'source_qubits': 10,            # D = qubit sorgente Hamiltoniana (es. 6 -> 64 dim)
-    'target_qubits': 4,             # d = qubit target dopo P (2 -> 4 dim = embedding_dim)
-    'use_projection': True,         # Se True, usa layer P per proiettare da 2^D a 2^d
-    'use_Projector': True,          # Se False, salta completamente P e passa gli stati direttamente al circuito
-    'max_time': 5,                 # M = evoluzioni temporali per frase (come "parole") - INTERO
-    'use_test_mode': False,         # True = B(t)=1 costante e J=1 uniforme
+    'num_states': 100,              # N = numero di "frasi quantistiche" da scegliere dallo spazio 2^10
+    'num_qubits': 4,                # Qubit del circuito QSA (escluse ancille) 
+    'source_qubits': 10,            # D = 10 qubit sorgente per 2^10 = 1024 dimensioni
+    'target_qubits': 4,             # d = 4 qubit target per embedding_dim = 16
+    'use_projection': True,         # NECESSARIO: proietta da 1024 -> 16 dimensioni
+    'use_Projector': True,          # USA la matrice P per ridurre dimensionalità  
+    'max_time': 5,                 # M = 5 evoluzioni temporali per "frase"
+    'use_test_mode': True,          # ABILITATO: stabilità numerica con B(t)=1, J=1
     'num_test_sets': 3,             # Numero di test set diversi da valutare
     'skip_register_analysis': True  # True = salta analisi registri (evita errore AerSimulator con gate custom)
 }

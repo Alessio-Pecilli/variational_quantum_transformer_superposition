@@ -23,14 +23,77 @@ def get_simulator():
 
 def clear_memory():
     """Forza la pulizia della memoria. Chiamare periodicamente durante training."""
-    gc.collect()
+    import psutil
+    import os
+    
+    # Log memoria prima della pulizia
+    if hasattr(os, 'getpid'):
+        try:
+            process = psutil.Process(os.getpid())
+            mem_before = process.memory_info().rss / 1024**2  # MB
+        except:
+            mem_before = -1
+    else:
+        mem_before = -1
+    
+    # Garbage collection multiplo
+    for _ in range(3):
+        gc.collect()
+    
     # Prova a liberare memoria non usata
     try:
         import ctypes
-        libc = ctypes.CDLL("libc.so.6")
-        libc.malloc_trim(0)
+        # Linux/Unix
+        try:
+            libc = ctypes.CDLL("libc.so.6")
+            libc.malloc_trim(0)
+        except:
+            # macOS/BSD
+            try:
+                libc = ctypes.CDLL("libc.dylib")
+                libc.malloc_trim(0)
+            except:
+                pass
     except Exception:
         pass  # Non disponibile su Windows/Mac
+    
+    # Log memoria dopo pulizia
+    if mem_before >= 0:
+        try:
+            process = psutil.Process(os.getpid())
+            mem_after = process.memory_info().rss / 1024**2  # MB
+            freed_mb = mem_before - mem_after
+            if freed_mb > 1.0:  # Solo se significativo
+                print(f"[MEMORY] Freed {freed_mb:.1f} MB ({mem_before:.1f} -> {mem_after:.1f} MB)")
+        except:
+            pass
+
+
+def check_memory_usage(threshold_gb=1.5, rank=0):
+    """
+    Controlla l'uso della memoria e avverte se si avvicina al limite.
+    
+    Args:
+        threshold_gb: Soglia di warning in GB
+        rank: MPI rank per logging
+    
+    Returns:
+        bool: True se la memoria è OK, False se vicina al limite
+    """
+    try:
+        import psutil
+        import os
+        
+        process = psutil.Process(os.getpid())
+        mem_gb = process.memory_info().rss / 1024**3
+        
+        if mem_gb > threshold_gb:
+            print(f"[MEMORY WARNING] Rank {rank}: {mem_gb:.2f} GB used (threshold: {threshold_gb:.1f} GB)")
+            return False
+        
+        return True
+    except Exception:
+        return True  # Assume OK se non riusciamo a controllare
 
 
 def get_unitary_from_tk(psi):

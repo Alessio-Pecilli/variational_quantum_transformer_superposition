@@ -51,7 +51,7 @@ from config import (
 from encoding import Encoding
 from optimization import get_params
 from generalized_quantum_circuits import GeneralizedQuantumCircuitBuilder
-from quantum_utils import clear_memory
+from quantum_utils import clear_memory, check_memory_usage
 from quantum_projection import (
     QuantumStateProjector,
     create_projector_from_config,
@@ -479,6 +479,13 @@ def distributed_objective_factory(
         local_cnt = 0.0
         local_sum_sqrt_p = 0.0
         for local_pos, (global_idx, sentence) in enumerate(my_items):
+            # CONTROLLO PREVENTIVO MEMORIA - SOGLIA PIÙ BASSA per quantum states
+            memory_threshold = 1.0 if quantum_states is not None else 1.5  # GB
+            if not check_memory_usage(threshold_gb=memory_threshold, rank=rank):
+                if rank == 0:
+                    logger.warning(f"[MEMORY] Soglia memoria {memory_threshold}GB superata al processo {local_pos}/{len(my_items)}")
+                clear_memory()  # Pulizia aggressiva
+                
             try:
                 # Se abbiamo sequenze QA, passa l'INTERA sequenza corrispondente
                 # Ogni sequenza ha num_states_per_seq stati (come una "frase" con N "parole")
@@ -620,6 +627,10 @@ def distributed_objective_factory(
                 local_cnt = 0.0
                 local_sum_sqrt_p = 0.0
                 for local_pos, (global_idx, sentence) in enumerate(local_items):
+                    # CONTROLLO PREVENTIVO MEMORIA (worker)
+                    if not check_memory_usage(threshold_gb=1.5, rank=rank):
+                        clear_memory()  # Pulizia aggressiva
+                        
                     try:
                         # Se abbiamo sequenze QA, passa l'INTERA sequenza corrispondente
                         if qa_sequences_list is not None:
@@ -640,6 +651,9 @@ def distributed_objective_factory(
                             local_sum_sqrt_p += np.sqrt(prob)
                     except Exception:
                         pass
+                    finally:
+                        # Pulizia dopo ogni loss
+                        clear_memory()
 
                 # Contribuisce alla riduzione
                 send_buf[0] = local_sum
@@ -1626,38 +1640,53 @@ def main():
             
             # SOLO RANK 0 genera TUTTE le frasi quantistiche, poi broadcast
             if rank == 0:
-                logger.info(f"[QUANTUM] Rank 0: Generazione {num_quantum_sentences} frasi quantistiche...")
+                logger.info(f"[QUANTUM] Rank 0: Generazione OTTIMIZZATA di {num_quantum_sentences} frasi quantistiche...")
+                logger.info(f"[QUANTUM] Dimensione target: 2^{num_qubits_qs} = {2**num_qubits_qs}, memoria stimata: {(num_quantum_sentences * sentence_length_quantum * (2**num_qubits_qs) * 16) // (1024**2)} MB")
                 
                 # USA LA NUOVA MODALITÀ: stati base casuali senza rimpiazzo
                 from quantum_annealing import TFIMHamiltonian
                 
-                # Crea Hamiltoniana TFIM
+                # OTTIMIZZAZIONE: Usa test_mode per stabilità numerica
                 hamiltonian = TFIMHamiltonian(
                     num_qubits=num_qubits_qs,
                     seed=cfg.get('seed', 42)
                 )
                 
-                # Genera N frasi usando N stati base diversi (senza rimpiazzo)
-                # Ogni frase ha M evoluzioni temporali
-                all_quantum_sentences_array = hamiltonian.generate_sentences(
-                    num_sentences=num_quantum_sentences,  # N frasi
-                    max_time=sentence_length_quantum,     # M parole per frase
-                    seed=cfg.get('seed', 42)
-                )
-                # Shape: (N, M, 2^D) = (num_quantum_sentences, sentence_length_quantum, 2^num_qubits_qs)
-                
-                # Converti in lista di array per compatibilità
+                # OTTIMIZZAZIONE: Genera in batch per evitare OOM
+                batch_size = min(20, num_quantum_sentences)  # Batch più piccoli
                 all_quantum_sentences = []
-                for i in range(num_quantum_sentences):
-                    quantum_sentence = all_quantum_sentences_array[i]  # Shape: (M, 2^D)
-                    all_quantum_sentences.append(quantum_sentence)
-                    
-                    if (i + 1) % 10 == 0 or i == 0:
-                        logger.info(f"[QUANTUM] Processati {i+1}/{num_quantum_sentences} frasi quantistiche...")
                 
-                # Array: (N, M, dim) = (num_sentences, sentence_length, hilbert_dim)
+                for batch_start in range(0, num_quantum_sentences, batch_size):
+                    batch_end = min(batch_start + batch_size, num_quantum_sentences)
+                    batch_sentences = batch_end - batch_start
+                    
+                    logger.info(f"[QUANTUM] Batch {batch_start//batch_size + 1}: generazione {batch_sentences} frasi ({batch_start}-{batch_end-1})...")
+                    
+                    # Genera batch
+                    batch_array = hamiltonian.generate_sentences(
+                        num_sentences=batch_sentences,
+                        max_time=sentence_length_quantum,
+                        seed=cfg.get('seed', 42) + batch_start  # Seed diverso per batch
+                    )
+                    
+                    # Converti batch in lista e aggiungi
+                    for i in range(batch_sentences):
+                        quantum_sentence = batch_array[i]  # Shape: (M, 2^D)
+                        all_quantum_sentences.append(quantum_sentence)
+                    
+                    # CLEANUP memoria dopo ogni batch
+                    del batch_array
+                    clear_memory()
+                    
+                    logger.info(f"[QUANTUM] Batch completato, totale frasi: {len(all_quantum_sentences)}/{num_quantum_sentences}")
+                
+                # Converti in array finale
                 quantum_states = np.array(all_quantum_sentences)
-                logger.info(f"[QUANTUM] ✓ Tutte le frasi generate: shape={quantum_states.shape}")
+                logger.info(f"[QUANTUM] ✓ Tutte le {num_quantum_sentences} frasi generate: shape={quantum_states.shape}")
+                
+                # Pulizia finale
+                del all_quantum_sentences
+                clear_memory()
                 
                 # Verifica che le frasi siano DIVERSE
                 if num_quantum_sentences >= 2:
