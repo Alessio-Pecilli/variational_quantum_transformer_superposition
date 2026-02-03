@@ -105,6 +105,54 @@ x_val_final, y_val_final = to_tensor(test_subset)
 print(f"Training Set shape: {x_data.shape}")
 print(f"Test Set shape: {x_val_final.shape}")
 # --- 3. FUNZIONI QUANTUM (RÉNYI) ---
+def calculate_geometric_overlap(logits: torch.Tensor, targets: torch.Tensor):
+    """
+    Calcola Loss e PPL usando l'overlap geometrico (Cosine Similarity) tra gli embedding
+    predetti e quelli target.
+    
+    La loss è basata sulla fedeltà geometrica: vogliamo massimizzare l'overlap
+    tra il vettore di logits e la direzione del target (one-hot).
+    
+    Args:
+        logits: Tensor di shape (batch_size, seq_len, vocab_size) - output del modello
+        targets: Tensor di shape (batch_size, seq_len) - indici delle parole target
+    
+    Returns:
+        loss: Loss basata sull'overlap geometrico (da minimizzare)
+        ppl_geometric: Perplexity geometrica (analogo alla PPL classica)
+    """
+    batch_size, seq_len, vocab_size = logits.shape
+    
+    # Normalizzazione L2 dei logits (per cosine similarity)
+    logits_norm = F.normalize(logits, p=2, dim=-1)  # (batch, seq, vocab)
+    
+    # Creiamo one-hot dei target per il confronto
+    targets_onehot = F.one_hot(targets, num_classes=vocab_size).float()  # (batch, seq, vocab)
+    targets_norm = F.normalize(targets_onehot, p=2, dim=-1)
+    
+    # Cosine similarity tra logits normalizzati e target one-hot normalizzato
+    # Prodotto scalare lungo la dimensione vocab
+    cosine_sim = (logits_norm * targets_norm).sum(dim=-1)  # (batch, seq)
+    
+    # La cosine similarity va da -1 a 1, la trasformiamo in [0, 1]
+    # overlap = (1 + cos) / 2 rappresenta la "fedeltà" geometrica
+    overlap = (1 + cosine_sim) / 2  # (batch, seq)
+    
+    # Fedeltà media (analogo a f_bar in calculate_quantum_metrics)
+    f_bar = torch.mean(overlap, dim=1)  # (batch,)
+    
+    # PPL geometrica = 1 / f_bar^2 (più bassa = migliore allineamento)
+    ppl_geometric = torch.pow(f_bar + 1e-10, -2)
+    
+    # Loss = log(PPL) = -2 * log(f_bar)
+    loss_geometric = torch.log(ppl_geometric + 1e-10).mean()
+    
+    # PPL media per il log
+    ppl_value = torch.exp(loss_geometric).item()
+    
+    return loss_geometric, ppl_value
+
+
 def calculate_quantum_metrics(logits: torch.Tensor, targets: torch.Tensor):
 
     """
@@ -636,13 +684,13 @@ optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_history = []
 ppl_history = []
 
-print(f"Inizio training Quantum su {len(x_data)} frasi...")
+print(f"Inizio training Geometric Overlap su {len(x_data)} frasi...")
 for epoch in range(EPOCHS):
     model.train()
     optimizer.zero_grad()
 
     logits = model(x_data)
-    loss, ppl_val = calculate_quantum_metrics(logits, y_data)
+    loss, ppl_val = calculate_geometric_overlap(logits, y_data)
 
     loss.backward()
     optimizer.step()
@@ -662,8 +710,8 @@ with torch.no_grad():
         x_test, y_test = x_val_final[test_idx].to(device), y_val_final[test_idx].to(device)
         logits_fold = model(x_test)
 
-        # 1. Metrica PPL (Quantum Logic)
-        _, ppl_fold = calculate_quantum_metrics(logits_fold, y_test)
+        # 1. Metrica PPL (Geometric Overlap)
+        _, ppl_fold = calculate_geometric_overlap(logits_fold, y_test)
 
         # 2. Metrica ERRORE (Classica Hard-Argmax)
         # Chi ha il valore più alto?
@@ -704,13 +752,13 @@ optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_history = []
 ppl_history = []
 
-print(f"Inizio training Quantum su {len(x_data)} frasi... NO SMAX")
+print(f"Inizio training Geometric Overlap su {len(x_data)} frasi... NO SMAX")
 for epoch in range(EPOCHS):
     model.train()
     optimizer.zero_grad()
 
     logits = model(x_data)
-    loss, ppl_val = calculate_quantum_metrics(logits, y_data)
+    loss, ppl_val = calculate_geometric_overlap(logits, y_data)
 
     loss.backward()
     optimizer.step()
@@ -730,8 +778,8 @@ with torch.no_grad():
         x_test, y_test = x_val_final[test_idx].to(device), y_val_final[test_idx].to(device)
         logits_fold = model(x_test)
 
-        # 1. Metrica PPL (Quantum Logic)
-        _, ppl_fold = calculate_quantum_metrics(logits_fold, y_test)
+        # 1. Metrica PPL (Geometric Overlap)
+        _, ppl_fold = calculate_geometric_overlap(logits_fold, y_test)
 
         # 2. Metrica ERRORE (Classica Hard-Argmax)
         # Chi ha il valore più alto?
@@ -753,11 +801,11 @@ with torch.no_grad():
 # --- 7. PLOT (Solo Training) ---
 plt.figure(figsize=(12, 5))
 plt.subplot(1, 2, 1)
-plt.plot(loss_history, label='Quantum Loss')
-plt.title('Training Loss (Rényi)'); plt.legend()
+plt.plot(loss_history, label='Geometric Overlap Loss')
+plt.title('Training Loss (Geometric)'); plt.legend()
 
 plt.subplot(1, 2, 2)
-plt.plot(ppl_history, color='orange', label='Quantum PPL')
+plt.plot(ppl_history, color='orange', label='Geometric PPL')
 plt.title('Training Perplexity'); plt.legend()
 plt.show()
 
@@ -772,13 +820,13 @@ optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 loss_history = []
 ppl_history = []
 
-print(f"Inizio training Quantum su {len(x_data)} frasi... NO SMAX")
+print(f"Inizio training Geometric Overlap su {len(x_data)} frasi... EMPTY MODEL")
 for epoch in range(EPOCHS):
     model.train()
     optimizer.zero_grad()
 
     logits = model(x_data)
-    loss, ppl_val = calculate_quantum_metrics(logits, y_data)
+    loss, ppl_val = calculate_geometric_overlap(logits, y_data)
 
     loss.backward()
     optimizer.step()
@@ -787,7 +835,7 @@ for epoch in range(EPOCHS):
     ppl_history.append(ppl_val)
 
     print(f"Epoch {epoch+1:03d} | Loss: {loss.item():.4f} | PPL : {ppl_val:.4f}")
-print("\n--- VALUTAZIONE 3-FOLD (PPL & ERRORE) NO SMAX ---")
+print("\n--- VALUTAZIONE 3-FOLD (PPL & ERRORE) EMPTY MODEL ---")
 kf = KFold(n_splits=3)
 fold_ppl_results = []
 fold_err_results = []
@@ -798,8 +846,8 @@ with torch.no_grad():
         x_test, y_test = x_val_final[test_idx].to(device), y_val_final[test_idx].to(device)
         logits_fold = model(x_test)
 
-        # 1. Metrica PPL (Quantum Logic)
-        _, ppl_fold = calculate_quantum_metrics(logits_fold, y_test)
+        # 1. Metrica PPL (Geometric Overlap)
+        _, ppl_fold = calculate_geometric_overlap(logits_fold, y_test)
 
         # 2. Metrica ERRORE (Classica Hard-Argmax)
         # Chi ha il valore più alto?
@@ -821,8 +869,8 @@ with torch.no_grad():
 # --- 7. PLOT (Solo Training) ---
 plt.figure(figsize=(12, 5))
 plt.subplot(1, 2, 1)
-plt.plot(loss_history, label='Quantum Loss')
-plt.title('Training Loss (Rényi)'); plt.legend()
+plt.plot(loss_history, label='Geometric Overlap Loss')
+plt.title('Training Loss (Geometric)'); plt.legend()
 
 plt.subplot(1, 2, 2)
 plt.plot(ppl_history, color='orange', label='Quantum PPL')
@@ -916,8 +964,8 @@ for epoch in range(EPOCHS):
 
     logits = model(x_data)
 
-    # 1. Quantum Loss (Rényi)
-    loss_q, ppl_val = calculate_quantum_metrics(logits, y_data)
+    # 1. Geometric Overlap Loss
+    loss_q, ppl_val = calculate_geometric_overlap(logits, y_data)
 
     # 2. Vincoli strutturali (da encoding.py)
     # Forza E^T E = I
@@ -961,7 +1009,7 @@ with torch.no_grad():
         x_test, y_test = x_val_final[test_idx].to(device), y_val_final[test_idx].to(device)
         logits_fold = model(x_test)
 
-        _, ppl_fold = calculate_quantum_metrics(logits_fold, y_test)
+        _, ppl_fold = calculate_geometric_overlap(logits_fold, y_test)
 
         pred_fold = torch.argmax(logits_fold, dim=-1)
         correct = (pred_fold == y_test).float().sum()
