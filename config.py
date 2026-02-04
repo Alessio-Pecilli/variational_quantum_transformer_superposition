@@ -90,14 +90,17 @@ QUANTUM_STATES_CONFIG = {
     'use_quantum_states': True,    # True = usa stati quantistici, False = usa sentences testuali
     'num_states': 100,              # N = numero di "frasi quantistiche" da scegliere dallo spazio 2^10
     'num_qubits': 4,                # Qubit del circuito QSA (escluse ancille) 
-    'source_qubits': 10,            # D = 10 qubit sorgente per 2^10 = 1024 dimensioni
+    'source_qubits': 10,             # D = 8 qubit sorgente per 2^8 = 256 dimensioni (LIMITE per kron)
     'target_qubits': 4,             # d = 4 qubit target per embedding_dim = 16
-    'use_projection': True,         # NECESSARIO: proietta da 1024 -> 16 dimensioni
+    'use_projection': True,         # NECESSARIO: proietta da 256 -> 16 dimensioni
     'use_Projector': True,          # USA la matrice P per ridurre dimensionalità  
     'max_time': 5,                 # M = 5 evoluzioni temporali per "frase"
     'use_test_mode': True,          # ABILITATO: stabilità numerica con B(t)=1, J=1
     'num_test_sets': 3,             # Numero di test set diversi da valutare
-    'skip_register_analysis': True  # True = salta analisi registri (evita errore AerSimulator con gate custom)
+    'skip_register_analysis': True, # True = salta analisi registri (evita errore AerSimulator con gate custom)
+    'batch_size': 10,              # NUOVO: processa stati in batch per ridurre memoria
+    'use_sparse_matrices': True,   # NUOVO: usa matrici sparse quando possibile
+    'memory_optimization': True    # NUOVO: abilita ottimizzazioni di memoria
 }
 
 # ML Classico Training Config (per MLClassicoSENTENCES e MLClassicoQUANTUMSTATES)

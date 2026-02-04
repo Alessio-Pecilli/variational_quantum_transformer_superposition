@@ -1,0 +1,35 @@
+2026-02-04 16:47:44,257 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-04 16:47:44,258 [INFO] [rank=0] [QUANTUM] Modalità QUANTUM STATES attiva!
+2026-02-04 16:47:44,259 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-04 16:47:44,259 [INFO] [rank=0] [QUANTUM] Frasi quantistiche (num_states): 100
+2026-02-04 16:47:44,259 [INFO] [rank=0] [QUANTUM] Parole per frase (max_time): 5
+2026-02-04 16:47:44,259 [INFO] [rank=0] [QUANTUM] ✓ PROIEZIONE ABILITATA: 10 qubit -> 4 qubit
+2026-02-04 16:47:44,259 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert sorgente: 2^10 = 1024
+2026-02-04 16:47:44,259 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert target: 2^4 = 16
+2026-02-04 16:47:44,260 [INFO] [rank=0] [QUANTUM] MPI ranks: 1
+2026-02-04 16:47:44,260 [INFO] [rank=0] [QUANTUM] Frasi per rank: ~100
+2026-02-04 16:47:44,260 [INFO] [rank=0] [QUANTUM] Rank 0: Generazione OTTIMIZZATA di 100 frasi quantistiche...
+2026-02-04 16:47:44,260 [INFO] [rank=0] [QUANTUM] Dimensione target: 2^10 = 1024, memoria stimata: 7 MB
+2026-02-04 16:47:45,388 [INFO] [rank=0] [QUANTUM] Batch 1: generazione 20 frasi (0-19)...
+2026-02-04 16:48:10,450 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 20/100
+2026-02-04 16:48:10,450 [INFO] [rank=0] [QUANTUM] Batch 2: generazione 20 frasi (20-39)...
+2026-02-04 16:48:36,163 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 40/100
+2026-02-04 16:48:36,164 [INFO] [rank=0] [QUANTUM] Batch 3: generazione 20 frasi (40-59)...
+2026-02-04 16:49:07,333 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 60/100
+2026-02-04 16:49:07,333 [INFO] [rank=0] [QUANTUM] Batch 4: generazione 20 frasi (60-79)...
+2026-02-04 16:49:36,812 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 80/100
+2026-02-04 16:49:36,813 [INFO] [rank=0] [QUANTUM] Batch 5: generazione 20 frasi (80-99)...
+2026-02-04 16:50:07,873 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 100/100
+2026-02-04 16:50:07,875 [INFO] [rank=0] [QUANTUM] ✓ Tutte le 100 frasi generate: shape=(100, 5, 1024)
+2026-02-04 16:50:08,069 [INFO] [rank=0] [QUANTUM] Verifica diversità: ||frase_0 - frase_1|| = 3.162278
+2026-02-04 16:50:08,075 [INFO] [rank=0] [QUANTUM] Salvate in quantum_states_generated.npy
+2026-02-04 16:50:08,075 [INFO] [rank=0] [QUANTUM] Rank 0: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-04 16:50:08,075 [INFO] [rank=0] [QUANTUM] Rank 0: Assegnate 100 frasi (IDs: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99])
+2026-02-04 16:50:08,079 [INFO] [rank=0] [PROJECTION] ✓ Projector creato: 1024 -> 16
+2026-02-04 16:50:08,080 [INFO] [rank=0] [QUANTUM] P sostituisce E (embedding): (16, 1024)
+2026-02-04 16:50:08,080 [INFO] [rank=0] [QUANTUM] V non serve in quantum mode (target = stati proiettati)
+2026-02-04 16:50:08,080 [INFO] [rank=0] Parametri: quantum=480 embed=0 rot=0 proj=16384 tot=16864 shape_half=(5, 2, 2, 4, 3)
+2026-02-04 16:50:08,100 [INFO] [rank=0] Inizio ottimizzazione con COBYLA (NO early stopping): maxiter=150, tol=1e-05
+2026-02-04 16:50:08,101 [INFO] [rank=0] [STOPPING CONFIG] HARD CONSTRAINT: Stop ONLY at 100 loss evaluations
+2026-02-04 16:50:08,101 [INFO] [rank=0] [STOPPING CONFIG] All early stopping logic DISABLED
+2026-02-04 16:50:08,210 [INFO] [rank=0] [LOSS EVAL 1/100] Starting evaluation...

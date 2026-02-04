@@ -162,8 +162,7 @@ for epoch in range(EPOCHS):
     
     train_loss_history.append(loss.item())
     train_ppl_history.append(ppl)
-    if (epoch + 1) % 20 == 0:
-        print(f"Epoch {epoch+1:03d} | Loss: {loss.item():.4f} | PPL: {ppl:.2f}")
+    print(f"Epoch {epoch+1:03d} | Loss: {loss.item():.4f} | PPL: {ppl:.2f}")
 
 # --- 6. TEST K-FOLD ---
 print(f"\n--- TEST K-FOLD (3-Splits) su 100 frasi di test ---")

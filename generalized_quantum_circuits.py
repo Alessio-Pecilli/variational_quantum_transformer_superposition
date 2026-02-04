@@ -528,6 +528,24 @@ def process_sentence_states(states, targets=None):
     states_calculated = []
     U = []
     Z = []
+    
+    # MEMORY SAFETY CHECK
+    if len(states) > 0:
+        state_dim = len(states[0])
+        kron_dim = state_dim ** 2
+        kron_size_mb = kron_dim * 16 / (1024**2)  # complex128 = 16 bytes
+        total_mb = kron_size_mb * len(states) * len(states)  # Worst case estimate
+        
+        print(f"[MEMORY CHECK] State dim: {state_dim}, Kron dim: {kron_dim}")
+        print(f"[MEMORY CHECK] Single kron size: {kron_size_mb:.1f}MB")
+        print(f"[MEMORY CHECK] Estimated total: {total_mb:.1f}MB")
+        
+        if kron_size_mb > 100:  # Limit single kron to 100MB
+            raise MemoryError(f"Kron product too large: {kron_size_mb:.1f}MB > 100MB limit. "
+                            f"Reduce state dimension from {state_dim}")
+        if total_mb > 500:  # Limit total processing to 500MB
+            raise MemoryError(f"Total processing too large: {total_mb:.1f}MB > 500MB limit")
+    
     #print("Inizio a fare gli stati, la lunghezza è ", len(states))
     for i in range(1, len(states)):
         #print("=" * 60)
@@ -547,6 +565,9 @@ def process_sentence_states(states, targets=None):
             kron = np.kron(t, t)
             #print(f"   kron shape={kron.shape}")
             psi = kron if psi is None else psi + kron
+            
+            # Libera immediatamente per evitare accumulo
+            del kron
 
         # Normalize psi
         norm_psi = np.linalg.norm(psi)
@@ -577,6 +598,10 @@ def process_sentence_states(states, targets=None):
         U.append(U_dagger)
         Z.append(Z_dagger)
         states_calculated.append(unitary_psi)
+        
+        # Garbage collection per liberare memoria immediatamente
+        import gc
+        gc.collect()
 
         #print("  [OK] Triplet saved in U, Z, states_calculated")
     return states_calculated, U, Z

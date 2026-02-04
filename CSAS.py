@@ -690,7 +690,7 @@ for epoch in range(EPOCHS):
     optimizer.zero_grad()
 
     logits = model(x_data)
-    loss, ppl_val = calculate_geometric_overlap(logits, y_data)
+    loss, ppl_val = calculate_quantum_metrics(logits, y_data)
 
     loss.backward()
     optimizer.step()

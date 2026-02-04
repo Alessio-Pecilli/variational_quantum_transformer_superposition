@@ -209,6 +209,17 @@ class TFIMHamiltonian:
        
 
         self._H = H_transverse + H_ising
+        
+        # OTTIMIZZAZIONE MEMORIA: Pre-diagonalizza una volta sola
+        print(f"[HAMILTONIAN] Diagonalizzazione {self.dim}×{self.dim} in corso...")
+        self._eigenvalues, self._eigenvectors = np.linalg.eigh(self._H)
+        print(f"[HAMILTONIAN] ✓ Diagonalizzazione completata e cached")
+        
+        # Libera la matrice originale per risparmiare memoria
+        del self._H
+        # Forza garbage collection
+        import gc
+        gc.collect()
 
    
 
@@ -260,11 +271,9 @@ class TFIMHamiltonian:
 
        
 
-        # Diagonalizza per evoluzione efficiente
+        # Usa diagonalizzazione PRE-CALCOLATA (cached)
 
-        eigenvalues, eigenvectors = np.linalg.eigh(self._H)
-
-        coeffs = np.conj(eigenvectors.T) @ psi0
+        coeffs = np.conj(self._eigenvectors.T) @ psi0
 
        
 
@@ -274,9 +283,9 @@ class TFIMHamiltonian:
 
         for i, t in enumerate(times):
 
-            phase_factors = np.exp(-1j * eigenvalues * t)
+            phase_factors = np.exp(-1j * self._eigenvalues * t)
 
-            states[i] = eigenvectors @ (coeffs * phase_factors)
+            states[i] = self._eigenvectors @ (coeffs * phase_factors)
 
             states[i] = states[i] / np.linalg.norm(states[i])
 
@@ -356,6 +365,11 @@ def generate_quantum_dataset(
         all_sequences.append(sequence)
     
     print(f"[QSAS-DATASET] ✓ Dataset completato: {num_sequences} sequenze × {sequence_length} stati")
+    
+    # Libera memoria e forza garbage collection
+    import gc
+    gc.collect()
+    
     return np.array(all_sequences)
 
 
