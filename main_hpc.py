@@ -431,6 +431,11 @@ def distributed_objective_factory(
             local_projector = projector
             if log_frequency and current_eval % log_frequency == 0:
                 logger.info(f"[PROJECTION] P matrix set: shape={raw_projection.shape}, norm={np.linalg.norm(raw_projection):.4f}")
+        elif projector is not None:
+            # FALLBACK: Usa il projector globale anche se i parametri non sono trainabili
+            local_projector = projector
+            if log_frequency and current_eval % log_frequency == 0:
+                logger.info(f"[PROJECTION] Using global projector (params not trainable)")
         
         if encoding is not None and raw_embedding is not None and raw_rotation is not None:
             encoding.set_embedding_matrix(

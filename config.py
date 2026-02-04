@@ -90,9 +90,9 @@ QUANTUM_STATES_CONFIG = {
     'use_quantum_states': True,    # True = usa stati quantistici, False = usa sentences testuali
     'num_states': 100,              # N = numero di "frasi quantistiche" da scegliere dallo spazio 2^10
     'num_qubits': 4,                # Qubit del circuito QSA (escluse ancille) 
-    'source_qubits': 10,             # D = 8 qubit sorgente per 2^8 = 256 dimensioni (LIMITE per kron)
-    'target_qubits': 4,             # d = 4 qubit target per embedding_dim = 16
-    'use_projection': True,         # NECESSARIO: proietta da 256 -> 16 dimensioni
+    'source_qubits': 10,            # D = 10 qubit sorgente per 2^10 = 1024 dimensioni
+    'target_qubits': 2,             # d = 2 qubit target per embedding_dim = 4
+    'use_projection': True,         # NECESSARIO: proietta da 1024 -> 4 dimensioni
     'use_Projector': True,          # USA la matrice P per ridurre dimensionalità  
     'max_time': 5,                 # M = 5 evoluzioni temporali per "frase"
     'use_test_mode': True,          # ABILITATO: stabilità numerica con B(t)=1, J=1
