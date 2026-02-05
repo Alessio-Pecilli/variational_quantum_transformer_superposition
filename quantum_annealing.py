@@ -258,10 +258,11 @@ class TFIMHamiltonian:
         
         return states, times
     
-    def generate_sentences(self, num_sentences: int, max_time: int = 5, 
+    def generate_sentences(self, num_sentences: int, max_time: Optional[int] = None, 
                           seed: Optional[int] = None) -> np.ndarray:
         """
         Genera N "frasi" quantistiche usando stati base casuali SENZA rimpiazzo.
+        Cambia Hamiltoniana (matrice J) ogni 10 stati totali.
         
         Ogni "frase" è una sequenza di M stati ottenuti per evoluzione temporale
         da un diverso stato base computazionale |i⟩ scelto casualmente.
@@ -269,11 +270,12 @@ class TFIMHamiltonian:
         Procedura:
         1. Sceglie N stati base diversi dai 2^D possibili (senza rimpiazzo)
         2. Per ogni stato base |i⟩, genera M stati usando evoluzione temporale
-        3. Risultato: array (N, M, 2^D) = (frasi, parole, dim_Hilbert)
+        3. Cambia matrice J ogni 10 stati totali (non ogni N/10 frasi)
+        4. Risultato: array (N, M, 2^D) = (frasi, parole, dim_Hilbert)
         
         Args:
             num_sentences: N = numero di "frasi" (stati base diversi)
-            max_time: M = numero di "parole" per frase (evoluzioni temporali)  
+            max_time: M = numero di "parole" per frase (se None, usa config.py)  
             seed: Seed per riproducibilità della selezione casuale
             
         Returns:
@@ -282,6 +284,15 @@ class TFIMHamiltonian:
                        - M = numero di parole per frase (tempi)
                        - 2^D = dimensione spazio di Hilbert
         """
+        # Importa config per max_time
+        if max_time is None:
+            try:
+                from config import QUANTUM_STATES_CONFIG
+                max_time = QUANTUM_STATES_CONFIG.get('max_time', 5)
+                print(f"[FixedH] 📋 max_time da config.py: {max_time}")
+            except ImportError:
+                max_time = 5
+                print(f"[FixedH] ⚠️  config.py non trovato, uso max_time = 5")
         if seed is not None:
             rng = np.random.default_rng(seed)
         else:
@@ -330,15 +341,61 @@ class TFIMHamiltonian:
                 print(line)
                 line = "         "
         
+        # Calcola STATI totali e intervallo per cambiare J (ogni 10 STATI)
+        total_states = actual_sentences * max_time
+        change_j_every_states = 10  # Fisso: ogni 10 stati
+        
+        print(f"[FixedH] 🔄 Cambio J ogni {change_j_every_states} STATI (totale: {total_states} stati)")
+        print(f"[FixedH] 📊 {actual_sentences} frasi × {max_time} parole = {total_states} stati")
+        
         # Genera le sequenze per ogni stato base
         sentences = np.zeros((actual_sentences, max_time, self.dim), dtype=complex)
+        current_j_group = -1  # Per tracciare quando cambiare J
         
         for i, basis_idx in enumerate(selected_indices):
-            # Crea stato base |i⟩
+            # Calcola range stati per questa frase
+            first_state_idx = i * max_time  # Primo stato di questa frase
+            last_state_idx = (i + 1) * max_time - 1  # Ultimo stato di questa frase
+            
+            # Verifica se è il momento di rigenerare J (controllo all'inizio della frase)
+            j_group = first_state_idx // change_j_every_states
+            if j_group != current_j_group:
+                current_j_group = j_group
+                
+                # Rigenera matrice J con nuovo seed
+                j_seed = (seed if seed is not None else 42) + j_group * 1000
+                print(f"\n[FixedH] 🎲 GRUPPO J-{j_group + 1}: Rigenerando J")
+                print(f"[FixedH] 📍 Frase {i+1}: stati globali {first_state_idx+1}-{last_state_idx+1}")
+                
+                # Rigenera J
+                old_J = self.J.copy() if hasattr(self, 'J') else None
+                self.J = self._generate_random_coupling(seed=j_seed)
+                self._build_hamiltonian()  # Ricostruisce H con nuova J
+                
+                # Stampa confronto J
+                print(f"[FixedH] 📊 MATRICE J GRUPPO {j_group + 1}:")
+                print(f"         J shape: {self.J.shape}")
+                print(f"         J range: [{np.min(self.J):.4f}, {np.max(self.J):.4f}]")
+                print(f"         J media: {np.mean(self.J):.4f}")
+                
+                # Mostra matrice J (se piccola)
+                if self.num_qubits <= 6:  # Solo per matrici piccole
+                    print(f"         J matrix:")
+                    for row_idx, row in enumerate(self.J):
+                        print(f"           [{' '.join(f'{val:6.3f}' for val in row)}]")
+                else:
+                    print(f"         J matrix troppo grande ({self.J.shape}) - mostro solo statistiche")
+                
+                # Verifica che sia diversa dalla precedente
+                if old_J is not None:
+                    is_different = not np.allclose(old_J, self.J, atol=1e-10)
+                    print(f"         Diversa da precedente: {'✅ SÌ' if is_different else '❌ NO'}")
+            
+            # Crea stato base |i⟩ 
             initial_state = np.zeros(self.dim, dtype=complex)
             initial_state[basis_idx] = 1.0
             
-            # Genera sequenza temporale da questo stato base
+            # Genera sequenza temporale da questo stato base (usa J corrente)
             states, _ = self.generate_sequential_states(
                 num_states=max_time,
                 max_time=10.0,  # Tempo totale fisso
@@ -347,7 +404,8 @@ class TFIMHamiltonian:
             
             sentences[i] = states
         
-        print(f"[FixedH] ✅ Generate {actual_sentences} frasi × {max_time} parole = {actual_sentences * max_time} stati totali")
+        print(f"\n[FixedH] ✅ Generate {actual_sentences} frasi × {max_time} parole = {actual_sentences * max_time} stati totali")
+        print(f"[FixedH] 🎲 Utilizzate {current_j_group + 1} matrici J diverse")
         return sentences
     
     @classmethod
