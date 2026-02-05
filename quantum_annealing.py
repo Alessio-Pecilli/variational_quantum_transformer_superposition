@@ -341,31 +341,32 @@ class TFIMHamiltonian:
                 print(line)
                 line = "         "
         
-        # Calcola STATI totali e intervallo per cambiare J (ogni 10 STATI)
-        total_states = actual_sentences * max_time
-        change_j_every_states = 10  # Fisso: ogni 10 stati
+        # Calcola FRASI totali e intervallo per cambiare J (ogni 10 FRASI)
+        change_j_every_sentences = 10  # Fisso: ogni 10 frasi
         
-        print(f"[FixedH] 🔄 Cambio J ogni {change_j_every_states} STATI (totale: {total_states} stati)")
-        print(f"[FixedH] 📊 {actual_sentences} frasi × {max_time} parole = {total_states} stati")
+        print(f"[FixedH] 🔄 Cambio J ogni {change_j_every_sentences} FRASI (totale: {actual_sentences} frasi)")
+        print(f"[FixedH] 📊 {actual_sentences} frasi × {max_time} parole = {actual_sentences * max_time} stati")
         
         # Genera le sequenze per ogni stato base
         sentences = np.zeros((actual_sentences, max_time, self.dim), dtype=complex)
         current_j_group = -1  # Per tracciare quando cambiare J
         
         for i, basis_idx in enumerate(selected_indices):
-            # Calcola range stati per questa frase
-            first_state_idx = i * max_time  # Primo stato di questa frase
-            last_state_idx = (i + 1) * max_time - 1  # Ultimo stato di questa frase
+            # Calcola gruppo basato sul numero di FRASI (non stati)
+            j_group = i // change_j_every_sentences
             
-            # Verifica se è il momento di rigenerare J (controllo all'inizio della frase)
-            j_group = first_state_idx // change_j_every_states
+            # Verifica se è il momento di rigenerare J (controllo per frasi)
             if j_group != current_j_group:
                 current_j_group = j_group
+                
+                # Calcola range di frasi per questo gruppo
+                first_sentence = j_group * change_j_every_sentences
+                last_sentence = min((j_group + 1) * change_j_every_sentences - 1, actual_sentences - 1)
                 
                 # Rigenera matrice J con nuovo seed
                 j_seed = (seed if seed is not None else 42) + j_group * 1000
                 print(f"\n[FixedH] 🎲 GRUPPO J-{j_group + 1}: Rigenerando J")
-                print(f"[FixedH] 📍 Frase {i+1}: stati globali {first_state_idx+1}-{last_state_idx+1}")
+                print(f"[FixedH] 📍 Frasi {first_sentence+1}-{last_sentence+1} (gruppo di {change_j_every_sentences})")
                 
                 # Rigenera J
                 old_J = self.J.copy() if hasattr(self, 'J') else None
