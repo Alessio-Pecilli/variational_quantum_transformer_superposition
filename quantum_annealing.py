@@ -370,7 +370,8 @@ class TFIMHamiltonian:
                 # Rigenera J
                 old_J = self.J.copy() if hasattr(self, 'J') else None
                 self.J = self._generate_random_coupling(seed=j_seed)
-                self._build_hamiltonian()  # Ricostruisce H con nuova J
+                self._build_operators()  # Ricostruisce operatori H_transverse e H_ising
+                self._H = self.H_transverse + self.H_ising  # Ricostruisce Hamiltoniana totale
                 
                 # Stampa confronto J
                 print(f"[FixedH] 📊 MATRICE J GRUPPO {j_group + 1}:")
