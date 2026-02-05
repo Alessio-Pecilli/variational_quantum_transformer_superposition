@@ -1,6 +1,6 @@
 import numpy as np
 
-from config import (
+from .config import (
     SUBJECT_ADJS,
     SUBJECTS,
     ADVERBS,

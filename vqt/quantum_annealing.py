@@ -287,7 +287,7 @@ class TFIMHamiltonian:
         # Importa config per max_time
         if max_time is None:
             try:
-                from config import QUANTUM_STATES_CONFIG
+                from .config import QUANTUM_STATES_CONFIG
                 max_time = QUANTUM_STATES_CONFIG.get('max_time', 5)
                 print(f"[FixedH] 📋 max_time da config.py: {max_time}")
             except ImportError:

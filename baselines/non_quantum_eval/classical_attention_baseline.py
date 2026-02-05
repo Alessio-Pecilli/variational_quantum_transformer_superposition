@@ -35,6 +35,10 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from sklearn.model_selection import KFold
 import random  # <--- NUOVO IMPORT
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+PTB_FILE = REPO_ROOT / "data" / "ptb_sentences.txt"
 
 # --- 1. CONFIGURAZIONE ---
 EMBED_DIM = 4
@@ -44,7 +48,7 @@ NUM_TRANSFORMER_LAYERS = 5
 LEARNING_RATE = 0.001
 EPOCHS = 100
 SENTENCE_LENGTH = 5
-NUM_SENTENCES = 100  # Dimensione del set di training
+NUM_SENTENCES = 300  # Dimensione del set di training
 TOTAL_NEEDED = NUM_SENTENCES * 2  # 100 Train + 100 Test
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -52,7 +56,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # 1. Carichiamo TUTTE le frasi valide dal file
 raw_sentences = []
 try:
-    with open('ptb_sentences.txt', 'r', encoding='utf-8') as f:
+    with open(PTB_FILE, 'r', encoding='utf-8') as f:
         for line in f:
             words = line.strip().split()
             # Filtriamo solo le frasi lunghe abbastanza
@@ -711,7 +715,7 @@ with torch.no_grad():
         logits_fold = model(x_test)
 
         # 1. Metrica PPL (Geometric Overlap)
-        _, ppl_fold = calculate_geometric_overlap(logits_fold, y_test)
+        _, ppl_fold = calculate_quantum_metrics(logits_fold, y_test)
 
         # 2. Metrica ERRORE (Classica Hard-Argmax)
         # Chi ha il valore più alto?

@@ -6,10 +6,10 @@ import numpy as np
 from datetime import datetime
 from itertools import zip_longest
 from scipy.optimize import minimize
-from generalized_quantum_circuits import AdaptiveQuantumCircuitFactory
-from quantum_utils import get_params, wrap_angles
-from quantum_circuits import get_circuit_function, create_experimental_circuit
-from visualization import save_loss_plot, save_loss_values_to_file, save_parameters
+from .generalized_quantum_circuits import AdaptiveQuantumCircuitFactory
+from .quantum_utils import get_params, wrap_angles
+from .quantum_circuits import get_circuit_function, create_experimental_circuit
+from .visualization import save_loss_plot, save_loss_values_to_file, save_parameters
 
 def compute_loss_variant(args):
     """Valuta una variante del circuito con shift diverso."""
@@ -476,8 +476,8 @@ def optimize_parameters_parallel(params, shift, states_calculated, U, Z, num_lay
                                  embedding_dim, num_qubits, sentence_length, num_workers=None,
                                  opt_maxiter=150, opt_maxfev=50):
     from multiprocessing import Pool
-    from quantum_utils import get_params
-    from config import OPTIMIZATION_CONFIG
+    from .quantum_utils import get_params
+    from .config import OPTIMIZATION_CONFIG
     import logging, time
     import numpy as np
 

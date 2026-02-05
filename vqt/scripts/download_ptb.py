@@ -3,12 +3,14 @@
 Script per pre-scaricare il dataset PTB in locale.
 Esegui questo script sul tuo PC con internet, poi copia il file sul cluster HPC.
 
-Uso: python download_ptb.py
+Uso: python -m vqt.scripts.download_ptb
 """
 
+from pathlib import Path
 from datasets import load_dataset
 
-OUTPUT_FILE = "ptb_sentences.txt"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+OUTPUT_FILE = REPO_ROOT / "data" / "ptb_sentences.txt"
 
 def main():
     print("Scaricamento PTB da HuggingFace...")
@@ -25,12 +27,13 @@ def main():
             print(f"  - {split}: {len(dataset_dict[split])} frasi")
     
     # Salva tutte le frasi in un file
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         for sentence in all_sentences:
             f.write(sentence + '\n')
     
     print(f"\n✅ Salvate {len(all_sentences)} frasi in '{OUTPUT_FILE}'")
-    print(f"\nOra copia '{OUTPUT_FILE}' sul cluster HPC nella stessa cartella del progetto.")
+    print(f"\nOra copia '{OUTPUT_FILE}' sul cluster HPC nella cartella del progetto.")
     
     # Statistiche per lunghezza
     print("\n📊 Statistiche lunghezza frasi:")

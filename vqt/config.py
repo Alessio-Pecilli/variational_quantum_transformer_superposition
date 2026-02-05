@@ -4,6 +4,10 @@ Configuration settings for quantum optimization experiments.
 
 from pathlib import Path
 
+# Repository root and shared paths
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = REPO_ROOT / "data"
+
 # Test-only mode settings
 TEST_ONLY_CONFIG = {
     'skip_training': False,  # True = salta training e carica matrici pre-addestrate
@@ -82,7 +86,7 @@ DATASET_CONFIG = {
     'dataset_name': 'ptb_text_only',
     'use_ptb': True,                # True = usa PTB dataset, False = usa frasi generate
     'random_sample': True,          # True = selezione random, False = prime N frasi
-    'local_ptb_file': 'ptb_sentences.txt'  # file locale con frasi PTB pre-scaricate (una per riga)
+    'local_ptb_file': str(DATA_DIR / 'ptb_sentences.txt')  # file locale con frasi PTB pre-scaricate (una per riga)
 }
 
 # Quantum States settings (alternativa a sentences testuali)

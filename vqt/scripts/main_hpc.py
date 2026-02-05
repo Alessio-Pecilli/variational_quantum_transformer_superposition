@@ -39,20 +39,20 @@ import logging
 import sys
 import os
 import traceback
-from generalized_quantum_circuits import process_sentence_states
+from ..generalized_quantum_circuits import process_sentence_states
 # Import del tuo progetto
-from config import (
+from ..config import (
     TRAINING_SENTENCES,
     OPTIMIZATION_CONFIG,
     QUANTUM_STATES_CONFIG,
     DATASET_CONFIG,
     get_training_sentences,
 )
-from encoding import Encoding
-from optimization import get_params
-from generalized_quantum_circuits import GeneralizedQuantumCircuitBuilder
-from quantum_utils import clear_memory, check_memory_usage
-from quantum_projection import (
+from ..encoding import Encoding
+from ..optimization import get_params
+from ..generalized_quantum_circuits import GeneralizedQuantumCircuitBuilder
+from ..quantum_utils import clear_memory, check_memory_usage
+from ..quantum_projection import (
     QuantumStateProjector,
     create_projector_from_config,
     get_projection_shape,
@@ -802,9 +802,9 @@ def save_all_matrices(best_params_native, cfg, logger, timestamp, encoding_insta
         embedding_shape: Shape della matrice E (vocab_size, embedding_dim) - opzionale, dedotto se None
         rotation_shape: Shape della matrice V (embedding_dim, 2^num_qubits) - opzionale, dedotto se None
     """
-    from layer import AnsatzBuilder
+    from ..layer import AnsatzBuilder
     from qiskit.quantum_info import Operator
-    from optimization import get_params
+    from ..optimization import get_params
     
     # Crea struttura cartelle
     results_dir = Path("results")
@@ -909,10 +909,10 @@ def analyze_ancillae_state(best_params_native, cfg, logger, timestamp):
     Verifica se i coefficienti sono complessi (con fasi) o reali.
     """
     from qiskit.quantum_info import Statevector, partial_trace, DensityMatrix
-    from generalized_quantum_circuits import GeneralizedQuantumCircuitBuilder, process_sentence_states
-    from quantum_annealing import generate_quantum_states
-    from optimization import get_params
-    from layer import AnsatzBuilder
+    from ..generalized_quantum_circuits import GeneralizedQuantumCircuitBuilder, process_sentence_states
+    from ..quantum_annealing import generate_quantum_states
+    from ..optimization import get_params
+    from ..layer import AnsatzBuilder
     
     logger.info("[ANCILLAE] Inizio analisi dello stato del registro C (ancillae)...")
     
@@ -996,7 +996,7 @@ def print_final_training_summary(best_params_native, cfg, logger, timestamp,
     Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
     Formula PPL: exp(L)
     """
-    from optimization import get_params
+    from ..optimization import get_params
     
     logger.info("\n" + "="*80)
     logger.info("=== TRAINING SUMMARY ===")
@@ -1164,7 +1164,7 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     projector = None
     use_projector_cfg = QUANTUM_STATES_CONFIG.get('use_Projector', True)
     if use_quantum_states and P_matrix.size > 0 and use_projector_cfg:
-        from quantum_projection import QuantumStateProjector
+        from ..quantum_projection import QuantumStateProjector
         projection_shape = P_matrix.shape
         projector = QuantumStateProjector(
             source_dim=projection_shape[1],
@@ -1176,7 +1176,7 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
         projection_shape = None
     
     # Configurazione da DATASET_CONFIG
-    from config import DATASET_CONFIG
+    from ..config import DATASET_CONFIG
     max_test_sentences = DATASET_CONFIG.get('max_sentences', 100)
     sentence_length = DATASET_CONFIG.get('sentence_length', 5)
     
@@ -1184,7 +1184,7 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
     
     # Genera frasi di test (DIVERSE da training)
     if use_quantum_states:
-        from quantum_annealing import generate_quantum_states
+        from ..quantum_annealing import generate_quantum_states
         qs_cfg = QUANTUM_STATES_CONFIG
         num_states = min(max_test_sentences, qs_cfg.get('num_states', 9))
         # Usa source_qubits se c'è proiezione, altrimenti num_qubits
@@ -1200,7 +1200,7 @@ def run_3fold_cross_validation(run_dir, cfg, logger, use_quantum_states=False):
         logger.info(f"[CV] Generazione {num_states} stati quantistici test (D={num_qubits_qs}, max_time={max_time})")
         
         # USA LA NUOVA MODALITÀ: stati base casuali senza rimpiazzo
-        from quantum_annealing import TFIMHamiltonian
+        from ..quantum_annealing import TFIMHamiltonian
         
         # Crea Hamiltoniana TFIM per test (seed diverso dal training)
         hamiltonian_test = TFIMHamiltonian(
@@ -1436,7 +1436,7 @@ def evaluate_perplexity_on_quantum_states(best_params_native, cfg, logger):
     """
     Genera un NUOVO set di stati quantistici (diverso dal training) e calcola perplexity.
     """
-    from quantum_annealing import generate_quantum_states
+    from ..quantum_annealing import generate_quantum_states
     
     qs_cfg = QUANTUM_STATES_CONFIG
     num_states = qs_cfg.get('num_states', 9)
@@ -1509,7 +1509,7 @@ def main():
     # ============================================================
     # TEST-ONLY MODE: Skip training e carica matrici pre-addestrate
     # ============================================================
-    from config import TEST_ONLY_CONFIG
+    from ..config import TEST_ONLY_CONFIG
     if TEST_ONLY_CONFIG.get('skip_training', False):
         if rank == 0:
             logger.info("\n" + "="*80)
@@ -1612,7 +1612,7 @@ def main():
             # - max_time = M "parole" (evoluzioni temporali) per frase
             # - Con K rank, ogni rank elabora N/K frasi
             # ==============================================================
-            from quantum_annealing import generate_quantum_states
+            from ..quantum_annealing import generate_quantum_states
             
             qs_cfg = QUANTUM_STATES_CONFIG
             num_quantum_sentences = qs_cfg.get('num_states', 9)  # N "frasi quantistiche"
@@ -1648,86 +1648,204 @@ def main():
                 logger.info(f"[QUANTUM] Rank 0: Generazione OTTIMIZZATA di {num_quantum_sentences} frasi quantistiche...")
                 logger.info(f"[QUANTUM] Dimensione target: 2^{num_qubits_qs} = {2**num_qubits_qs}, memoria stimata: {(num_quantum_sentences * sentence_length_quantum * (2**num_qubits_qs) * 16) // (1024**2)} MB")
                 
-                # USA LA NUOVA MODALITÀ: stati base casuali senza rimpiazzo
-                from quantum_annealing import TFIMHamiltonian
+                # ===============================================
+                # NUOVO SISTEMA MINI-BATCH con molti LOG!
+                # ===============================================
+                logger.info("\n" + "="*80)
+                logger.info("=== NUOVO SISTEMA MINI-BATCH DATASET ===")
+                logger.info("="*80)
                 
-                # OTTIMIZZAZIONE: Usa test_mode per stabilità numerica
-                hamiltonian = TFIMHamiltonian(
-                    num_qubits=num_qubits_qs,
+                # Log parametri config
+                logger.info(f"[CONFIG] QUANTUM_STATES_CONFIG reading...")
+                for key, value in QUANTUM_STATES_CONFIG.items():
+                    logger.info(f"[CONFIG]   {key}: {value}")
+                
+                # Crea dataset mini-batch usando config.py
+                from ..quantum_annealing import TFIMHamiltonian
+                
+                logger.info(f"[MINIBATCH] Creazione TFIMHamiltonian...")
+                logger.info(f"[MINIBATCH] - num_qubits: {QUANTUM_STATES_CONFIG.get('num_qubits', 4)}")
+                logger.info(f"[MINIBATCH] - seed: {cfg.get('seed', 42)}")
+                
+                # Crea dataset usando il metodo convenienza
+                logger.info(f"[MINIBATCH] Generazione dataset con create_minibatch_dataset_from_config...")
+                minibatch_data, minibatch_info, tfim_instance = TFIMHamiltonian.create_minibatch_dataset_from_config(
                     seed=cfg.get('seed', 42)
                 )
                 
-                # OTTIMIZZAZIONE: Genera in batch per evitare OOM
-                batch_size = min(20, num_quantum_sentences)  # Batch più piccoli
-                all_quantum_sentences = []
+                # Log dettagliato del dataset generato
+                logger.info(f"\n[MINIBATCH] ✅ Dataset generato con successo!")
+                logger.info(f"[MINIBATCH] 📊 Statistiche complete:")
+                for key, value in minibatch_info.items():
+                    logger.info(f"[MINIBATCH]   {key}: {value}")
                 
-                for batch_start in range(0, num_quantum_sentences, batch_size):
-                    batch_end = min(batch_start + batch_size, num_quantum_sentences)
-                    batch_sentences = batch_end - batch_start
-                    
-                    logger.info(f"[QUANTUM] Batch {batch_start//batch_size + 1}: generazione {batch_sentences} frasi ({batch_start}-{batch_end-1})...")
-                    
-                    # Genera batch
-                    batch_array = hamiltonian.generate_sentences(
-                        num_sentences=batch_sentences,
-                        max_time=sentence_length_quantum,
-                        seed=cfg.get('seed', 42) + batch_start  # Seed diverso per batch
-                    )
-                    
-                    # Converti batch in lista e aggiungi
-                    for i in range(batch_sentences):
-                        quantum_sentence = batch_array[i]  # Shape: (M, 2^D)
-                        all_quantum_sentences.append(quantum_sentence)
-                    
-                    # CLEANUP memoria dopo ogni batch
-                    del batch_array
-                    clear_memory()
-                    
-                    logger.info(f"[QUANTUM] Batch completato, totale frasi: {len(all_quantum_sentences)}/{num_quantum_sentences}")
+                # Log struttura per ogni mini-batch
+                batches = minibatch_data['batches']
+                J_matrices = minibatch_data['J_matrices']
+                initial_states_per_batch = minibatch_data['initial_states']
+                hamiltonians = minibatch_data['hamiltonians']
                 
-                # Converti in array finale
-                quantum_states = np.array(all_quantum_sentences)
-                logger.info(f"[QUANTUM] ✓ Tutte le {num_quantum_sentences} frasi generate: shape={quantum_states.shape}")
+                logger.info(f"\n[MINIBATCH] 🔍 Dettagli per ogni batch:")
+                for batch_idx in range(minibatch_info['num_batches']):
+                    batch_states = batches[batch_idx]
+                    J_matrix = J_matrices[batch_idx]
+                    initial_states = initial_states_per_batch[batch_idx]
+                    hamiltonian = hamiltonians[batch_idx]
+                    
+                    logger.info(f"[MINIBATCH] Batch {batch_idx + 1}:")
+                    logger.info(f"[MINIBATCH]   - States shape: {batch_states.shape}")
+                    logger.info(f"[MINIBATCH]   - J matrix range: [{J_matrix.min():.3f}, {J_matrix.max():.3f}]")
+                    logger.info(f"[MINIBATCH]   - Initial states: {len(initial_states)}")
+                    logger.info(f"[MINIBATCH]   - Hamiltonian id: {id(hamiltonian)}")
+                    
+                    # Log alcuni stati iniziali (primi 3)
+                    for i, state in enumerate(initial_states[:3]):
+                        state_repr = np.where(np.abs(state) > 1e-10)[0]
+                        if len(state_repr) == 1:
+                            binary = format(state_repr[0], f'0{minibatch_info["num_qubits"]}b')
+                            logger.info(f"[MINIBATCH]     - Initial[{i}]: |{binary}⟩")
+                    
+                    # Verifica diversità matrice J  
+                    if batch_idx > 0:
+                        prev_J = J_matrices[batch_idx-1]
+                        diff = np.linalg.norm(J_matrix - prev_J)
+                        logger.info(f"[MINIBATCH]   - J differ from prev: {diff:.6f} {'✓' if diff > 1e-6 else '✗'}")
                 
-                # Pulizia finale
-                del all_quantum_sentences
-                clear_memory()
+                # Prepara iterator per training
+                logger.info(f"\n[MINIBATCH] 🔄 Preparazione iterator per training...")
+                batch_iterator = tfim_instance.get_batch_iterator(minibatch_data, shuffle=True, seed=cfg.get('seed', 42))
+                logger.info(f"[MINIBATCH] Iterator creato con {len(batch_iterator)} batch")
                 
-                # Verifica che le frasi siano DIVERSE
-                if num_quantum_sentences >= 2:
+                # CONVERSIONE per compatibilità con resto del codice
+                # Il codice esistente si aspetta quantum_states con shape (num_sentences, time_steps, dim)
+                logger.info(f"\n[MINIBATCH] 🔄 Conversione in formato compatibile...")
+                
+                # Concatena tutti i batch in un singolo array per compatibilità
+                all_sentences = []
+                batch_info_mapping = []  # Mappa sentence_idx -> (batch_idx, sentence_in_batch)
+                
+                for batch_idx, batch_data in enumerate(batch_iterator):
+                    batch_states = batch_data['batch_states']  # (batch_size, time_steps, dim)
+                    
+                    for sentence_in_batch in range(batch_states.shape[0]):
+                        sentence_states = batch_states[sentence_in_batch]  # (time_steps, dim)
+                        all_sentences.append(sentence_states)
+                        batch_info_mapping.append((batch_idx, sentence_in_batch))
+                    
+                    logger.info(f"[MINIBATCH] Batch {batch_idx}: estratte {batch_states.shape[0]} frasi")
+                
+                # Crea quantum_states nel formato atteso
+                quantum_states = np.array(all_sentences)  # (total_sentences, time_steps, dim)
+                logger.info(f"[MINIBATCH] ✅ Conversione completata: {quantum_states.shape}")
+                
+                # Log finale di verifica
+                logger.info(f"\n[MINIBATCH] 🎯 Verifica finale:")
+                logger.info(f"[MINIBATCH] - Total sentences: {len(all_sentences)}")
+                logger.info(f"[MINIBATCH] - Quantum states shape: {quantum_states.shape}")
+                logger.info(f"[MINIBATCH] - Memory size: {quantum_states.nbytes / 1024**2:.1f} MB")
+                logger.info(f"[MINIBATCH] - Batch mapping length: {len(batch_info_mapping)}")
+                
+                # Verifica diversità fra sentence
+                if len(all_sentences) >= 2:
                     diff_01 = np.linalg.norm(quantum_states[0] - quantum_states[1])
-                    logger.info(f"[QUANTUM] Verifica diversità: ||frase_0 - frase_1|| = {diff_01:.6f}")
-                    if diff_01 < 1e-6:
-                        logger.warning("[QUANTUM] ⚠ Le frasi sembrano identiche!")
+                    logger.info(f"[MINIBATCH] - Diversità ||sent_0 - sent_1||: {diff_01:.6f} {'✓' if diff_01 > 1e-6 else '✗'}")
                 
-                # Salva per debug
-                np.save('quantum_states_generated.npy', quantum_states)
-                logger.info(f"[QUANTUM] Salvate in quantum_states_generated.npy")
+                # Salva per debug (opzionale)
+                np.save('quantum_states_minibatch.npy', quantum_states)
+                logger.info(f"[MINIBATCH] Stati salvati in quantum_states_minibatch.npy")
+                
+                # Salva anche metadati per debug avanzato
+                metadata_debug = {
+                    'minibatch_info': minibatch_info,
+                    'batch_info_mapping': batch_info_mapping,
+                    'config_used': dict(QUANTUM_STATES_CONFIG)
+                }
+                np.save('minibatch_metadata_debug.npy', metadata_debug)
+                logger.info(f"[MINIBATCH] Metadata salvati in minibatch_metadata_debug.npy")
+                
+                logger.info("\n" + "="*80)
+                logger.info("=== MINI-BATCH DATASET READY FOR TRAINING! ===")
+                logger.info("="*80)
             else:
                 quantum_states = None
             
-            # Broadcast a TUTTI i rank
+            # Broadcast a TUTTI i rank con LOG dettagliati
+            logger.info(f"[MINIBATCH] Rank {rank}: Broadcasting quantum states dal rank 0...")
             quantum_states = comm.bcast(quantum_states, root=0)
-            logger.info(f"[QUANTUM] Rank {rank}: Ricevute frasi quantistiche, shape={quantum_states.shape}")
             
-            # Ora distribuiamo le frasi tra i rank (IDENTICO alle sentences testuali)
-            sentences = [f"quantum_sentence_{i}" for i in range(num_quantum_sentences)]
+            if quantum_states is not None:
+                logger.info(f"[MINIBATCH] Rank {rank}: ✅ Ricevute quantum states, shape={quantum_states.shape}")
+                logger.info(f"[MINIBATCH] Rank {rank}: - Data type: {quantum_states.dtype}")
+                logger.info(f"[MINIBATCH] Rank {rank}: - Memory: {quantum_states.nbytes / 1024**2:.1f} MB")
+                logger.info(f"[MINIBATCH] Rank {rank}: - Min value: {quantum_states.min():.6f}")
+                logger.info(f"[MINIBATCH] Rank {rank}: - Max value: {quantum_states.max():.6f}")
+            else:
+                logger.warning(f"[MINIBATCH] Rank {rank}: ⚠ quantum_states è None!")
+            
+            # Broadcast anche metadata per debug avanzato se su rank 0
+            if rank == 0:
+                broadcast_metadata = {
+                    'minibatch_info': minibatch_info,
+                    'batch_info_mapping': batch_info_mapping,
+                    'total_batches': minibatch_info['num_batches'],
+                    'batch_size': minibatch_info['batch_size']
+                }
+                logger.info(f"[MINIBATCH] Rank 0: Broadcasting metadata...")
+            else:
+                broadcast_metadata = None
+            
+            broadcast_metadata = comm.bcast(broadcast_metadata, root=0)
+            logger.info(f"[MINIBATCH] Rank {rank}: Metadata ricevuto, batches={broadcast_metadata['total_batches']}")
+            
+            # Ora distribuiamo le frasi tra i rank con LOG dettagliati per mini-batch
+            logger.info(f"[MINIBATCH] Rank {rank}: Distribuzione frasi tra rank...")
+            
+            # Leggi parametri da metadata
+            num_quantum_sentences = broadcast_metadata['minibatch_info']['dataset_size']
+            sentences = [f"minibatch_sentence_{i}" for i in range(num_quantum_sentences)]
+            
+            logger.info(f"[MINIBATCH] Rank {rank}: Distribuendo {num_quantum_sentences} frasi quantistiche")
+            logger.info(f"[MINIBATCH] Rank {rank}: Totale ranks: {size}")
+            
             indices = np.arange(num_quantum_sentences, dtype=np.int64)
             chunks = np.array_split(indices, size)
             local_ids = chunks[rank].tolist()
             my_items = [(int(gid), sentences[int(gid)]) for gid in local_ids]
-            encoding_local = None  # Non serve encoding con QA!
+            encoding_local = None  # Non serve encoding con mini-batch QA!
             
-            logger.info(f"[QUANTUM] Rank {rank}: Assegnate {len(my_items)} frasi (IDs: {[x[0] for x in my_items]})")
+            logger.info(f"[MINIBATCH] Rank {rank}: ✅ Assegnate {len(my_items)} frasi")
+            logger.info(f"[MINIBATCH] Rank {rank}: - IDs assegnati: {[x[0] for x in my_items]}")
+            logger.info(f"[MINIBATCH] Rank {rank}: - Range: {min([x[0] for x in my_items]) if my_items else 'N/A'}-{max([x[0] for x in my_items]) if my_items else 'N/A'}")
+            
+            # Log informazioni su quale batch appartiene ogni frase
+            batch_info_mapping = broadcast_metadata['batch_info_mapping']
+            for gid, sentence_name in my_items[:3]:  # Solo primi 3 per non spammare
+                if gid < len(batch_info_mapping):
+                    batch_idx, sentence_in_batch = batch_info_mapping[gid]
+                    logger.info(f"[MINIBATCH] Rank {rank}: - Frase {gid} → Batch {batch_idx}, posizione {sentence_in_batch}")
+            
+            if len(my_items) > 3:
+                logger.info(f"[MINIBATCH] Rank {rank}: ... e altre {len(my_items) - 3} frasi")
         else:
-            # Modalità SENTENCES TESTUALI (default)
+            # Modalità SENTENCES TESTUALI (default) 
+            logger.info(f"[TEXT] Rank {rank}: Modalità SENTENCES TESTUALI attiva")
+            logger.info(f"[TEXT] Rank {rank}: use_quantum_states = {use_quantum_states}")
+            
             quantum_states = None  # Niente stati QA
-            if rank == 0:
-                logger.info(f"[TEXT] Modalità SENTENCES TESTUALI attiva")
             sentences = TRAINING_SENTENCES
+            
+            logger.info(f"[TEXT] Rank {rank}: Frasi testuali: {len(sentences)}")
+            for i, sentence in enumerate(sentences[:3]):  # Log prime 3 frasi
+                logger.info(f"[TEXT] Rank {rank}: - Frase {i}: '{sentence}'")
+            
             chunks, my_items, encoding_local = make_splits_and_encodings(
                 sentences, comm, rank, size, cfg['embedding_dim'], logger
             )
+            
+            logger.info(f"[TEXT] Rank {rank}: ✅ Splits e encoding completati")
+            logger.info(f"[TEXT] Rank {rank}: - Items assegnati: {len(my_items)}")
+            if encoding_local:
+                logger.info(f"[TEXT] Rank {rank}: - Vocab size: {len(encoding_local.vocabulary)}")
         
         # Parametrizzazione
         params_shape = get_params(cfg['num_qubits'], cfg['num_layers']).shape
@@ -1738,7 +1856,7 @@ def main():
         projection_shape = None
         projector = None
         if use_quantum_states:
-            from quantum_projection import create_projector_from_config, get_projection_shape
+            from ..quantum_projection import create_projector_from_config, get_projection_shape
             projection_shape = get_projection_shape(QUANTUM_STATES_CONFIG)
             if projection_shape is not None:
                 projector = create_projector_from_config(QUANTUM_STATES_CONFIG)

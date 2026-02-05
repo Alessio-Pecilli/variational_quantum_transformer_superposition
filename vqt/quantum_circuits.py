@@ -9,13 +9,13 @@ from qiskit.circuit.library import UnitaryGate
 from qiskit.quantum_info import Statevector
 from typing import List, Optional, Dict
 
-from layer import AnsatzBuilder
-from quantum_utils import build_controlled_unitary, calculate_loss_from_statevector
-import visualization
+from .layer import AnsatzBuilder
+from .quantum_utils import build_controlled_unitary, calculate_loss_from_statevector
+from . import visualization
 
 # Import new generalized architecture
 try:
-    from generalized_quantum_circuits import (
+    from .generalized_quantum_circuits import (
         AdaptiveQuantumCircuitFactory, 
         GeneralizedQuantumCircuitBuilder
     )

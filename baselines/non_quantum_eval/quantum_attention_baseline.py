@@ -50,7 +50,7 @@ QSAS_CONFIG = {
 
     # Dataset
 
-    'num_sequences': 100,       # N = numero "frasi quantistiche"
+    'num_sequences': 300,       # N = numero "frasi quantistiche"
 
     'sequence_length': 5,       # M = "parole" per sequenza (evoluzioni temporali)
 
@@ -1430,9 +1430,9 @@ def main():
 
        
 
-        if (epoch + 1) % 10 == 0 or epoch == 0:
+        
 
-            print(f"Epoch {epoch+1:03d} | Loss: {loss:.4f} | PPL: {ppl:.4f}")
+        print(f"Epoch {epoch+1:03d} | Loss: {loss:.4f} | PPL: {ppl:.4f}")
 
    
 
@@ -1500,9 +1500,8 @@ def main():
 
        
 
-        if (epoch + 1) % 10 == 0 or epoch == 0:
 
-            print(f"Epoch {epoch+1:03d} | Loss: {loss:.4f} | PPL: {ppl:.4f}")
+        print(f"Epoch {epoch+1:03d} | Loss: {loss:.4f} | PPL: {ppl:.4f}")
 
    
 

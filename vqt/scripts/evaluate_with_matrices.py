@@ -47,19 +47,19 @@ except ImportError:
     size = 1
 
 # Import configurazioni e utilities
-from config import (
+from ..config import (
     OPTIMIZATION_CONFIG,
     DATASET_CONFIG,
     QUANTUM_STATES_CONFIG,
     get_training_sentences
 )
-from encoding import Encoding
-from generalized_quantum_circuits import (
+from ..encoding import Encoding
+from ..generalized_quantum_circuits import (
     GeneralizedQuantumCircuitBuilder, 
     process_sentence_states
 )
-from layer import AnsatzBuilder
-from quantum_annealing import generate_quantum_states
+from ..layer import AnsatzBuilder
+from ..quantum_annealing import generate_quantum_states
 
 
 # =====================================================================
@@ -362,7 +362,7 @@ def compute_loss_with_ansatz_matrices(builder, psi, U, Z, ansatz_V_matrix, ansat
         float: loss calcolata
     """
     from qiskit.circuit.library import UnitaryGate
-    from quantum_utils import calculate_loss_from_statevector
+    from ..quantum_utils import calculate_loss_from_statevector
     
     # Crea circuito quantistico - IDENTICO al main
     qc = QuantumCircuit(builder.n_total_qubits, builder.n_total_qubits)

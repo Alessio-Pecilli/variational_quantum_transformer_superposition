@@ -11,11 +11,11 @@ from qiskit.quantum_info import Statevector
 from typing import List, Dict, Tuple, Optional
 import math
 
-from config import DEFAULT_SENTENCES
-from encoding import Encoding
-from layer import AnsatzBuilder
-from quantum_utils import build_controlled_unitary, calculate_loss_from_statevector, get_params, get_unitary_from_tk
-import visualization
+from .config import DEFAULT_SENTENCES
+from .encoding import Encoding
+from .layer import AnsatzBuilder
+from .quantum_utils import build_controlled_unitary, calculate_loss_from_statevector, get_params, get_unitary_from_tk
+from . import visualization
 
 
 class GeneralizedQuantumCircuitBuilder:
