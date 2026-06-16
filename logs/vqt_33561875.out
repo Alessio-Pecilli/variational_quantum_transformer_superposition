@@ -1,0 +1,1209 @@
+=== JOB 33561875 STARTED at Thu Feb  5 13:00:42 CET 2026 on lrdn0981.leonardo.local ===
+Loading openmpi/4.1.6--gcc--12.2.0
+  Loading requirement: gcc/12.2.0-binut2.41
+Loading python/3.11.7
+  Loading requirement: bzip2/1.0.8-ib3znej libmd/1.0.4-2km2lxx
+    libbsd/0.12.1-oocs6an expat/2.6.2-p2t4wry ncurses/6.5-svfl57u
+    readline/8.2-zeda6mx gdbm/1.23-wiol7vk libiconv/1.17-nhc3mhm
+    xz/5.4.6-xxxg42c zlib-ng/2.1.6-jkgunjc libxml2/2.10.3-zbbe7lm
+    pigz/2.8-5bwzpml zstd/1.5.6-uq5yyux tar/1.34-jgektnv gettext/0.22.5-hsxgafg
+    libffi/3.4.6-4vs4jpp libxcrypt/4.4.35-7om46b5 sqlite/3.43.2-4kl5mnp
+    util-linux-uuid/2.38.1-5achpds
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:01:34,309 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-05 13:01:34,311 [INFO] [rank=0] [QUANTUM] Modalità QUANTUM STATES attiva!
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] Frasi quantistiche (num_states): 100
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] Parole per frase (max_time): 5
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] ✓ PROIEZIONE ABILITATA: 10 qubit -> 2 qubit
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert sorgente: 2^10 = 1024
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert target: 2^2 = 4
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] MPI ranks: 100
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] Frasi per rank: ~1
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] Rank 0: Generazione OTTIMIZZATA di 100 frasi quantistiche...
+2026-02-05 13:01:34,312 [INFO] [rank=0] [QUANTUM] Dimensione target: 2^10 = 1024, memoria stimata: 7 MB
+[TFIM] Inizializzata Hamiltoniana Transverse Field Ising Model:
+       - Qubit: 10
+       - Dimensione Hilbert: 1024
+       - Coefficiente campo trasverso: 1.0
+       - Coefficiente interazione Ising: 1.0
+       - Jᵢⱼ ∈ [0, 1] (random, fissi)
+2026-02-05 13:01:35,077 [INFO] [rank=0] [QUANTUM] Batch 1: generazione 20 frasi (0-19)...
+
+[FixedH] Generazione sequenze con input variabile:
+         - Possibili basis states: 1024 (2^10)
+         - N richiesti: 20  
+         - N generati: 20 ✓
+         - ✅ N ≤ 2^D: nessun replacement
+[FixedH] 📊 BASIS STATES SELEZIONATI:
+         |1100001010⟩ |1011011011⟩ |0011001100⟩ |1111011111⟩ |1101011011⟩ |1100000110⟩ |0010000010⟩ |0001011001⟩ 
+         |1010010011⟩ |1000001100⟩ |0110110100⟩ |0001010110⟩ |0111001101⟩ |1101100011⟩ |0001011111⟩ |1011101100⟩ 
+         |1100100001⟩ |0110111010⟩ |1011000001⟩ |1000010110⟩ 
+[FixedH] 🔄 Cambio J ogni 10 STATI (totale: 100 stati)
+[FixedH] 📊 20 frasi × 5 parole = 100 stati
+
+[FixedH] 🎲 GRUPPO J-1: Rigenerando J
+[FixedH] 📍 Frase 1: stati globali 1-5
+[FixedH] 📊 MATRICE J GRUPPO 1:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9756]
+         J media: 0.4892
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ❌ NO
+
+[FixedH] 🎲 GRUPPO J-2: Rigenerando J
+[FixedH] 📍 Frase 3: stati globali 11-15
+[FixedH] 📊 MATRICE J GRUPPO 2:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9793]
+         J media: 0.4711
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-3: Rigenerando J
+[FixedH] 📍 Frase 5: stati globali 21-25
+[FixedH] 📊 MATRICE J GRUPPO 3:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9703]
+         J media: 0.4524
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-4: Rigenerando J
+[FixedH] 📍 Frase 7: stati globali 31-35
+[FixedH] 📊 MATRICE J GRUPPO 4:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9852]
+         J media: 0.4652
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-5: Rigenerando J
+[FixedH] 📍 Frase 9: stati globali 41-45
+[FixedH] 📊 MATRICE J GRUPPO 5:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9071]
+         J media: 0.4023
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-6: Rigenerando J
+[FixedH] 📍 Frase 11: stati globali 51-55
+[FixedH] 📊 MATRICE J GRUPPO 6:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9980]
+         J media: 0.5057
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-7: Rigenerando J
+[FixedH] 📍 Frase 13: stati globali 61-65
+[FixedH] 📊 MATRICE J GRUPPO 7:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9545]
+         J media: 0.5119
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-8: Rigenerando J
+[FixedH] 📍 Frase 15: stati globali 71-75
+[FixedH] 📊 MATRICE J GRUPPO 8:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9930]
+         J media: 0.4364
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-9: Rigenerando J
+[FixedH] 📍 Frase 17: stati globali 81-85
+[FixedH] 📊 MATRICE J GRUPPO 9:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9783]
+         J media: 0.3743
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-10: Rigenerando J
+[FixedH] 📍 Frase 19: stati globali 91-95
+[FixedH] 📊 MATRICE J GRUPPO 10:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9834]
+         J media: 0.4742
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] ✅ Generate 20 frasi × 5 parole = 100 stati totali
+[FixedH] 🎲 Utilizzate 10 matrici J diverse
+[MEMORY] Freed 34.0 MB (316.8 -> 282.7 MB)
+2026-02-05 13:02:03,507 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 20/100
+2026-02-05 13:02:03,508 [INFO] [rank=0] [QUANTUM] Batch 2: generazione 20 frasi (20-39)...
+
+[FixedH] Generazione sequenze con input variabile:
+         - Possibili basis states: 1024 (2^10)
+         - N richiesti: 20  
+         - N generati: 20 ✓
+         - ✅ N ≤ 2^D: nessun replacement
+[FixedH] 📊 BASIS STATES SELEZIONATI:
+         |0101010101⟩ |1110101100⟩ |0011101001⟩ |1000110111⟩ |0100100011⟩ |0001110110⟩ |0011011110⟩ |1000111011⟩ 
+         |1000001010⟩ |1101001100⟩ |1001100100⟩ |0011110001⟩ |0111101110⟩ |1110101110⟩ |1011110001⟩ |1100101011⟩ 
+         |0111000001⟩ |1010111110⟩ |1101111011⟩ |1100010100⟩ 
+[FixedH] 🔄 Cambio J ogni 10 STATI (totale: 100 stati)
+[FixedH] 📊 20 frasi × 5 parole = 100 stati
+
+[FixedH] 🎲 GRUPPO J-1: Rigenerando J
+[FixedH] 📍 Frase 1: stati globali 1-5
+[FixedH] 📊 MATRICE J GRUPPO 1:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9563]
+         J media: 0.4859
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-2: Rigenerando J
+[FixedH] 📍 Frase 3: stati globali 11-15
+[FixedH] 📊 MATRICE J GRUPPO 2:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9933]
+         J media: 0.4205
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-3: Rigenerando J
+[FixedH] 📍 Frase 5: stati globali 21-25
+[FixedH] 📊 MATRICE J GRUPPO 3:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9958]
+         J media: 0.5104
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-4: Rigenerando J
+[FixedH] 📍 Frase 7: stati globali 31-35
+[FixedH] 📊 MATRICE J GRUPPO 4:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9733]
+         J media: 0.4269
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-5: Rigenerando J
+[FixedH] 📍 Frase 9: stati globali 41-45
+[FixedH] 📊 MATRICE J GRUPPO 5:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9924]
+         J media: 0.3868
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-6: Rigenerando J
+[FixedH] 📍 Frase 11: stati globali 51-55
+[FixedH] 📊 MATRICE J GRUPPO 6:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9896]
+         J media: 0.4708
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-7: Rigenerando J
+[FixedH] 📍 Frase 13: stati globali 61-65
+[FixedH] 📊 MATRICE J GRUPPO 7:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9911]
+         J media: 0.5768
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-8: Rigenerando J
+[FixedH] 📍 Frase 15: stati globali 71-75
+[FixedH] 📊 MATRICE J GRUPPO 8:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9878]
+         J media: 0.4299
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-9: Rigenerando J
+[FixedH] 📍 Frase 17: stati globali 81-85
+[FixedH] 📊 MATRICE J GRUPPO 9:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9856]
+         J media: 0.4612
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-10: Rigenerando J
+[FixedH] 📍 Frase 19: stati globali 91-95
+[FixedH] 📊 MATRICE J GRUPPO 10:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9671]
+         J media: 0.4873
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] ✅ Generate 20 frasi × 5 parole = 100 stati totali
+[FixedH] 🎲 Utilizzate 10 matrici J diverse
+[MEMORY] Freed 47.3 MB (331.6 -> 284.3 MB)
+2026-02-05 13:02:31,758 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 40/100
+2026-02-05 13:02:31,758 [INFO] [rank=0] [QUANTUM] Batch 3: generazione 20 frasi (40-59)...
+
+[FixedH] Generazione sequenze con input variabile:
+         - Possibili basis states: 1024 (2^10)
+         - N richiesti: 20  
+         - N generati: 20 ✓
+         - ✅ N ≤ 2^D: nessun replacement
+[FixedH] 📊 BASIS STATES SELEZIONATI:
+         |1110111010⟩ |0100010100⟩ |1101011101⟩ |1001000001⟩ |1011010000⟩ |1010111100⟩ |0011011011⟩ |0010010100⟩ 
+         |1110101100⟩ |1111011111⟩ |1111001101⟩ |1010010010⟩ |1111101011⟩ |0000101111⟩ |0100110111⟩ |1000101110⟩ 
+         |1111100010⟩ |0011100011⟩ |0110011110⟩ |1101010001⟩ 
+[FixedH] 🔄 Cambio J ogni 10 STATI (totale: 100 stati)
+[FixedH] 📊 20 frasi × 5 parole = 100 stati
+
+[FixedH] 🎲 GRUPPO J-1: Rigenerando J
+[FixedH] 📍 Frase 1: stati globali 1-5
+[FixedH] 📊 MATRICE J GRUPPO 1:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9976]
+         J media: 0.4337
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-2: Rigenerando J
+[FixedH] 📍 Frase 3: stati globali 11-15
+[FixedH] 📊 MATRICE J GRUPPO 2:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9866]
+         J media: 0.4354
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-3: Rigenerando J
+[FixedH] 📍 Frase 5: stati globali 21-25
+[FixedH] 📊 MATRICE J GRUPPO 3:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9848]
+         J media: 0.4351
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-4: Rigenerando J
+[FixedH] 📍 Frase 7: stati globali 31-35
+[FixedH] 📊 MATRICE J GRUPPO 4:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9571]
+         J media: 0.4258
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-5: Rigenerando J
+[FixedH] 📍 Frase 9: stati globali 41-45
+[FixedH] 📊 MATRICE J GRUPPO 5:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9899]
+         J media: 0.4219
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-6: Rigenerando J
+[FixedH] 📍 Frase 11: stati globali 51-55
+[FixedH] 📊 MATRICE J GRUPPO 6:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9602]
+         J media: 0.4592
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-7: Rigenerando J
+[FixedH] 📍 Frase 13: stati globali 61-65
+[FixedH] 📊 MATRICE J GRUPPO 7:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9998]
+         J media: 0.5026
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-8: Rigenerando J
+[FixedH] 📍 Frase 15: stati globali 71-75
+[FixedH] 📊 MATRICE J GRUPPO 8:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9905]
+         J media: 0.4387
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-9: Rigenerando J
+[FixedH] 📍 Frase 17: stati globali 81-85
+[FixedH] 📊 MATRICE J GRUPPO 9:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9910]
+         J media: 0.4511
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-10: Rigenerando J
+[FixedH] 📍 Frase 19: stati globali 91-95
+[FixedH] 📊 MATRICE J GRUPPO 10:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9828]
+         J media: 0.4497
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] ✅ Generate 20 frasi × 5 parole = 100 stati totali
+[FixedH] 🎲 Utilizzate 10 matrici J diverse
+[MEMORY] Freed 6.0 MB (291.9 -> 285.9 MB)
+2026-02-05 13:02:59,985 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 60/100
+2026-02-05 13:02:59,986 [INFO] [rank=0] [QUANTUM] Batch 4: generazione 20 frasi (60-79)...
+
+[FixedH] Generazione sequenze con input variabile:
+         - Possibili basis states: 1024 (2^10)
+         - N richiesti: 20  
+         - N generati: 20 ✓
+         - ✅ N ≤ 2^D: nessun replacement
+[FixedH] 📊 BASIS STATES SELEZIONATI:
+         |0101100010⟩ |0011111000⟩ |0010100000⟩ |0000110110⟩ |1100110001⟩ |0110111101⟩ |1010110110⟩ |0011110100⟩ 
+         |0001011000⟩ |0100100001⟩ |1010010000⟩ |1001101110⟩ |1111110111⟩ |1001000000⟩ |0111010111⟩ |1110001011⟩ 
+         |1101000000⟩ |0100101100⟩ |1000100001⟩ |1001001110⟩ 
+[FixedH] 🔄 Cambio J ogni 10 STATI (totale: 100 stati)
+[FixedH] 📊 20 frasi × 5 parole = 100 stati
+
+[FixedH] 🎲 GRUPPO J-1: Rigenerando J
+[FixedH] 📍 Frase 1: stati globali 1-5
+[FixedH] 📊 MATRICE J GRUPPO 1:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9944]
+         J media: 0.4482
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-2: Rigenerando J
+[FixedH] 📍 Frase 3: stati globali 11-15
+[FixedH] 📊 MATRICE J GRUPPO 2:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9786]
+         J media: 0.4109
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-3: Rigenerando J
+[FixedH] 📍 Frase 5: stati globali 21-25
+[FixedH] 📊 MATRICE J GRUPPO 3:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9574]
+         J media: 0.4199
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-4: Rigenerando J
+[FixedH] 📍 Frase 7: stati globali 31-35
+[FixedH] 📊 MATRICE J GRUPPO 4:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9882]
+         J media: 0.4466
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-5: Rigenerando J
+[FixedH] 📍 Frase 9: stati globali 41-45
+[FixedH] 📊 MATRICE J GRUPPO 5:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9861]
+         J media: 0.4775
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-6: Rigenerando J
+[FixedH] 📍 Frase 11: stati globali 51-55
+[FixedH] 📊 MATRICE J GRUPPO 6:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9950]
+         J media: 0.4524
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-7: Rigenerando J
+[FixedH] 📍 Frase 13: stati globali 61-65
+[FixedH] 📊 MATRICE J GRUPPO 7:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9781]
+         J media: 0.5109
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-8: Rigenerando J
+[FixedH] 📍 Frase 15: stati globali 71-75
+[FixedH] 📊 MATRICE J GRUPPO 8:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9760]
+         J media: 0.4018
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-9: Rigenerando J
+[FixedH] 📍 Frase 17: stati globali 81-85
+[FixedH] 📊 MATRICE J GRUPPO 9:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9908]
+         J media: 0.4508
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-10: Rigenerando J
+[FixedH] 📍 Frase 19: stati globali 91-95
+[FixedH] 📊 MATRICE J GRUPPO 10:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9993]
+         J media: 0.4163
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] ✅ Generate 20 frasi × 5 parole = 100 stati totali
+[FixedH] 🎲 Utilizzate 10 matrici J diverse
+[MEMORY] Freed 37.9 MB (325.4 -> 287.5 MB)
+2026-02-05 13:03:28,117 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 80/100
+2026-02-05 13:03:28,118 [INFO] [rank=0] [QUANTUM] Batch 5: generazione 20 frasi (80-99)...
+
+[FixedH] Generazione sequenze con input variabile:
+         - Possibili basis states: 1024 (2^10)
+         - N richiesti: 20  
+         - N generati: 20 ✓
+         - ✅ N ≤ 2^D: nessun replacement
+[FixedH] 📊 BASIS STATES SELEZIONATI:
+         |1110110010⟩ |0001001100⟩ |1100010010⟩ |0011010011⟩ |0010101111⟩ |0010010010⟩ |0001011100⟩ |1000101100⟩ 
+         |1000101011⟩ |0011101011⟩ |0101101101⟩ |1000000001⟩ |1100111110⟩ |0010110001⟩ |1101000010⟩ |0101111101⟩ 
+         |1110011110⟩ |0010010000⟩ |1101100011⟩ |0000010100⟩ 
+[FixedH] 🔄 Cambio J ogni 10 STATI (totale: 100 stati)
+[FixedH] 📊 20 frasi × 5 parole = 100 stati
+
+[FixedH] 🎲 GRUPPO J-1: Rigenerando J
+[FixedH] 📍 Frase 1: stati globali 1-5
+[FixedH] 📊 MATRICE J GRUPPO 1:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9809]
+         J media: 0.4366
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-2: Rigenerando J
+[FixedH] 📍 Frase 3: stati globali 11-15
+[FixedH] 📊 MATRICE J GRUPPO 2:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9972]
+         J media: 0.4507
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-3: Rigenerando J
+[FixedH] 📍 Frase 5: stati globali 21-25
+[FixedH] 📊 MATRICE J GRUPPO 3:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9851]
+         J media: 0.3793
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-4: Rigenerando J
+[FixedH] 📍 Frase 7: stati globali 31-35
+[FixedH] 📊 MATRICE J GRUPPO 4:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9919]
+         J media: 0.4920
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-5: Rigenerando J
+[FixedH] 📍 Frase 9: stati globali 41-45
+[FixedH] 📊 MATRICE J GRUPPO 5:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9984]
+         J media: 0.4842
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-6: Rigenerando J
+[FixedH] 📍 Frase 11: stati globali 51-55
+[FixedH] 📊 MATRICE J GRUPPO 6:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9864]
+         J media: 0.4712
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-7: Rigenerando J
+[FixedH] 📍 Frase 13: stati globali 61-65
+[FixedH] 📊 MATRICE J GRUPPO 7:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9929]
+         J media: 0.4531
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-8: Rigenerando J
+[FixedH] 📍 Frase 15: stati globali 71-75
+[FixedH] 📊 MATRICE J GRUPPO 8:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9502]
+         J media: 0.4026
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-9: Rigenerando J
+[FixedH] 📍 Frase 17: stati globali 81-85
+[FixedH] 📊 MATRICE J GRUPPO 9:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9857]
+         J media: 0.5021
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] 🎲 GRUPPO J-10: Rigenerando J
+[FixedH] 📍 Frase 19: stati globali 91-95
+[FixedH] 📊 MATRICE J GRUPPO 10:
+         J shape: (10, 10)
+         J range: [0.0000, 0.9774]
+         J media: 0.4534
+         J matrix troppo grande ((10, 10)) - mostro solo statistiche
+         Diversa da precedente: ✅ SÌ
+
+[FixedH] ✅ Generate 20 frasi × 5 parole = 100 stati totali
+[FixedH] 🎲 Utilizzate 10 matrici J diverse
+[MEMORY] Freed 6.0 MB (295.0 -> 289.0 MB)
+2026-02-05 13:03:56,460 [INFO] [rank=0] [QUANTUM] Batch completato, totale frasi: 100/100
+2026-02-05 13:03:56,463 [INFO] [rank=0] [QUANTUM] ✓ Tutte le 100 frasi generate: shape=(100, 5, 1024)
+[MEMORY] Freed 6.2 MB (296.8 -> 290.6 MB)
+2026-02-05 13:03:56,560 [INFO] [rank=0] [QUANTUM] Verifica diversità: ||frase_0 - frase_1|| = 3.162278
+2026-02-05 13:03:56,566 [INFO] [rank=0] [QUANTUM] Salvate in quantum_states_generated.npy
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,678 [INFO] [rank=1] [QUANTUM] Rank 1: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,678 [INFO] [rank=3] [QUANTUM] Rank 3: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,678 [INFO] [rank=2] [QUANTUM] Rank 2: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,680 [INFO] [rank=7] [QUANTUM] Rank 7: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,680 [INFO] [rank=4] [QUANTUM] Rank 4: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,680 [INFO] [rank=5] [QUANTUM] Rank 5: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,680 [INFO] [rank=6] [QUANTUM] Rank 6: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,685 [INFO] [rank=14] [QUANTUM] Rank 14: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,686 [INFO] [rank=2] [QUANTUM] Rank 2: Assegnate 1 frasi (IDs: [2])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,686 [INFO] [rank=8] [QUANTUM] Rank 8: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,686 [INFO] [rank=12] [QUANTUM] Rank 12: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,687 [INFO] [rank=15] [QUANTUM] Rank 15: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,687 [INFO] [rank=13] [QUANTUM] Rank 13: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,687 [INFO] [rank=9] [QUANTUM] Rank 9: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,687 [INFO] [rank=10] [QUANTUM] Rank 10: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,687 [INFO] [rank=11] [QUANTUM] Rank 11: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,687 [INFO] [rank=7] [QUANTUM] Rank 7: Assegnate 1 frasi (IDs: [7])
+2026-02-05 13:03:56,689 [INFO] [rank=1] [QUANTUM] Rank 1: Assegnate 1 frasi (IDs: [1])
+2026-02-05 13:03:56,694 [INFO] [rank=4] [QUANTUM] Rank 4: Assegnate 1 frasi (IDs: [4])
+2026-02-05 13:03:56,696 [INFO] [rank=14] [QUANTUM] Rank 14: Assegnate 1 frasi (IDs: [14])
+2026-02-05 13:03:56,696 [INFO] [rank=5] [QUANTUM] Rank 5: Assegnate 1 frasi (IDs: [5])
+2026-02-05 13:03:56,697 [INFO] [rank=9] [QUANTUM] Rank 9: Assegnate 1 frasi (IDs: [9])
+2026-02-05 13:03:56,697 [INFO] [rank=15] [QUANTUM] Rank 15: Assegnate 1 frasi (IDs: [15])
+2026-02-05 13:03:56,699 [INFO] [rank=12] [QUANTUM] Rank 12: Assegnate 1 frasi (IDs: [12])
+2026-02-05 13:03:56,699 [INFO] [rank=13] [QUANTUM] Rank 13: Assegnate 1 frasi (IDs: [13])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,699 [INFO] [rank=51] [QUANTUM] Rank 51: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,701 [INFO] [rank=60] [QUANTUM] Rank 60: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,703 [INFO] [rank=6] [QUANTUM] Rank 6: Assegnate 1 frasi (IDs: [6])
+2026-02-05 13:03:56,709 [INFO] [rank=10] [QUANTUM] Rank 10: Assegnate 1 frasi (IDs: [10])
+2026-02-05 13:03:56,710 [INFO] [rank=3] [QUANTUM] Rank 3: Assegnate 1 frasi (IDs: [3])
+2026-02-05 13:03:56,714 [INFO] [rank=11] [QUANTUM] Rank 11: Assegnate 1 frasi (IDs: [11])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,716 [INFO] [rank=32] [QUANTUM] Rank 32: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,700 [INFO] [rank=48] [QUANTUM] Rank 48: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,700 [INFO] [rank=49] [QUANTUM] Rank 49: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,700 [INFO] [rank=50] [QUANTUM] Rank 50: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,703 [INFO] [rank=48] [QUANTUM] Rank 48: Assegnate 1 frasi (IDs: [48])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,708 [INFO] [rank=52] [QUANTUM] Rank 52: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,708 [INFO] [rank=58] [QUANTUM] Rank 58: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,708 [INFO] [rank=53] [QUANTUM] Rank 53: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,708 [INFO] [rank=56] [QUANTUM] Rank 56: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,708 [INFO] [rank=50] [QUANTUM] Rank 50: Assegnate 1 frasi (IDs: [50])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,709 [INFO] [rank=54] [QUANTUM] Rank 54: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,709 [INFO] [rank=55] [QUANTUM] Rank 55: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,709 [INFO] [rank=57] [QUANTUM] Rank 57: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,709 [INFO] [rank=59] [QUANTUM] Rank 59: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,714 [INFO] [rank=49] [QUANTUM] Rank 49: Assegnate 1 frasi (IDs: [49])
+2026-02-05 13:03:56,714 [INFO] [rank=52] [QUANTUM] Rank 52: Assegnate 1 frasi (IDs: [52])
+2026-02-05 13:03:56,715 [INFO] [rank=59] [QUANTUM] Rank 59: Assegnate 1 frasi (IDs: [59])
+2026-02-05 13:03:56,716 [INFO] [rank=51] [QUANTUM] Rank 51: Assegnate 1 frasi (IDs: [51])
+2026-02-05 13:03:56,718 [INFO] [rank=53] [QUANTUM] Rank 53: Assegnate 1 frasi (IDs: [53])
+2026-02-05 13:03:56,720 [INFO] [rank=8] [QUANTUM] Rank 8: Assegnate 1 frasi (IDs: [8])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,720 [INFO] [rank=81] [QUANTUM] Rank 81: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,701 [INFO] [rank=63] [QUANTUM] Rank 63: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,701 [INFO] [rank=62] [QUANTUM] Rank 62: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,701 [INFO] [rank=61] [QUANTUM] Rank 61: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,709 [INFO] [rank=63] [QUANTUM] Rank 63: Assegnate 1 frasi (IDs: [63])
+2026-02-05 13:03:56,712 [INFO] [rank=61] [QUANTUM] Rank 61: Assegnate 1 frasi (IDs: [61])
+2026-02-05 13:03:56,713 [INFO] [rank=60] [QUANTUM] Rank 60: Assegnate 1 frasi (IDs: [60])
+2026-02-05 13:03:56,715 [INFO] [rank=62] [QUANTUM] Rank 62: Assegnate 1 frasi (IDs: [62])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,716 [INFO] [rank=65] [QUANTUM] Rank 65: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,716 [INFO] [rank=66] [QUANTUM] Rank 66: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,716 [INFO] [rank=67] [QUANTUM] Rank 67: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,716 [INFO] [rank=64] [QUANTUM] Rank 64: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,724 [INFO] [rank=66] [QUANTUM] Rank 66: Assegnate 1 frasi (IDs: [66])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,724 [INFO] [rank=77] [QUANTUM] Rank 77: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,724 [INFO] [rank=75] [QUANTUM] Rank 75: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,724 [INFO] [rank=71] [QUANTUM] Rank 71: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=76] [QUANTUM] Rank 76: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=72] [QUANTUM] Rank 72: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=68] [QUANTUM] Rank 68: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=78] [QUANTUM] Rank 78: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,728 [INFO] [rank=0] [QUANTUM] Rank 0: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,729 [INFO] [rank=0] [QUANTUM] Rank 0: Assegnate 1 frasi (IDs: [0])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,720 [INFO] [rank=83] [QUANTUM] Rank 83: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,720 [INFO] [rank=80] [QUANTUM] Rank 80: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,720 [INFO] [rank=82] [QUANTUM] Rank 82: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,721 [INFO] [rank=96] [QUANTUM] Rank 96: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,721 [INFO] [rank=97] [QUANTUM] Rank 97: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,721 [INFO] [rank=99] [QUANTUM] Rank 99: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,722 [INFO] [rank=98] [QUANTUM] Rank 98: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,726 [INFO] [rank=98] [QUANTUM] Rank 98: Assegnate 1 frasi (IDs: [98])
+2026-02-05 13:03:56,728 [INFO] [rank=82] [QUANTUM] Rank 82: Assegnate 1 frasi (IDs: [82])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,729 [INFO] [rank=89] [QUANTUM] Rank 89: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,729 [INFO] [rank=91] [QUANTUM] Rank 91: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,729 [INFO] [rank=88] [QUANTUM] Rank 88: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,729 [INFO] [rank=90] [QUANTUM] Rank 90: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,730 [INFO] [rank=84] [QUANTUM] Rank 84: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,730 [INFO] [rank=92] [QUANTUM] Rank 92: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[DEBUG] 🧠 Generating params for num_qubits=4, num_layers=5
+[DEBUG PARAM RESOLVER] num_qubits=4, num_layers=5
+[DEBUG SHAPE] num_qubits=4, num_layers=5
+[QuantumStateProjector] Initialized:
+    Source dim: 1024 (2^10 qubits)
+    Target dim: 4 (2^2 qubits)
+    P matrix shape: (4, 1024)
+    Trainable parameters: 4096
+2026-02-05 13:03:56,732 [INFO] [rank=0] [PROJECTION] ✓ Projector creato: 1024 -> 4
+2026-02-05 13:03:56,732 [INFO] [rank=0] [QUANTUM] P sostituisce E (embedding): (4, 1024)
+2026-02-05 13:03:56,732 [INFO] [rank=0] [QUANTUM] V non serve in quantum mode (target = stati proiettati)
+2026-02-05 13:03:56,732 [INFO] [rank=0] Parametri: quantum=480 embed=0 rot=0 proj=4096 tot=4576 shape_half=(5, 2, 2, 4, 3)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,737 [INFO] [rank=16] [QUANTUM] Rank 16: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,737 [INFO] [rank=19] [QUANTUM] Rank 19: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,737 [INFO] [rank=17] [QUANTUM] Rank 17: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,737 [INFO] [rank=18] [QUANTUM] Rank 18: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,717 [INFO] [rank=33] [QUANTUM] Rank 33: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,717 [INFO] [rank=35] [QUANTUM] Rank 35: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,717 [INFO] [rank=34] [QUANTUM] Rank 34: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,722 [INFO] [rank=33] [QUANTUM] Rank 33: Assegnate 1 frasi (IDs: [33])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,724 [INFO] [rank=37] [QUANTUM] Rank 37: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=36] [QUANTUM] Rank 36: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=39] [QUANTUM] Rank 39: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=38] [QUANTUM] Rank 38: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,726 [INFO] [rank=34] [QUANTUM] Rank 34: Assegnate 1 frasi (IDs: [34])
+2026-02-05 13:03:56,733 [INFO] [rank=36] [QUANTUM] Rank 36: Assegnate 1 frasi (IDs: [36])
+2026-02-05 13:03:56,733 [INFO] [rank=32] [QUANTUM] Rank 32: Assegnate 1 frasi (IDs: [32])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,740 [INFO] [rank=20] [QUANTUM] Rank 20: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,740 [INFO] [rank=30] [QUANTUM] Rank 30: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,741 [INFO] [rank=21] [QUANTUM] Rank 21: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,741 [INFO] [rank=23] [QUANTUM] Rank 23: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,741 [INFO] [rank=22] [QUANTUM] Rank 22: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,741 [INFO] [rank=24] [QUANTUM] Rank 24: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,743 [INFO] [rank=19] [QUANTUM] Rank 19: Assegnate 1 frasi (IDs: [19])
+2026-02-05 13:03:56,747 [INFO] [rank=16] [QUANTUM] Rank 16: Assegnate 1 frasi (IDs: [16])
+2026-02-05 13:03:56,747 [INFO] [rank=17] [QUANTUM] Rank 17: Assegnate 1 frasi (IDs: [17])
+2026-02-05 13:03:56,752 [INFO] [rank=18] [QUANTUM] Rank 18: Assegnate 1 frasi (IDs: [18])
+2026-02-05 13:03:56,718 [INFO] [rank=58] [QUANTUM] Rank 58: Assegnate 1 frasi (IDs: [58])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,719 [INFO] [rank=44] [QUANTUM] Rank 44: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,719 [INFO] [rank=47] [QUANTUM] Rank 47: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,719 [INFO] [rank=46] [QUANTUM] Rank 46: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,719 [INFO] [rank=45] [QUANTUM] Rank 45: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,720 [INFO] [rank=40] [QUANTUM] Rank 40: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,720 [INFO] [rank=42] [QUANTUM] Rank 42: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,720 [INFO] [rank=43] [QUANTUM] Rank 43: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,720 [INFO] [rank=41] [QUANTUM] Rank 41: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,721 [INFO] [rank=55] [QUANTUM] Rank 55: Assegnate 1 frasi (IDs: [55])
+2026-02-05 13:03:56,722 [INFO] [rank=56] [QUANTUM] Rank 56: Assegnate 1 frasi (IDs: [56])
+2026-02-05 13:03:56,722 [INFO] [rank=57] [QUANTUM] Rank 57: Assegnate 1 frasi (IDs: [57])
+2026-02-05 13:03:56,723 [INFO] [rank=54] [QUANTUM] Rank 54: Assegnate 1 frasi (IDs: [54])
+2026-02-05 13:03:56,724 [INFO] [rank=40] [QUANTUM] Rank 40: Assegnate 1 frasi (IDs: [40])
+2026-02-05 13:03:56,727 [INFO] [rank=42] [QUANTUM] Rank 42: Assegnate 1 frasi (IDs: [42])
+2026-02-05 13:03:56,728 [INFO] [rank=47] [QUANTUM] Rank 47: Assegnate 1 frasi (IDs: [47])
+2026-02-05 13:03:56,728 [INFO] [rank=41] [QUANTUM] Rank 41: Assegnate 1 frasi (IDs: [41])
+2026-02-05 13:03:56,730 [INFO] [rank=44] [QUANTUM] Rank 44: Assegnate 1 frasi (IDs: [44])
+2026-02-05 13:03:56,730 [INFO] [rank=46] [QUANTUM] Rank 46: Assegnate 1 frasi (IDs: [46])
+2026-02-05 13:03:56,749 [INFO] [rank=43] [QUANTUM] Rank 43: Assegnate 1 frasi (IDs: [43])
+2026-02-05 13:03:56,749 [INFO] [rank=45] [QUANTUM] Rank 45: Assegnate 1 frasi (IDs: [45])
+2026-02-05 13:03:56,725 [INFO] [rank=64] [QUANTUM] Rank 64: Assegnate 1 frasi (IDs: [64])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=79] [QUANTUM] Rank 79: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=73] [QUANTUM] Rank 73: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=70] [QUANTUM] Rank 70: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=69] [QUANTUM] Rank 69: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,725 [INFO] [rank=74] [QUANTUM] Rank 74: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,731 [INFO] [rank=67] [QUANTUM] Rank 67: Assegnate 1 frasi (IDs: [67])
+2026-02-05 13:03:56,732 [INFO] [rank=68] [QUANTUM] Rank 68: Assegnate 1 frasi (IDs: [68])
+2026-02-05 13:03:56,734 [INFO] [rank=71] [QUANTUM] Rank 71: Assegnate 1 frasi (IDs: [71])
+2026-02-05 13:03:56,735 [INFO] [rank=76] [QUANTUM] Rank 76: Assegnate 1 frasi (IDs: [76])
+2026-02-05 13:03:56,735 [INFO] [rank=77] [QUANTUM] Rank 77: Assegnate 1 frasi (IDs: [77])
+2026-02-05 13:03:56,735 [INFO] [rank=74] [QUANTUM] Rank 74: Assegnate 1 frasi (IDs: [74])
+2026-02-05 13:03:56,735 [INFO] [rank=70] [QUANTUM] Rank 70: Assegnate 1 frasi (IDs: [70])
+2026-02-05 13:03:56,737 [INFO] [rank=72] [QUANTUM] Rank 72: Assegnate 1 frasi (IDs: [72])
+2026-02-05 13:03:56,738 [INFO] [rank=75] [QUANTUM] Rank 75: Assegnate 1 frasi (IDs: [75])
+2026-02-05 13:03:56,738 [INFO] [rank=69] [QUANTUM] Rank 69: Assegnate 1 frasi (IDs: [69])
+2026-02-05 13:03:56,740 [INFO] [rank=79] [QUANTUM] Rank 79: Assegnate 1 frasi (IDs: [79])
+2026-02-05 13:03:56,740 [INFO] [rank=78] [QUANTUM] Rank 78: Assegnate 1 frasi (IDs: [78])
+2026-02-05 13:03:56,750 [INFO] [rank=73] [QUANTUM] Rank 73: Assegnate 1 frasi (IDs: [73])
+2026-02-05 13:03:56,756 [INFO] [rank=65] [QUANTUM] Rank 65: Assegnate 1 frasi (IDs: [65])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,730 [INFO] [rank=85] [QUANTUM] Rank 85: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,730 [INFO] [rank=86] [QUANTUM] Rank 86: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,730 [INFO] [rank=87] [QUANTUM] Rank 87: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,730 [INFO] [rank=93] [QUANTUM] Rank 93: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,730 [INFO] [rank=94] [QUANTUM] Rank 94: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,730 [INFO] [rank=95] [QUANTUM] Rank 95: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,730 [INFO] [rank=99] [QUANTUM] Rank 99: Assegnate 1 frasi (IDs: [99])
+2026-02-05 13:03:56,730 [INFO] [rank=96] [QUANTUM] Rank 96: Assegnate 1 frasi (IDs: [96])
+2026-02-05 13:03:56,731 [INFO] [rank=97] [QUANTUM] Rank 97: Assegnate 1 frasi (IDs: [97])
+2026-02-05 13:03:56,733 [INFO] [rank=83] [QUANTUM] Rank 83: Assegnate 1 frasi (IDs: [83])
+2026-02-05 13:03:56,734 [INFO] [rank=81] [QUANTUM] Rank 81: Assegnate 1 frasi (IDs: [81])
+2026-02-05 13:03:56,737 [INFO] [rank=93] [QUANTUM] Rank 93: Assegnate 1 frasi (IDs: [93])
+2026-02-05 13:03:56,737 [INFO] [rank=85] [QUANTUM] Rank 85: Assegnate 1 frasi (IDs: [85])
+2026-02-05 13:03:56,738 [INFO] [rank=80] [QUANTUM] Rank 80: Assegnate 1 frasi (IDs: [80])
+2026-02-05 13:03:56,738 [INFO] [rank=87] [QUANTUM] Rank 87: Assegnate 1 frasi (IDs: [87])
+2026-02-05 13:03:56,739 [INFO] [rank=94] [QUANTUM] Rank 94: Assegnate 1 frasi (IDs: [94])
+2026-02-05 13:03:56,739 [INFO] [rank=89] [QUANTUM] Rank 89: Assegnate 1 frasi (IDs: [89])
+2026-02-05 13:03:56,740 [INFO] [rank=92] [QUANTUM] Rank 92: Assegnate 1 frasi (IDs: [92])
+2026-02-05 13:03:56,740 [INFO] [rank=84] [QUANTUM] Rank 84: Assegnate 1 frasi (IDs: [84])
+2026-02-05 13:03:56,741 [INFO] [rank=91] [QUANTUM] Rank 91: Assegnate 1 frasi (IDs: [91])
+2026-02-05 13:03:56,742 [INFO] [rank=88] [QUANTUM] Rank 88: Assegnate 1 frasi (IDs: [88])
+2026-02-05 13:03:56,744 [INFO] [rank=86] [QUANTUM] Rank 86: Assegnate 1 frasi (IDs: [86])
+2026-02-05 13:03:56,746 [INFO] [rank=95] [QUANTUM] Rank 95: Assegnate 1 frasi (IDs: [95])
+2026-02-05 13:03:56,761 [INFO] [rank=90] [QUANTUM] Rank 90: Assegnate 1 frasi (IDs: [90])
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,741 [INFO] [rank=28] [QUANTUM] Rank 28: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,741 [INFO] [rank=27] [QUANTUM] Rank 27: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,742 [INFO] [rank=26] [QUANTUM] Rank 26: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,742 [INFO] [rank=29] [QUANTUM] Rank 29: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,742 [INFO] [rank=25] [QUANTUM] Rank 25: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 13:03:56,742 [INFO] [rank=31] [QUANTUM] Rank 31: Ricevute frasi quantistiche, shape=(100, 5, 1024)
+2026-02-05 13:03:56,743 [INFO] [rank=39] [QUANTUM] Rank 39: Assegnate 1 frasi (IDs: [39])
+2026-02-05 13:03:56,744 [INFO] [rank=37] [QUANTUM] Rank 37: Assegnate 1 frasi (IDs: [37])
+2026-02-05 13:03:56,745 [INFO] [rank=30] [QUANTUM] Rank 30: Assegnate 1 frasi (IDs: [30])
+2026-02-05 13:03:56,747 [INFO] [rank=31] [QUANTUM] Rank 31: Assegnate 1 frasi (IDs: [31])
+2026-02-05 13:03:56,748 [INFO] [rank=27] [QUANTUM] Rank 27: Assegnate 1 frasi (IDs: [27])
+2026-02-05 13:03:56,749 [INFO] [rank=25] [QUANTUM] Rank 25: Assegnate 1 frasi (IDs: [25])
+2026-02-05 13:03:56,749 [INFO] [rank=21] [QUANTUM] Rank 21: Assegnate 1 frasi (IDs: [21])
+2026-02-05 13:03:56,752 [INFO] [rank=20] [QUANTUM] Rank 20: Assegnate 1 frasi (IDs: [20])
+2026-02-05 13:03:56,752 [INFO] [rank=35] [QUANTUM] Rank 35: Assegnate 1 frasi (IDs: [35])
+2026-02-05 13:03:56,752 [INFO] [rank=22] [QUANTUM] Rank 22: Assegnate 1 frasi (IDs: [22])
+2026-02-05 13:03:56,754 [INFO] [rank=24] [QUANTUM] Rank 24: Assegnate 1 frasi (IDs: [24])
+2026-02-05 13:03:56,756 [INFO] [rank=26] [QUANTUM] Rank 26: Assegnate 1 frasi (IDs: [26])
+2026-02-05 13:03:56,761 [INFO] [rank=28] [QUANTUM] Rank 28: Assegnate 1 frasi (IDs: [28])
+2026-02-05 13:03:56,764 [INFO] [rank=29] [QUANTUM] Rank 29: Assegnate 1 frasi (IDs: [29])
+2026-02-05 13:03:56,765 [INFO] [rank=23] [QUANTUM] Rank 23: Assegnate 1 frasi (IDs: [23])
+2026-02-05 13:03:56,852 [INFO] [rank=38] [QUANTUM] Rank 38: Assegnate 1 frasi (IDs: [38])
+2026-02-05 13:03:56,958 [INFO] [rank=0] Inizio ottimizzazione con COBYLA (NO early stopping): maxiter=150, tol=1e-05
+2026-02-05 13:03:56,958 [INFO] [rank=0] [STOPPING CONFIG] HARD CONSTRAINT: Stop ONLY at 100 loss evaluations
+2026-02-05 13:03:56,958 [INFO] [rank=0] [STOPPING CONFIG] All early stopping logic DISABLED
+2026-02-05 13:03:57,389 [INFO] [rank=0] [LOSS EVAL 1/100] Starting evaluation...
+[Rank 0] Memoria attuale: 0.41 GB
+[PROJECTION] Proiezione P applicata: (5, 1024) -> (5, 4)
+[MEMORY CHECK] State dim: 4, Kron dim: 16
+[MEMORY CHECK] Single kron size: 0.0MB
+[MEMORY CHECK] Estimated total: 0.0MB
+[DEBUG] 🧠 Generating params for num_qubits=4, num_layers=5
+[DEBUG PARAM RESOLVER] num_qubits=4, num_layers=5
+[DEBUG SHAPE] num_qubits=4, num_layers=5
+stati QA: 5 stati
+sentence_length ricevuta:  5
+Loss: 5.601439 at 13:04:20 [4D, 5W]
+[MEMORY] Freed 124.9 MB (903.0 -> 778.1 MB)
+2026-02-05 13:04:24,440 [INFO] [rank=0] [TRAIN] Loss (circuito): 5.142093
+2026-02-05 13:04:24,442 [INFO] [rank=0] [TRAIN] Loss (formula L=-2ln(mean_sqrt_p)): 4.904732
+2026-02-05 13:04:24,443 [INFO] [rank=0] [TRAIN] PPL (exp(L)): 134.926699
+2026-02-05 13:04:24,446 [INFO] [rank=0] [TRACKER] New best! Loss=5.142093 at iter 1
+2026-02-05 13:04:24,447 [INFO] [rank=0] [TRACKING] iter=1, loss=5.142093, best=5.142093, evals=1/100
+2026-02-05 13:04:25,196 [INFO] [rank=0] [LOSS EVAL 2/100] Starting evaluation...
+[MEMORY WARNING] Rank 0: 1.41 GB used (threshold: 1.0 GB)
+2026-02-05 13:04:25,198 [WARNING] [rank=0] [MEMORY] Soglia memoria 1.0GB superata al processo 0/1

@@ -11,7 +11,7 @@
 #SBATCH --ntasks-per-node=20     # 5 × 20 = 100 rank (ben sotto il limite 256)
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=0                  # usa TUTTA la RAM del nodo BOOST
-#SBATCH --time=15:00:00
+#SBATCH --time=05:30:00
 
 echo "=== JOB $SLURM_JOB_ID STARTED at $(date) on $(hostname) ==="
 

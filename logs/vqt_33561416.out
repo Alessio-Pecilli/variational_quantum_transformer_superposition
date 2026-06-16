@@ -1,0 +1,59 @@
+=== JOB 33561416 STARTED at Thu Feb  5 12:56:28 CET 2026 on lrdn1345.leonardo.local ===
+Loading openmpi/4.1.6--gcc--12.2.0
+  Loading requirement: gcc/12.2.0-binut2.41
+Loading python/3.11.7
+  Loading requirement: bzip2/1.0.8-ib3znej libmd/1.0.4-2km2lxx
+    libbsd/0.12.1-oocs6an expat/2.6.2-p2t4wry ncurses/6.5-svfl57u
+    readline/8.2-zeda6mx gdbm/1.23-wiol7vk libiconv/1.17-nhc3mhm
+    xz/5.4.6-xxxg42c zlib-ng/2.1.6-jkgunjc libxml2/2.10.3-zbbe7lm
+    pigz/2.8-5bwzpml zstd/1.5.6-uq5yyux tar/1.34-jgektnv gettext/0.22.5-hsxgafg
+    libffi/3.4.6-4vs4jpp libxcrypt/4.4.35-7om46b5 sqlite/3.43.2-4kl5mnp
+    util-linux-uuid/2.38.1-5achpds
+[PTB] Caricamento da file locale: ptb_sentences.txt
+[PTB-LOCAL] Trovate 593 frasi con esattamente 5 parole
+[PTB-LOCAL] Selezionate 100 frasi RANDOM
+✅ Generalized Quantum Circuits available
+2026-02-05 12:57:25,138 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-05 12:57:25,159 [INFO] [rank=0] [QUANTUM] Modalità QUANTUM STATES attiva!
+2026-02-05 12:57:25,159 [INFO] [rank=0] [QUANTUM] ========================================
+2026-02-05 12:57:25,159 [INFO] [rank=0] [QUANTUM] Frasi quantistiche (num_states): 100
+2026-02-05 12:57:25,159 [INFO] [rank=0] [QUANTUM] Parole per frase (max_time): 5
+2026-02-05 12:57:25,160 [INFO] [rank=0] [QUANTUM] ✓ PROIEZIONE ABILITATA: 10 qubit -> 2 qubit
+2026-02-05 12:57:25,160 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert sorgente: 2^10 = 1024
+2026-02-05 12:57:25,160 [INFO] [rank=0] [QUANTUM] Dimensione Hilbert target: 2^2 = 4
+2026-02-05 12:57:25,160 [INFO] [rank=0] [QUANTUM] MPI ranks: 100
+2026-02-05 12:57:25,160 [INFO] [rank=0] [QUANTUM] Frasi per rank: ~1
+2026-02-05 12:57:25,160 [INFO] [rank=0] [QUANTUM] Rank 0: Generazione OTTIMIZZATA di 100 frasi quantistiche...
+2026-02-05 12:57:25,160 [INFO] [rank=0] [QUANTUM] Dimensione target: 2^10 = 1024, memoria stimata: 7 MB
+[TFIM] Inizializzata Hamiltoniana Transverse Field Ising Model:
+       - Qubit: 10
+       - Dimensione Hilbert: 1024
+       - Coefficiente campo trasverso: 1.0
+       - Coefficiente interazione Ising: 1.0
+       - Jᵢⱼ ∈ [0, 1] (random, fissi)
+2026-02-05 12:57:25,901 [INFO] [rank=0] [QUANTUM] Batch 1: generazione 20 frasi (0-19)...
+
+[FixedH] Generazione sequenze con input variabile:
+         - Possibili basis states: 1024 (2^10)
+         - N richiesti: 20  
+         - N generati: 20 ✓
+         - ✅ N ≤ 2^D: nessun replacement
+[FixedH] 📊 BASIS STATES SELEZIONATI:
+         |1100001010⟩ |1011011011⟩ |0011001100⟩ |1111011111⟩ |1101011011⟩ |1100000110⟩ |0010000010⟩ |0001011001⟩ 
+         |1010010011⟩ |1000001100⟩ |0110110100⟩ |0001010110⟩ |0111001101⟩ |1101100011⟩ |0001011111⟩ |1011101100⟩ 
+         |1100100001⟩ |0110111010⟩ |1011000001⟩ |1000010110⟩ 
+[FixedH] 🔄 Cambio J ogni 10 STATI (totale: 100 stati)
+[FixedH] 📊 20 frasi × 5 parole = 100 stati
+
+[FixedH] 🎲 GRUPPO J-1: Rigenerando J
+[FixedH] 📍 Frase 1: stati globali 1-5
+2026-02-05 12:57:25,915 [ERROR] [rank=0] Errore critico durante il training
+2026-02-05 12:57:25,915 [ERROR] [rank=0] Tipo: AttributeError, Msg: 'TFIMHamiltonian' object has no attribute '_build_hamiltonian'
+2026-02-05 12:57:25,918 [ERROR] [rank=0] Traceback (most recent call last):
+2026-02-05 12:57:25,918 [ERROR] [rank=0]   File "/leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superposition/main_hpc.py", line 1671, in main
+2026-02-05 12:57:25,918 [ERROR] [rank=0]     batch_array = hamiltonian.generate_sentences(
+2026-02-05 12:57:25,918 [ERROR] [rank=0]                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-05 12:57:25,918 [ERROR] [rank=0]   File "/leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superposition/quantum_annealing.py", line 373, in generate_sentences
+2026-02-05 12:57:25,918 [ERROR] [rank=0]     self._build_hamiltonian()  # Ricostruisce H con nuova J
+2026-02-05 12:57:25,918 [ERROR] [rank=0]     ^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-05 12:57:25,918 [ERROR] [rank=0] AttributeError: 'TFIMHamiltonian' object has no attribute '_build_hamiltonian'

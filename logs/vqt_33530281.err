@@ -1,0 +1,716 @@
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/scipy/_lib/pyprima/common/preproc.py:68: UserWarning: COBYLA: Invalid MAXFUN; it should be at least num_vars + 2; it is set to 4578
+  warn(f'{solver}: Invalid MAXFUN; it should be at least {min_maxfun_str}; it is set to {maxfun}')
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:293: RuntimeWarning: underflow encountered in matmul
+  um0um1 = um0 @ um1.T.conjugate()
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:229: RuntimeWarning: underflow encountered in matmul
+  A1 = (SX + 1j * SY) @ UX
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:219: RuntimeWarning: underflow encountered in matmul
+  SX = VX @ Sigma @ VXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+[lrdn3001:1064410:0:1064410]       ud_ep.c:280  Fatal: UD endpoint 0x67a97f0 to <no debug data>: unhandled timeout error
+[lrdn3001:1064414:0:1064414]       ud_ep.c:280  Fatal: UD endpoint 0x4cba190 to <no debug data>: unhandled timeout error
+[lrdn3001:1064413:0:1064413]       ud_ep.c:280  Fatal: UD endpoint 0x3a93a60 to <no debug data>: unhandled timeout error
+[lrdn3001:1064408:0:1064408]       ud_ep.c:280  Fatal: UD endpoint 0x5055a10 to <no debug data>: unhandled timeout error
+[lrdn3001:1064420:0:1064420]       ud_ep.c:280  Fatal: UD endpoint 0x42d20b0 to <no debug data>: unhandled timeout error
+[lrdn3001:1064409:0:1064409]       ud_ep.c:280  Fatal: UD endpoint 0x7a0d870 to <no debug data>: unhandled timeout error
+[lrdn3001:1064412:0:1064412]       ud_ep.c:280  Fatal: UD endpoint 0x4a9c3c0 to <no debug data>: unhandled timeout error
+[lrdn3001:1064417:0:1064417]       ud_ep.c:280  Fatal: UD endpoint 0x4955d30 to <no debug data>: unhandled timeout error
+[lrdn3001:1064416:0:1064416]       ud_ep.c:280  Fatal: UD endpoint 0x35b5e10 to <no debug data>: unhandled timeout error
+[lrdn3001:1064415:0:1064415]       ud_ep.c:280  Fatal: UD endpoint 0x5bbf7a0 to <no debug data>: unhandled timeout error
+[lrdn3001:1064411:0:1064411]       ud_ep.c:280  Fatal: UD endpoint 0x4097ea0 to <no debug data>: unhandled timeout error
+[lrdn3001:1064407:0:1064407]       ud_ep.c:280  Fatal: UD endpoint 0x6863ab0 to <no debug data>: unhandled timeout error
+==== backtrace (tid:1064413) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x14c4fa3523cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x14c4fa34f211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x14c4fa34f337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x14c4f29f7fe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x14c4fa3482ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x14c4faa27eaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x14c4facc74a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x14c4facc80b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x14c4facc80d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x14c4facd0829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x14c4ff582407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x14c51574e628]
+==== backtrace (tid:1064415) ====
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x14c51574f368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x14c515754a1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x14c515755169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x14c5157553fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x14c515774460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x14c515774963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x14c51456fd85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+==== backtrace (tid:1064407) ====
+==== backtrace (tid:1064411) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x14eb22e9b3cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x14eb22e98211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x14eb22e98337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x14eb2070afe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x14eb22e912ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x14eb23570eaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x14eb281554a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x14eb281560b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x14eb281560d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x14eb2815e829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x14eb2c210407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x14eb423dc628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x14eb423dd368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x14eb423e2a1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x14eb423e3169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x14eb423e33fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x14eb42402460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x14eb42402963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x14eb411fdd85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+==== backtrace (tid:1064420) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x14a53a5513cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x14a53a54e211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x14a53a54e337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x14a532bfdfe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x14a53a5472ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x14a53ac26eaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x14a53aec64a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x14a53aec70b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x14a53aec70d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x14a53aecf829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x14a53f781407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x14a55594d628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x14a55594e368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x14a555953a1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x14a555954169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x14a5559543fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x14a555973460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x14a555973963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x14a55476ed85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x15001e8d93cc]
+==== backtrace (tid:1064408) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x14f9b05573cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x14f9b0554211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x14f9b0554337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x14f9a8d89fe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x14f9b054d2ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x14f9b0c2ceaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x14f9b0ecc4a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x14f9b0ecd0b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x14f9b0ecd0d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x14f9b0ed5829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x14f9b5787407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x14f9cb953628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x14f9cb954368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x14f9cb959a1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x14f9cb95a169]
+==== backtrace (tid:1064416) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x15008f69b3cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x15008f698211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x15008f698337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x150087dd1fe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x15008f6912ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x15008fd70eaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x1500941244a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x1500941250b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x1500941250d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x15009412d829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x1500989df407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x1500aebab628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x1500aebac368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x1500aebb1a1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x1500aebb2169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x1500aebb23fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x1500aebd1460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x1500aebd1963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x1500ad9ccd85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x14f9cb95a3fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x14f9cb979460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x14f9cb979963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x14f9ca774d85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x15001e8d6211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x15001e8d6337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x15001c10efe0]
+==== backtrace (tid:1064409) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x14e6708653cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x14e670862211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x14e670862337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x14e668f8ffe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x14e67085b2ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x14e670f3aeaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x14e6711da4a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x14e6711db0b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x14e6711db0d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x14e6711e3829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x14e675a95407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x14e68bc61628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x14e68bc62368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x14e68bc67a1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x14e68bc68169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x14e68bc683fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x14e68bc87460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x14e68bc87963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x14e68aa82d85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+==== backtrace (tid:1064417) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x14d119f5d3cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x14d119f5a211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x14d119f5a337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x14d11274efe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x14d119f532ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x14d11a632eaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libopen-pal.so.40(opal_progress+0x2c) [0x14d11eff5b2c]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x2515) [0x14d11a8d2515]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x14d11a8d30b9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x14d11a8d30d9]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x14d11a8db829]
+11  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x14d11f18d407]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x14d135359628]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x14d13535a368]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x14d13535fa1f]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x14d135360169]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x14d1353603fc]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x14d13537f460]
+18  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x14d13537f963]
+19  /lib64/libc.so.6(__libc_start_main+0xe5) [0x14d13417ad85]
+20  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+==== backtrace (tid:1064414) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x14f06ae9b3cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x14f06ae98211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x14f06ae98337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x14f06870afe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x14f06ae912ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x14f06b570eaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x14f0700dd4a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x14f0700de0b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x14f0700de0d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x14f0700e6829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x14f074198407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x14f08a364628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x14f08a365368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x14f08a36aa1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x14f08a36b169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x14f08a36b3fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x14f08a38a460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x14f08a38a963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x14f089185d85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+==== backtrace (tid:1064410) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x1551e89aa3cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x1551e89a7211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x1551e89a7337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x1551e1194fe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x1551e89a02ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x1551e907feaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x1551e931f4a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x1551e93200b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x1551e93200d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x1551e9328829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x1551edbda407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x155203da6628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x155203da7368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x155203daca1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x155203dad169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x155203dad3fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x155203dcc460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x155203dcc963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x155202bc7d85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+ 4  /lib64/libucs.so.0(+0x222ec) [0x15001e8cf2ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x15001efaeeaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x15001f24e4a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x15001f24f0b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x15001f24f0d9]
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x1505a293d3cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x1505a293a211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x1505a293a337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x1505a0172fe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x1505a29332ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x1505a3012eaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x1505a32b24a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x1505a32b30b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x1505a32b30d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x1505a32bb829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x1505a7b6d407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x1505bdd39628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x1505bdd3a368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x1505bdd3fa1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x1505bdd40169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x1505bdd403fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x1505bdd5f460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x1505bdd5f963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x1505bcb5ad85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x15001f257829]
+==== backtrace (tid:1064412) ====
+ 0  /lib64/libucs.so.0(ucs_handle_error+0x2dc) [0x1527a3dcc3cc]
+ 1  /lib64/libucs.so.0(ucs_fatal_error_message+0xb1) [0x1527a3dc9211]
+ 2  /lib64/libucs.so.0(ucs_fatal_error_format+0x117) [0x1527a3dc9337]
+ 3  /lib64/ucx/libuct_ib.so.0(+0x61fe0) [0x1527a0655fe0]
+ 4  /lib64/libucs.so.0(+0x222ec) [0x1527a3dc22ec]
+ 5  /lib64/libucp.so.0(ucp_worker_progress+0x6a) [0x1527a84c7eaa]
+ 6  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(+0x24a5) [0x1527a87674a5]
+ 7  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs_nofence+0x159) [0x1527a87680b9]
+ 8  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmca_common_ucx.so.40(opal_common_ucx_del_procs+0x9) [0x1527a87680d9]
+ 9  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/openmpi/mca_pml_ucx.so(mca_pml_ucx_del_procs+0x89) [0x1527a8770829]
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x1527ad022407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x1527c31ee628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x1527c31ef368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x1527c31f4a1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x1527c31f5169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x1527c31f53fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x1527c3214460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x1527c3214963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x1527c200fd85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+10  /leonardo/prod/opt/libraries/openmpi/4.1.6/gcc--12.2.0/lib/libmpi.so(ompi_mpi_finalize+0x557) [0x150023b09407]
+11  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_FinalizeEx+0x108) [0x150039cd5628]
+12  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_Exit+0x8) [0x150039cd6368]
+13  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(+0x29da1f) [0x150039cdba1f]
+14  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_SimpleFileObject+0x469) [0x150039cdc169]
+15  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(_PyRun_AnyFileObject+0x3c) [0x150039cdc3fc]
+16  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_RunMain+0x7b0) [0x150039cfb460]
+17  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/lib/libpython3.11.so.1.0(Py_BytesMain+0x43) [0x150039cfb963]
+18  /lib64/libc.so.6(__libc_start_main+0xe5) [0x150038af6d85]
+19  /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3(_start+0x2e) [0x400fde]
+=================================
+srun: error: lrdn3001: tasks 1-11,14: Aborted
+slurmstepd: error:  mpi/pmix_v3: _errhandler: lrdn3001 [0]: pmixp_client_v2.c:212: Error handler invoked: status = -25, source = [slurm.pmix.33530281.0:4]
+slurmstepd: error: *** STEP 33530281.0 ON lrdn3001 CANCELLED AT 2026-02-05T11:29:42 ***
+srun: Job step aborted: Waiting up to 182 seconds for job step to finish.
+srun: error: lrdn3001: tasks 12-13,15-29: Killed
+srun: error: lrdn3001: task 0: Killed
+srun: error: lrdn3007: tasks 90-119: Killed

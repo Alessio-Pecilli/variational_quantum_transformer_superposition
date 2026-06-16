@@ -1,0 +1,6 @@
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/qiskit/synthesis/unitary/qsd.py:220: RuntimeWarning: underflow encountered in matmul
+  UX = VX @ WXdg
+/leonardo_work/IscrC_QuSALa/venv_py311/lib/python3.11/site-packages/scipy/_lib/pyprima/common/preproc.py:68: UserWarning: COBYLA: Invalid MAXFUN; it should be at least num_vars + 2; it is set to 4578
+  warn(f'{solver}: Invalid MAXFUN; it should be at least {min_maxfun_str}; it is set to {maxfun}')
+srun: Job step aborted: Waiting up to 182 seconds for job step to finish.
+slurmstepd: error: *** JOB 33561875 ON lrdn0981 CANCELLED AT 2026-02-05T13:04:50 ***
