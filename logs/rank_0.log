@@ -2747,3 +2747,337 @@
 2026-02-05 14:35:30,108 [INFO] [rank=0] [COMPLETE] - Summaries: results/run_20260205_135438_seed42/summaries
 2026-02-05 14:35:30,108 [INFO] [rank=0] [COMPLETE] - Plots: results/run_20260205_135438_seed42/plots
 2026-02-05 14:35:30,108 [INFO] [rank=0] [COMPLETE] - Matrici: results/run_20260205_135438_seed42/matrices
+2026-06-16 22:19:54,030 [INFO] [rank=0] [MPI] Avvio backend distribuito JAX+PennyLane su 1 rank
+2026-06-16 22:19:54,144 [INFO] [rank=0] [DATA] Frasi testuali caricate: 4 | lunghezza=5
+2026-06-16 22:19:56,128 [INFO] [rank=0] [TRAIN] Backend JAX+PennyLane+MPI | epochs=2 | lr=0.001 | padded_sequence_length=8
+2026-06-16 22:19:56,128 [INFO] [rank=0] [MPI] ranks=1 | sample_globali=4 | sample_locali_medi~=4
+2026-06-16 22:19:56,128 [INFO] [rank=0] [TRAIN] Warmup JIT alla prima iterazione di ogni rank
+2026-06-16 22:20:28,830 [INFO] [rank=0] [TRAIN] Epoch 0001/0002 | loss=5.93698808
+2026-06-16 22:20:28,861 [INFO] [rank=0] [TRAIN] Epoch 0002/0002 | loss=5.84820418
+2026-06-16 22:20:28,861 [INFO] [rank=0] [CV] Inizio valutazione post-training
+2026-06-16 22:20:28,968 [INFO] [rank=0] [DATA] Frasi testuali caricate: 4 | lunghezza=5
+2026-06-16 22:20:41,560 [INFO] [rank=0] [SAVE] Run completata: results\run_20260616_222039_seed42
+2026-06-16 22:20:41,560 [INFO] [rank=0] [SAVE] Matrici: results\run_20260616_222039_seed42\matrices
+2026-06-16 22:20:41,561 [INFO] [rank=0] [SAVE] Parametri: results\run_20260616_222039_seed42\parameters
+2026-06-16 22:20:41,561 [INFO] [rank=0] [SAVE] Summary: results\run_20260616_222039_seed42\summaries
+2026-06-16 22:20:41,561 [INFO] [rank=0] [SAVE] Plots: results\run_20260616_222039_seed42\plots
+2026-06-16 22:20:42,544 [INFO] [rank=0] [Rank 0] Uscita pulita (exit=0)
+2026-06-16 22:22:50,813 [INFO] [rank=0] [MPI] Avvio backend distribuito JAX+PennyLane su 1 rank
+2026-06-16 22:22:50,910 [INFO] [rank=0] [DATA] Frasi testuali caricate: 4 | lunghezza=5
+2026-06-16 22:22:52,696 [INFO] [rank=0] [TRAIN] Backend JAX+PennyLane+MPI | epochs=2 | lr=0.001 | padded_sequence_length=8
+2026-06-16 22:22:52,696 [INFO] [rank=0] [MPI] ranks=1 | sample_globali=4 | sample_locali_medi~=4
+2026-06-16 22:22:52,696 [INFO] [rank=0] [TRAIN] Warmup JIT alla prima iterazione di ogni rank
+2026-06-16 22:23:20,745 [INFO] [rank=0] [TRAIN] Epoch 0001/0002 | loss=5.93698808
+2026-06-16 22:23:20,773 [INFO] [rank=0] [TRAIN] Epoch 0002/0002 | loss=5.84820418
+2026-06-16 22:23:20,774 [INFO] [rank=0] [CV] Inizio valutazione post-training
+2026-06-16 22:23:20,868 [INFO] [rank=0] [DATA] Frasi testuali caricate: 4 | lunghezza=5
+2026-06-16 22:23:31,786 [INFO] [rank=0] [SAVE] Run completata: results\run_20260616_222330_seed42
+2026-06-16 22:23:31,786 [INFO] [rank=0] [SAVE] Matrici: results\run_20260616_222330_seed42\matrices
+2026-06-16 22:23:31,787 [INFO] [rank=0] [SAVE] Parametri: results\run_20260616_222330_seed42\parameters
+2026-06-16 22:23:31,787 [INFO] [rank=0] [SAVE] Summary: results\run_20260616_222330_seed42\summaries
+2026-06-16 22:23:31,787 [INFO] [rank=0] [SAVE] Plots: results\run_20260616_222330_seed42\plots
+2026-06-16 22:23:32,756 [INFO] [rank=0] [Rank 0] Uscita pulita (exit=0)
+2026-06-16 22:33:24,267 [INFO] [rank=0] [MPI] Avvio backend distribuito JAX+PennyLane su 1 rank
+2026-06-16 22:33:24,373 [INFO] [rank=0] [DATA] Frasi testuali caricate: 100 | lunghezza=5
+2026-06-16 22:33:24,374 [INFO] [rank=0] [DATA] Split frasi | train=80 | test=20
+2026-06-16 22:33:26,759 [INFO] [rank=0] [TRAIN] Backend JAX+PennyLane+MPI | epochs=2000 | lr=0.001 | padded_sequence_length=8
+2026-06-16 22:33:26,759 [INFO] [rank=0] [MPI] ranks=1 | sample_globali=80 | sample_locali_medi~=80
+2026-06-16 22:33:26,759 [INFO] [rank=0] [TRAIN] Time budget attivo: 0.50 ore (~30.0 minuti)
+2026-06-16 22:33:26,759 [INFO] [rank=0] [TRAIN] Warmup JIT alla prima iterazione di ogni rank
+2026-06-16 22:34:59,916 [INFO] [rank=0] [TRAIN] Epoch 0001/2000 | opt_loss=5.58961234 | train_loss=5.51356531 | train_ppl=246.76035951 | test_loss=5.59308356 | test_ppl=266.22666242
+2026-06-16 22:35:03,027 [INFO] [rank=0] [TRAIN] Epoch 0010/2000 | opt_loss=5.05582512
+2026-06-16 22:35:06,628 [INFO] [rank=0] [TRAIN] Epoch 0020/2000 | opt_loss=4.69665099
+2026-06-16 22:35:31,621 [INFO] [rank=0] [TRAIN] Epoch 0030/2000 | opt_loss=4.43812505
+2026-06-16 22:35:35,057 [INFO] [rank=0] [TRAIN] Epoch 0040/2000 | opt_loss=4.23153666
+2026-06-16 22:35:59,864 [INFO] [rank=0] [TRAIN] Epoch 0050/2000 | opt_loss=4.05339429 | train_loss=4.03674344 | train_ppl=56.46270930 | test_loss=3.97325414 | test_ppl=52.97348915
+2026-06-16 22:36:03,125 [INFO] [rank=0] [TRAIN] Epoch 0060/2000 | opt_loss=3.89429381
+2026-06-16 22:36:06,347 [INFO] [rank=0] [TRAIN] Epoch 0070/2000 | opt_loss=3.74864336
+2026-06-16 22:36:30,125 [INFO] [rank=0] [TRAIN] Epoch 0080/2000 | opt_loss=3.61299668
+2026-06-16 22:36:33,399 [INFO] [rank=0] [TRAIN] Epoch 0090/2000 | opt_loss=3.48508104
+2026-06-16 22:36:57,532 [INFO] [rank=0] [TRAIN] Epoch 0100/2000 | opt_loss=3.36260782 | train_loss=3.35054608 | train_ppl=28.08032269 | test_loss=3.24160192 | test_ppl=25.42845850
+2026-06-16 22:37:00,741 [INFO] [rank=0] [TRAIN] Epoch 0110/2000 | opt_loss=3.24234691
+2026-06-16 22:37:04,003 [INFO] [rank=0] [TRAIN] Epoch 0120/2000 | opt_loss=3.12058291
+2026-06-16 22:37:27,710 [INFO] [rank=0] [TRAIN] Epoch 0130/2000 | opt_loss=2.99641183
+2026-06-16 22:37:30,946 [INFO] [rank=0] [TRAIN] Epoch 0140/2000 | opt_loss=2.87289822
+2026-06-16 22:37:54,453 [INFO] [rank=0] [TRAIN] Epoch 0150/2000 | opt_loss=2.75375837 | train_loss=2.74218372 | train_ppl=15.42300091 | test_loss=2.67625228 | test_ppl=14.50538660
+2026-06-16 22:37:57,822 [INFO] [rank=0] [TRAIN] Epoch 0160/2000 | opt_loss=2.64113978
+2026-06-16 22:38:01,058 [INFO] [rank=0] [TRAIN] Epoch 0170/2000 | opt_loss=2.53558760
+2026-06-16 22:38:24,972 [INFO] [rank=0] [TRAIN] Epoch 0180/2000 | opt_loss=2.43679492
+2026-06-16 22:38:28,238 [INFO] [rank=0] [TRAIN] Epoch 0190/2000 | opt_loss=2.34419003
+2026-06-16 22:38:51,961 [INFO] [rank=0] [TRAIN] Epoch 0200/2000 | opt_loss=2.25718428 | train_loss=2.24877013 | train_ppl=9.45709653 | test_loss=2.22076193 | test_ppl=9.21142124
+2026-06-16 22:38:55,168 [INFO] [rank=0] [TRAIN] Epoch 0210/2000 | opt_loss=2.17522734
+2026-06-16 22:38:58,429 [INFO] [rank=0] [TRAIN] Epoch 0220/2000 | opt_loss=2.09780422
+2026-06-16 22:39:22,327 [INFO] [rank=0] [TRAIN] Epoch 0230/2000 | opt_loss=2.02442703
+2026-06-16 22:39:25,614 [INFO] [rank=0] [TRAIN] Epoch 0240/2000 | opt_loss=1.95463632
+2026-06-16 22:39:49,291 [INFO] [rank=0] [TRAIN] Epoch 0250/2000 | opt_loss=1.88801402 | train_loss=1.88151173 | train_ppl=6.55898014 | test_loss=1.86815053 | test_ppl=6.47561635
+2026-06-16 22:39:52,617 [INFO] [rank=0] [TRAIN] Epoch 0260/2000 | opt_loss=1.82420666
+2026-06-16 22:39:56,318 [INFO] [rank=0] [TRAIN] Epoch 0270/2000 | opt_loss=1.76295477
+2026-06-16 22:40:23,861 [INFO] [rank=0] [TRAIN] Epoch 0280/2000 | opt_loss=1.70411840
+2026-06-16 22:40:27,123 [INFO] [rank=0] [TRAIN] Epoch 0290/2000 | opt_loss=1.64768475
+2026-06-16 22:40:51,036 [INFO] [rank=0] [TRAIN] Epoch 0300/2000 | opt_loss=1.59374654 | train_loss=1.58849554 | train_ppl=4.89540341 | test_loss=1.58022251 | test_ppl=4.85591123
+2026-06-16 22:40:54,134 [INFO] [rank=0] [TRAIN] Epoch 0310/2000 | opt_loss=1.54245227
+2026-06-16 22:40:57,228 [INFO] [rank=0] [TRAIN] Epoch 0320/2000 | opt_loss=1.49394288
+2026-06-16 22:41:19,335 [INFO] [rank=0] [TRAIN] Epoch 0330/2000 | opt_loss=1.44829534
+2026-06-16 22:41:22,359 [INFO] [rank=0] [TRAIN] Epoch 0340/2000 | opt_loss=1.40548980
+2026-06-16 22:41:44,250 [INFO] [rank=0] [TRAIN] Epoch 0350/2000 | opt_loss=1.36540565 | train_loss=1.36153965 | train_ppl=3.90166051 | test_loss=1.35441651 | test_ppl=3.87446428
+2026-06-16 22:41:47,254 [INFO] [rank=0] [TRAIN] Epoch 0360/2000 | opt_loss=1.32783944
+2026-06-16 22:41:50,295 [INFO] [rank=0] [TRAIN] Epoch 0370/2000 | opt_loss=1.29253123
+2026-06-16 22:42:12,324 [INFO] [rank=0] [TRAIN] Epoch 0380/2000 | opt_loss=1.25918976
+2026-06-16 22:42:15,380 [INFO] [rank=0] [TRAIN] Epoch 0390/2000 | opt_loss=1.22751598
+2026-06-16 22:42:37,798 [INFO] [rank=0] [TRAIN] Epoch 0400/2000 | opt_loss=1.19722767 | train_loss=1.19426529 | train_ppl=3.30052513 | test_loss=1.18964129 | test_ppl=3.28561065
+2026-06-16 22:42:40,888 [INFO] [rank=0] [TRAIN] Epoch 0410/2000 | opt_loss=1.16808357
+2026-06-16 22:42:44,001 [INFO] [rank=0] [TRAIN] Epoch 0420/2000 | opt_loss=1.13990021
+2026-06-16 22:43:07,703 [INFO] [rank=0] [TRAIN] Epoch 0430/2000 | opt_loss=1.11255398
+2026-06-16 22:43:11,482 [INFO] [rank=0] [TRAIN] Epoch 0440/2000 | opt_loss=1.08596873
+2026-06-16 22:43:34,609 [INFO] [rank=0] [TRAIN] Epoch 0450/2000 | opt_loss=1.06010091 | train_loss=1.05755273 | train_ppl=2.87881112 | test_loss=1.05622942 | test_ppl=2.87497275
+2026-06-16 22:43:37,841 [INFO] [rank=0] [TRAIN] Epoch 0460/2000 | opt_loss=1.03493476
+2026-06-16 22:43:40,976 [INFO] [rank=0] [TRAIN] Epoch 0470/2000 | opt_loss=1.01047790
+2026-06-16 22:44:03,291 [INFO] [rank=0] [TRAIN] Epoch 0480/2000 | opt_loss=0.98672133
+2026-06-16 22:44:06,427 [INFO] [rank=0] [TRAIN] Epoch 0490/2000 | opt_loss=0.96358797
+2026-06-16 22:44:28,781 [INFO] [rank=0] [TRAIN] Epoch 0500/2000 | opt_loss=0.94101130 | train_loss=0.93878332 | train_ppl=2.55647787 | test_loss=0.93979870 | test_ppl=2.55880266
+2026-06-16 22:44:31,835 [INFO] [rank=0] [TRAIN] Epoch 0510/2000 | opt_loss=0.91896896
+2026-06-16 22:44:34,878 [INFO] [rank=0] [TRAIN] Epoch 0520/2000 | opt_loss=0.89744492
+2026-06-16 22:44:57,211 [INFO] [rank=0] [TRAIN] Epoch 0530/2000 | opt_loss=0.87642741
+2026-06-16 22:45:00,280 [INFO] [rank=0] [TRAIN] Epoch 0540/2000 | opt_loss=0.85590489
+2026-06-16 22:45:23,151 [INFO] [rank=0] [TRAIN] Epoch 0550/2000 | opt_loss=0.83586618 | train_loss=0.83388852 | train_ppl=2.30194685 | test_loss=0.83589145 | test_ppl=2.30622349
+2026-06-16 22:45:26,239 [INFO] [rank=0] [TRAIN] Epoch 0560/2000 | opt_loss=0.81630120
+2026-06-16 22:45:29,333 [INFO] [rank=0] [TRAIN] Epoch 0570/2000 | opt_loss=0.79720044
+2026-06-16 22:45:51,951 [INFO] [rank=0] [TRAIN] Epoch 0580/2000 | opt_loss=0.77855480
+2026-06-16 22:45:55,033 [INFO] [rank=0] [TRAIN] Epoch 0590/2000 | opt_loss=0.76035554
+2026-06-16 22:46:17,813 [INFO] [rank=0] [TRAIN] Epoch 0600/2000 | opt_loss=0.74259418 | train_loss=0.74084181 | train_ppl=2.09745730 | test_loss=0.74358761 | test_ppl=2.10286099
+2026-06-16 22:46:20,844 [INFO] [rank=0] [TRAIN] Epoch 0610/2000 | opt_loss=0.72526249
+2026-06-16 22:46:23,901 [INFO] [rank=0] [TRAIN] Epoch 0620/2000 | opt_loss=0.70835240
+2026-06-16 22:46:46,212 [INFO] [rank=0] [TRAIN] Epoch 0630/2000 | opt_loss=0.69185599
+2026-06-16 22:46:49,300 [INFO] [rank=0] [TRAIN] Epoch 0640/2000 | opt_loss=0.67576546
+2026-06-16 22:47:11,678 [INFO] [rank=0] [TRAIN] Epoch 0650/2000 | opt_loss=0.66007311 | train_loss=0.65852549 | train_ppl=1.93174417 | test_loss=0.66177321 | test_ppl=1.93766949
+2026-06-16 22:47:14,712 [INFO] [rank=0] [TRAIN] Epoch 0660/2000 | opt_loss=0.64477131
+2026-06-16 22:47:17,762 [INFO] [rank=0] [TRAIN] Epoch 0670/2000 | opt_loss=0.62985249
+2026-06-16 22:47:40,120 [INFO] [rank=0] [TRAIN] Epoch 0680/2000 | opt_loss=0.61530913
+2026-06-16 22:47:43,194 [INFO] [rank=0] [TRAIN] Epoch 0690/2000 | opt_loss=0.60113374
+2026-06-16 22:48:05,646 [INFO] [rank=0] [TRAIN] Epoch 0700/2000 | opt_loss=0.58731889 | train_loss=0.58595695 | train_ppl=1.79654494 | test_loss=0.58949426 | test_ppl=1.80257570
+2026-06-16 22:48:08,687 [INFO] [rank=0] [TRAIN] Epoch 0710/2000 | opt_loss=0.57385715
+2026-06-16 22:48:11,806 [INFO] [rank=0] [TRAIN] Epoch 0720/2000 | opt_loss=0.56074116
+2026-06-16 22:48:34,460 [INFO] [rank=0] [TRAIN] Epoch 0730/2000 | opt_loss=0.54796356
+2026-06-16 22:48:37,528 [INFO] [rank=0] [TRAIN] Epoch 0740/2000 | opt_loss=0.53551706
+2026-06-16 22:48:59,801 [INFO] [rank=0] [TRAIN] Epoch 0750/2000 | opt_loss=0.52339440 | train_loss=0.52219966 | train_ppl=1.68559023 | test_loss=0.52586966 | test_ppl=1.69148275
+2026-06-16 22:49:02,888 [INFO] [rank=0] [TRAIN] Epoch 0760/2000 | opt_loss=0.51158838
+2026-06-16 22:49:05,981 [INFO] [rank=0] [TRAIN] Epoch 0770/2000 | opt_loss=0.50009188
+2026-06-16 22:49:28,406 [INFO] [rank=0] [TRAIN] Epoch 0780/2000 | opt_loss=0.48889783
+2026-06-16 22:49:31,478 [INFO] [rank=0] [TRAIN] Epoch 0790/2000 | opt_loss=0.47799926
+2026-06-16 22:49:53,794 [INFO] [rank=0] [TRAIN] Epoch 0800/2000 | opt_loss=0.46738926 | train_loss=0.46634387 | train_ppl=1.59402979 | test_loss=0.47003092 | test_ppl=1.59964430
+2026-06-16 22:49:56,846 [INFO] [rank=0] [TRAIN] Epoch 0810/2000 | opt_loss=0.45706103
+2026-06-16 22:49:59,913 [INFO] [rank=0] [TRAIN] Epoch 0820/2000 | opt_loss=0.44700789
+2026-06-16 22:50:22,423 [INFO] [rank=0] [TRAIN] Epoch 0830/2000 | opt_loss=0.43722323
+2026-06-16 22:50:25,563 [INFO] [rank=0] [TRAIN] Epoch 0840/2000 | opt_loss=0.42770057
+2026-06-16 22:50:48,546 [INFO] [rank=0] [TRAIN] Epoch 0850/2000 | opt_loss=0.41843353 | train_loss=0.41752065 | train_ppl=1.51807814 | test_loss=0.42113144 | test_ppl=1.52332557
+2026-06-16 22:50:51,710 [INFO] [rank=0] [TRAIN] Epoch 0860/2000 | opt_loss=0.40941586
+2026-06-16 22:50:54,843 [INFO] [rank=0] [TRAIN] Epoch 0870/2000 | opt_loss=0.40064139
+2026-06-16 22:51:17,176 [INFO] [rank=0] [TRAIN] Epoch 0880/2000 | opt_loss=0.39210407
+2026-06-16 22:51:20,269 [INFO] [rank=0] [TRAIN] Epoch 0890/2000 | opt_loss=0.38379795
+2026-06-16 22:51:42,594 [INFO] [rank=0] [TRAIN] Epoch 0900/2000 | opt_loss=0.37571718 | train_loss=0.37492127 | train_ppl=1.45476876 | test_loss=0.37837848 | test_ppl=1.45959029
+2026-06-16 22:51:45,687 [INFO] [rank=0] [TRAIN] Epoch 0910/2000 | opt_loss=0.36785598
+2026-06-16 22:51:48,831 [INFO] [rank=0] [TRAIN] Epoch 0920/2000 | opt_loss=0.36020865
+2026-06-16 22:52:11,108 [INFO] [rank=0] [TRAIN] Epoch 0930/2000 | opt_loss=0.35276955
+2026-06-16 22:52:14,197 [INFO] [rank=0] [TRAIN] Epoch 0940/2000 | opt_loss=0.34553312
+2026-06-16 22:52:36,508 [INFO] [rank=0] [TRAIN] Epoch 0950/2000 | opt_loss=0.33849381 | train_loss=0.33780050 | train_ppl=1.40175625 | test_loss=0.34104897 | test_ppl=1.40612530
+2026-06-16 22:52:39,576 [INFO] [rank=0] [TRAIN] Epoch 0960/2000 | opt_loss=0.33164614
+2026-06-16 22:52:42,682 [INFO] [rank=0] [TRAIN] Epoch 0970/2000 | opt_loss=0.32498468
+2026-06-16 22:53:04,952 [INFO] [rank=0] [TRAIN] Epoch 0980/2000 | opt_loss=0.31850405
+2026-06-16 22:53:08,067 [INFO] [rank=0] [TRAIN] Epoch 0990/2000 | opt_loss=0.31219894
+2026-06-16 22:53:30,282 [INFO] [rank=0] [TRAIN] Epoch 1000/2000 | opt_loss=0.30606412 | train_loss=0.30545981 | train_ppl=1.35714653 | test_loss=0.30847681 | test_ppl=1.36107708
+2026-06-16 22:53:33,346 [INFO] [rank=0] [TRAIN] Epoch 1010/2000 | opt_loss=0.30009449
+2026-06-16 22:53:36,443 [INFO] [rank=0] [TRAIN] Epoch 1020/2000 | opt_loss=0.29428505
+2026-06-16 22:53:58,741 [INFO] [rank=0] [TRAIN] Epoch 1030/2000 | opt_loss=0.28863096
+2026-06-16 22:54:01,823 [INFO] [rank=0] [TRAIN] Epoch 1040/2000 | opt_loss=0.28312753
+2026-06-16 22:54:24,166 [INFO] [rank=0] [TRAIN] Epoch 1050/2000 | opt_loss=0.27777022 | train_loss=0.27724236 | train_ppl=1.31938582 | test_loss=0.28003070 | test_ppl=1.32291835
+2026-06-16 22:54:27,230 [INFO] [rank=0] [TRAIN] Epoch 1060/2000 | opt_loss=0.27255466
+2026-06-16 22:54:30,307 [INFO] [rank=0] [TRAIN] Epoch 1070/2000 | opt_loss=0.26747663
+2026-06-16 22:54:53,864 [INFO] [rank=0] [TRAIN] Epoch 1080/2000 | opt_loss=0.26253207
+2026-06-16 22:54:57,135 [INFO] [rank=0] [TRAIN] Epoch 1090/2000 | opt_loss=0.25771705
+2026-06-16 22:55:22,245 [INFO] [rank=0] [TRAIN] Epoch 1100/2000 | opt_loss=0.25302779 | train_loss=0.25256564 | train_ppl=1.28722625 | test_loss=0.25513248 | test_ppl=1.29039884
+2026-06-16 22:55:25,762 [INFO] [rank=0] [TRAIN] Epoch 1110/2000 | opt_loss=0.24846062
+2026-06-16 22:55:29,333 [INFO] [rank=0] [TRAIN] Epoch 1120/2000 | opt_loss=0.24401201
+2026-06-16 22:55:53,264 [INFO] [rank=0] [TRAIN] Epoch 1130/2000 | opt_loss=0.23967853
+2026-06-16 22:55:57,305 [INFO] [rank=0] [TRAIN] Epoch 1140/2000 | opt_loss=0.23545687
+2026-06-16 22:56:20,398 [INFO] [rank=0] [TRAIN] Epoch 1150/2000 | opt_loss=0.23134382 | train_loss=0.23093837 | train_ppl=1.25968678 | test_loss=0.23328822 | test_ppl=1.26252798
+2026-06-16 22:56:23,951 [INFO] [rank=0] [TRAIN] Epoch 1160/2000 | opt_loss=0.22733628
+2026-06-16 22:56:27,505 [INFO] [rank=0] [TRAIN] Epoch 1170/2000 | opt_loss=0.22343122
+2026-06-16 22:56:53,842 [INFO] [rank=0] [TRAIN] Epoch 1180/2000 | opt_loss=0.21962575
+2026-06-16 22:56:57,208 [INFO] [rank=0] [TRAIN] Epoch 1190/2000 | opt_loss=0.21591703
+2026-06-16 22:57:21,747 [INFO] [rank=0] [TRAIN] Epoch 1200/2000 | opt_loss=0.21230232 | train_loss=0.21194592 | train_ppl=1.23598935 | test_loss=0.21408253 | test_ppl=1.23852218
+2026-06-16 22:57:24,989 [INFO] [rank=0] [TRAIN] Epoch 1210/2000 | opt_loss=0.20877899
+2026-06-16 22:57:28,202 [INFO] [rank=0] [TRAIN] Epoch 1220/2000 | opt_loss=0.20534446
+2026-06-16 22:57:53,119 [INFO] [rank=0] [TRAIN] Epoch 1230/2000 | opt_loss=0.20199625
+2026-06-16 22:57:56,616 [INFO] [rank=0] [TRAIN] Epoch 1240/2000 | opt_loss=0.19873195
+2026-06-16 22:58:20,908 [INFO] [rank=0] [TRAIN] Epoch 1250/2000 | opt_loss=0.19554922 | train_loss=0.19523534 | train_ppl=1.21550856 | test_loss=0.19716240 | test_ppl=1.21775244
+2026-06-16 22:58:24,423 [INFO] [rank=0] [TRAIN] Epoch 1260/2000 | opt_loss=0.19244580
+2026-06-16 22:58:27,894 [INFO] [rank=0] [TRAIN] Epoch 1270/2000 | opt_loss=0.18941951
+2026-06-16 22:58:51,945 [INFO] [rank=0] [TRAIN] Epoch 1280/2000 | opt_loss=0.18646822
+2026-06-16 22:58:55,137 [INFO] [rank=0] [TRAIN] Epoch 1290/2000 | opt_loss=0.18358988
+2026-06-16 22:59:18,092 [INFO] [rank=0] [TRAIN] Epoch 1300/2000 | opt_loss=0.18078249 | train_loss=0.18050558 | train_ppl=1.19773754 | test_loss=0.18222661 | test_ppl=1.19970889
+2026-06-16 22:59:21,326 [INFO] [rank=0] [TRAIN] Epoch 1310/2000 | opt_loss=0.17804412
+2026-06-16 22:59:24,459 [INFO] [rank=0] [TRAIN] Epoch 1320/2000 | opt_loss=0.17537291
+2026-06-16 22:59:47,161 [INFO] [rank=0] [TRAIN] Epoch 1330/2000 | opt_loss=0.17276702
+2026-06-16 22:59:50,337 [INFO] [rank=0] [TRAIN] Epoch 1340/2000 | opt_loss=0.17022472
+2026-06-16 23:00:13,052 [INFO] [rank=0] [TRAIN] Epoch 1350/2000 | opt_loss=0.16774428 | train_loss=0.16749957 | train_ppl=1.18226268 | test_loss=0.16901794 | test_ppl=1.18397545
+2026-06-16 23:00:16,155 [INFO] [rank=0] [TRAIN] Epoch 1360/2000 | opt_loss=0.16532406
+2026-06-16 23:00:19,277 [INFO] [rank=0] [TRAIN] Epoch 1370/2000 | opt_loss=0.16296245
+2026-06-16 23:00:42,043 [INFO] [rank=0] [TRAIN] Epoch 1380/2000 | opt_loss=0.16065789
+2026-06-16 23:00:45,155 [INFO] [rank=0] [TRAIN] Epoch 1390/2000 | opt_loss=0.15840888
+2026-06-16 23:01:07,735 [INFO] [rank=0] [TRAIN] Epoch 1400/2000 | opt_loss=0.15621395 | train_loss=0.15599738 | train_ppl=1.16874409 | test_loss=0.15731637 | test_ppl=1.17021035
+2026-06-16 23:01:10,881 [INFO] [rank=0] [TRAIN] Epoch 1410/2000 | opt_loss=0.15407168
+2026-06-16 23:01:14,008 [INFO] [rank=0] [TRAIN] Epoch 1420/2000 | opt_loss=0.15198068
+2026-06-16 23:01:36,546 [INFO] [rank=0] [TRAIN] Epoch 1430/2000 | opt_loss=0.14993962
+2026-06-16 23:01:39,616 [INFO] [rank=0] [TRAIN] Epoch 1440/2000 | opt_loss=0.14794720
+2026-06-16 23:02:02,061 [INFO] [rank=0] [TRAIN] Epoch 1450/2000 | opt_loss=0.14600215 | train_loss=0.14581020 | train_ppl=1.15690048 | test_loss=0.14693317 | test_ppl=1.15813085
+2026-06-16 23:02:05,292 [INFO] [rank=0] [TRAIN] Epoch 1460/2000 | opt_loss=0.14410324
+2026-06-16 23:02:08,372 [INFO] [rank=0] [TRAIN] Epoch 1470/2000 | opt_loss=0.14224930
+2026-06-16 23:02:30,813 [INFO] [rank=0] [TRAIN] Epoch 1480/2000 | opt_loss=0.14043914
+2026-06-16 23:02:33,901 [INFO] [rank=0] [TRAIN] Epoch 1490/2000 | opt_loss=0.13867166
+2026-06-16 23:02:56,440 [INFO] [rank=0] [TRAIN] Epoch 1500/2000 | opt_loss=0.13694575 | train_loss=0.13677541 | train_ppl=1.14649733 | test_loss=0.13770589 | test_ppl=1.14750144
+2026-06-16 23:02:59,463 [INFO] [rank=0] [TRAIN] Epoch 1510/2000 | opt_loss=0.13526036
+2026-06-16 23:03:02,533 [INFO] [rank=0] [TRAIN] Epoch 1520/2000 | opt_loss=0.13361445
+2026-06-16 23:03:25,119 [INFO] [rank=0] [TRAIN] Epoch 1530/2000 | opt_loss=0.13200701
+2026-06-16 23:03:26,965 [INFO] [rank=0] [TRAIN] Stop per budget temporale raggiunto a epoch=1536
+2026-06-16 23:03:26,965 [INFO] [rank=0] [EVAL] Valutazione finale su train/test holdout
+2026-06-16 23:03:48,244 [INFO] [rank=0] [EVAL] Final train | loss=0.13090416 | ppl=1.13978722
+2026-06-16 23:03:48,244 [INFO] [rank=0] [EVAL] Final test  | loss=0.13169836 | ppl=1.14063392
+2026-06-16 23:03:48,244 [INFO] [rank=0] [SAVE] Run completata: results\run_20260616_230346_seed42
+2026-06-16 23:03:48,245 [INFO] [rank=0] [SAVE] Matrici: results\run_20260616_230346_seed42\matrices
+2026-06-16 23:03:48,245 [INFO] [rank=0] [SAVE] Parametri: results\run_20260616_230346_seed42\parameters
+2026-06-16 23:03:48,245 [INFO] [rank=0] [SAVE] Summary: results\run_20260616_230346_seed42\summaries
+2026-06-16 23:03:48,245 [INFO] [rank=0] [SAVE] Plots: results\run_20260616_230346_seed42\plots
+2026-06-16 23:03:49,217 [INFO] [rank=0] [Rank 0] Uscita pulita (exit=0)
+2026-06-16 23:05:18,771 [INFO] [rank=0] [MPI] Avvio backend distribuito JAX+PennyLane su 1 rank
+2026-06-16 23:05:18,854 [INFO] [rank=0] [DATA] Frasi testuali caricate: 5 | lunghezza=10
+2026-06-16 23:05:18,854 [INFO] [rank=0] [DATA] Split frasi | train=4 | test=1
+2026-06-16 23:05:20,617 [INFO] [rank=0] [TRAIN] Backend JAX+PennyLane+MPI | epochs=2000 | lr=0.001 | padded_sequence_length=16
+2026-06-16 23:05:20,618 [INFO] [rank=0] [MPI] ranks=1 | sample_globali=4 | sample_locali_medi~=4
+2026-06-16 23:05:20,618 [INFO] [rank=0] [TRAIN] Time budget attivo: 0.50 ore (~30.0 minuti)
+2026-06-16 23:05:20,618 [INFO] [rank=0] [TRAIN] Warmup JIT alla prima iterazione di ogni rank
+2026-06-16 23:07:02,273 [INFO] [rank=0] [TRAIN] Epoch 0001/2000 | opt_loss=7.35827323 | train_loss=7.11304129 | train_ppl=1227.87619519 | test_loss=7.11304129 | test_ppl=1227.87619519
+2026-06-16 23:07:03,502 [INFO] [rank=0] [TRAIN] Epoch 0010/2000 | opt_loss=5.79150518
+2026-06-16 23:07:04,872 [INFO] [rank=0] [TRAIN] Epoch 0020/2000 | opt_loss=4.94171788
+2026-06-16 23:07:39,659 [INFO] [rank=0] [TRAIN] Epoch 0030/2000 | opt_loss=4.47451441
+2026-06-16 23:07:41,059 [INFO] [rank=0] [TRAIN] Epoch 0040/2000 | opt_loss=4.18317373
+2026-06-16 23:08:15,428 [INFO] [rank=0] [TRAIN] Epoch 0050/2000 | opt_loss=3.97843546 | train_loss=3.96084280 | train_ppl=52.50155580 | test_loss=3.96084280 | test_ppl=52.50155580
+2026-06-16 23:08:16,864 [INFO] [rank=0] [TRAIN] Epoch 0060/2000 | opt_loss=3.81694138
+2026-06-16 23:08:18,300 [INFO] [rank=0] [TRAIN] Epoch 0070/2000 | opt_loss=3.67598465
+2026-06-16 23:08:57,041 [INFO] [rank=0] [TRAIN] Epoch 0080/2000 | opt_loss=3.54450880
+2026-06-16 23:08:58,613 [INFO] [rank=0] [TRAIN] Epoch 0090/2000 | opt_loss=3.41721335
+2026-06-16 23:09:35,263 [INFO] [rank=0] [TRAIN] Epoch 0100/2000 | opt_loss=3.29171166 | train_loss=3.27921929 | train_ppl=26.55503294 | test_loss=3.27921929 | test_ppl=26.55503294
+2026-06-16 23:09:36,824 [INFO] [rank=0] [TRAIN] Epoch 0110/2000 | opt_loss=3.16726521
+2026-06-16 23:09:38,414 [INFO] [rank=0] [TRAIN] Epoch 0120/2000 | opt_loss=3.04454244
+2026-06-16 23:10:17,231 [INFO] [rank=0] [TRAIN] Epoch 0130/2000 | opt_loss=2.92542104
+2026-06-16 23:10:18,932 [INFO] [rank=0] [TRAIN] Epoch 0140/2000 | opt_loss=2.81240824
+2026-06-16 23:10:54,959 [INFO] [rank=0] [TRAIN] Epoch 0150/2000 | opt_loss=2.70779169 | train_loss=2.69785400 | train_ppl=14.84783407 | test_loss=2.69785400 | test_ppl=14.84783407
+2026-06-16 23:10:56,444 [INFO] [rank=0] [TRAIN] Epoch 0160/2000 | opt_loss=2.61291645
+2026-06-16 23:10:57,957 [INFO] [rank=0] [TRAIN] Epoch 0170/2000 | opt_loss=2.52795290
+2026-06-16 23:11:33,721 [INFO] [rank=0] [TRAIN] Epoch 0180/2000 | opt_loss=2.45214727
+2026-06-16 23:11:35,226 [INFO] [rank=0] [TRAIN] Epoch 0190/2000 | opt_loss=2.38426829
+2026-06-16 23:12:10,609 [INFO] [rank=0] [TRAIN] Epoch 0200/2000 | opt_loss=2.32298919 | train_loss=2.31717630 | train_ppl=10.14698181 | test_loss=2.31717630 | test_ppl=10.14698181
+2026-06-16 23:12:12,217 [INFO] [rank=0] [TRAIN] Epoch 0210/2000 | opt_loss=2.26710855
+2026-06-16 23:12:13,763 [INFO] [rank=0] [TRAIN] Epoch 0220/2000 | opt_loss=2.21563633
+2026-06-16 23:12:49,099 [INFO] [rank=0] [TRAIN] Epoch 0230/2000 | opt_loss=2.16779939
+2026-06-16 23:12:50,568 [INFO] [rank=0] [TRAIN] Epoch 0240/2000 | opt_loss=2.12300887
+2026-06-16 23:13:25,279 [INFO] [rank=0] [TRAIN] Epoch 0250/2000 | opt_loss=2.08081724 | train_loss=2.07672703 | train_ppl=7.97831332 | test_loss=2.07672703 | test_ppl=7.97831332
+2026-06-16 23:13:26,779 [INFO] [rank=0] [TRAIN] Epoch 0260/2000 | opt_loss=2.04087949
+2026-06-16 23:13:28,263 [INFO] [rank=0] [TRAIN] Epoch 0270/2000 | opt_loss=2.00292304
+2026-06-16 23:14:02,950 [INFO] [rank=0] [TRAIN] Epoch 0280/2000 | opt_loss=1.96672633
+2026-06-16 23:14:04,470 [INFO] [rank=0] [TRAIN] Epoch 0290/2000 | opt_loss=1.93210434
+2026-06-16 23:14:39,065 [INFO] [rank=0] [TRAIN] Epoch 0300/2000 | opt_loss=1.89889906 | train_loss=1.89565101 | train_ppl=6.65688072 | test_loss=1.89565101 | test_ppl=6.65688072
+2026-06-16 23:14:40,577 [INFO] [rank=0] [TRAIN] Epoch 0310/2000 | opt_loss=1.86697323
+2026-06-16 23:14:42,062 [INFO] [rank=0] [TRAIN] Epoch 0320/2000 | opt_loss=1.83620623
+2026-06-16 23:15:16,717 [INFO] [rank=0] [TRAIN] Epoch 0330/2000 | opt_loss=1.80649125
+2026-06-16 23:15:18,213 [INFO] [rank=0] [TRAIN] Epoch 0340/2000 | opt_loss=1.77773333
+2026-06-16 23:15:52,935 [INFO] [rank=0] [TRAIN] Epoch 0350/2000 | opt_loss=1.74984783 | train_loss=1.74710428 | train_ppl=5.73796309 | test_loss=1.74710428 | test_ppl=5.73796309
+2026-06-16 23:15:54,371 [INFO] [rank=0] [TRAIN] Epoch 0360/2000 | opt_loss=1.72275932
+2026-06-16 23:15:55,823 [INFO] [rank=0] [TRAIN] Epoch 0370/2000 | opt_loss=1.69640057
+2026-06-16 23:16:32,250 [INFO] [rank=0] [TRAIN] Epoch 0380/2000 | opt_loss=1.67071174
+2026-06-16 23:16:33,791 [INFO] [rank=0] [TRAIN] Epoch 0390/2000 | opt_loss=1.64563961
+2026-06-16 23:17:08,985 [INFO] [rank=0] [TRAIN] Epoch 0400/2000 | opt_loss=1.62113695 | train_loss=1.61871635 | train_ppl=5.04660809 | test_loss=1.61871635 | test_ppl=5.04660809
+2026-06-16 23:17:10,636 [INFO] [rank=0] [TRAIN] Epoch 0410/2000 | opt_loss=1.59716184
+2026-06-16 23:17:12,170 [INFO] [rank=0] [TRAIN] Epoch 0420/2000 | opt_loss=1.57367710
+2026-06-16 23:17:47,208 [INFO] [rank=0] [TRAIN] Epoch 0430/2000 | opt_loss=1.55064978
+2026-06-16 23:17:48,720 [INFO] [rank=0] [TRAIN] Epoch 0440/2000 | opt_loss=1.52805068
+2026-06-16 23:18:23,564 [INFO] [rank=0] [TRAIN] Epoch 0450/2000 | opt_loss=1.50585386 | train_loss=1.50365539 | train_ppl=4.49810137 | test_loss=1.50365539 | test_ppl=4.49810137
+2026-06-16 23:18:25,070 [INFO] [rank=0] [TRAIN] Epoch 0460/2000 | opt_loss=1.48403626
+2026-06-16 23:18:26,582 [INFO] [rank=0] [TRAIN] Epoch 0470/2000 | opt_loss=1.46257737
+2026-06-16 23:19:02,457 [INFO] [rank=0] [TRAIN] Epoch 0480/2000 | opt_loss=1.44145889
+2026-06-16 23:19:03,921 [INFO] [rank=0] [TRAIN] Epoch 0490/2000 | opt_loss=1.42066445
+2026-06-16 23:19:38,859 [INFO] [rank=0] [TRAIN] Epoch 0500/2000 | opt_loss=1.40017938 | train_loss=1.39814737 | train_ppl=4.04769413 | test_loss=1.39814737 | test_ppl=4.04769413
+2026-06-16 23:19:40,337 [INFO] [rank=0] [TRAIN] Epoch 0510/2000 | opt_loss=1.37999053
+2026-06-16 23:19:41,814 [INFO] [rank=0] [TRAIN] Epoch 0520/2000 | opt_loss=1.36008606
+2026-06-16 23:20:16,766 [INFO] [rank=0] [TRAIN] Epoch 0530/2000 | opt_loss=1.34045532
+2026-06-16 23:20:18,275 [INFO] [rank=0] [TRAIN] Epoch 0540/2000 | opt_loss=1.32108874
+2026-06-16 23:20:53,073 [INFO] [rank=0] [TRAIN] Epoch 0550/2000 | opt_loss=1.30197768 | train_loss=1.30008033 | train_ppl=3.66959143 | test_loss=1.30008033 | test_ppl=3.66959143
+2026-06-16 23:20:54,490 [INFO] [rank=0] [TRAIN] Epoch 0560/2000 | opt_loss=1.28311442
+2026-06-16 23:20:55,924 [INFO] [rank=0] [TRAIN] Epoch 0570/2000 | opt_loss=1.26449203
+2026-06-16 23:21:30,614 [INFO] [rank=0] [TRAIN] Epoch 0580/2000 | opt_loss=1.24610434
+2026-06-16 23:21:32,084 [INFO] [rank=0] [TRAIN] Epoch 0590/2000 | opt_loss=1.22794588
+2026-06-16 23:22:06,730 [INFO] [rank=0] [TRAIN] Epoch 0600/2000 | opt_loss=1.21001188 | train_loss=1.20823065 | train_ppl=3.34755642 | test_loss=1.20823065 | test_ppl=3.34755642
+2026-06-16 23:22:08,241 [INFO] [rank=0] [TRAIN] Epoch 0610/2000 | opt_loss=1.19229815
+2026-06-16 23:22:09,770 [INFO] [rank=0] [TRAIN] Epoch 0620/2000 | opt_loss=1.17480114
+2026-06-16 23:22:45,025 [INFO] [rank=0] [TRAIN] Epoch 0630/2000 | opt_loss=1.15751785
+2026-06-16 23:22:46,521 [INFO] [rank=0] [TRAIN] Epoch 0640/2000 | opt_loss=1.14044582
+2026-06-16 23:23:21,253 [INFO] [rank=0] [TRAIN] Epoch 0650/2000 | opt_loss=1.12358310 | train_loss=1.12190828 | train_ppl=3.07070838 | test_loss=1.12190828 | test_ppl=3.07070838
+2026-06-16 23:23:22,782 [INFO] [rank=0] [TRAIN] Epoch 0660/2000 | opt_loss=1.10692822
+2026-06-16 23:23:24,306 [INFO] [rank=0] [TRAIN] Epoch 0670/2000 | opt_loss=1.09048015
+2026-06-16 23:23:58,741 [INFO] [rank=0] [TRAIN] Epoch 0680/2000 | opt_loss=1.07423828
+2026-06-16 23:24:00,245 [INFO] [rank=0] [TRAIN] Epoch 0690/2000 | opt_loss=1.05820239
+2026-06-16 23:24:34,348 [INFO] [rank=0] [TRAIN] Epoch 0700/2000 | opt_loss=1.04237261 | train_loss=1.04080098 | train_ppl=2.83148407 | test_loss=1.04080098 | test_ppl=2.83148407
+2026-06-16 23:24:35,774 [INFO] [rank=0] [TRAIN] Epoch 0710/2000 | opt_loss=1.02674936
+2026-06-16 23:24:37,214 [INFO] [rank=0] [TRAIN] Epoch 0720/2000 | opt_loss=1.01133335
+2026-06-16 23:25:11,455 [INFO] [rank=0] [TRAIN] Epoch 0730/2000 | opt_loss=0.99612554
+2026-06-16 23:25:12,985 [INFO] [rank=0] [TRAIN] Epoch 0740/2000 | opt_loss=0.98112707
+2026-06-16 23:25:47,247 [INFO] [rank=0] [TRAIN] Epoch 0750/2000 | opt_loss=0.96633923 | train_loss=0.96487209 | train_ppl=2.62445193 | test_loss=0.96487209 | test_ppl=2.62445193
+2026-06-16 23:25:48,740 [INFO] [rank=0] [TRAIN] Epoch 0760/2000 | opt_loss=0.95176346
+2026-06-16 23:25:50,220 [INFO] [rank=0] [TRAIN] Epoch 0770/2000 | opt_loss=0.93740125
+2026-06-16 23:26:25,093 [INFO] [rank=0] [TRAIN] Epoch 0780/2000 | opt_loss=0.92325416
+2026-06-16 23:26:26,595 [INFO] [rank=0] [TRAIN] Epoch 0790/2000 | opt_loss=0.90932374
+2026-06-16 23:27:04,634 [INFO] [rank=0] [TRAIN] Epoch 0800/2000 | opt_loss=0.89561150 | train_loss=0.89425234 | train_ppl=2.44550669 | test_loss=0.89425234 | test_ppl=2.44550669
+2026-06-16 23:27:06,392 [INFO] [rank=0] [TRAIN] Epoch 0810/2000 | opt_loss=0.88211892
+2026-06-16 23:27:07,971 [INFO] [rank=0] [TRAIN] Epoch 0820/2000 | opt_loss=0.86884736
+2026-06-16 23:27:46,829 [INFO] [rank=0] [TRAIN] Epoch 0830/2000 | opt_loss=0.85579806
+2026-06-16 23:27:48,591 [INFO] [rank=0] [TRAIN] Epoch 0840/2000 | opt_loss=0.84297212
+2026-06-16 23:28:25,162 [INFO] [rank=0] [TRAIN] Epoch 0850/2000 | opt_loss=0.83037045 | train_loss=0.82912264 | train_ppl=2.29130756 | test_loss=0.82912264 | test_ppl=2.29130756
+2026-06-16 23:28:26,717 [INFO] [rank=0] [TRAIN] Epoch 0860/2000 | opt_loss=0.81799376
+2026-06-16 23:28:28,299 [INFO] [rank=0] [TRAIN] Epoch 0870/2000 | opt_loss=0.80584257
+2026-06-16 23:29:05,042 [INFO] [rank=0] [TRAIN] Epoch 0880/2000 | opt_loss=0.79391716
+2026-06-16 23:29:06,597 [INFO] [rank=0] [TRAIN] Epoch 0890/2000 | opt_loss=0.78221754
+2026-06-16 23:29:41,248 [INFO] [rank=0] [TRAIN] Epoch 0900/2000 | opt_loss=0.77074351 | train_loss=0.76960850 | train_ppl=2.15892087 | test_loss=0.76960850 | test_ppl=2.15892087
+2026-06-16 23:29:42,748 [INFO] [rank=0] [TRAIN] Epoch 0910/2000 | opt_loss=0.75949459
+2026-06-16 23:29:44,251 [INFO] [rank=0] [TRAIN] Epoch 0920/2000 | opt_loss=0.74847002
+2026-06-16 23:30:18,488 [INFO] [rank=0] [TRAIN] Epoch 0930/2000 | opt_loss=0.73766880
+2026-06-16 23:30:20,001 [INFO] [rank=0] [TRAIN] Epoch 0940/2000 | opt_loss=0.72708965
+2026-06-16 23:30:54,028 [INFO] [rank=0] [TRAIN] Epoch 0950/2000 | opt_loss=0.71673103 | train_loss=0.71570723 | train_ppl=2.04563290 | test_loss=0.71570723 | test_ppl=2.04563290
+2026-06-16 23:30:55,538 [INFO] [rank=0] [TRAIN] Epoch 0960/2000 | opt_loss=0.70659114
+2026-06-16 23:30:57,046 [INFO] [rank=0] [TRAIN] Epoch 0970/2000 | opt_loss=0.69666794
+2026-06-16 23:31:30,823 [INFO] [rank=0] [TRAIN] Epoch 0980/2000 | opt_loss=0.68695912
+2026-06-16 23:31:32,336 [INFO] [rank=0] [TRAIN] Epoch 0990/2000 | opt_loss=0.67746214
+2026-06-16 23:32:08,057 [INFO] [rank=0] [TRAIN] Epoch 1000/2000 | opt_loss=0.66817425 | train_loss=0.66725685 | train_ppl=1.94888390 | test_loss=0.66725685 | test_ppl=1.94888390
+2026-06-16 23:32:09,676 [INFO] [rank=0] [TRAIN] Epoch 1010/2000 | opt_loss=0.65917979
+2026-06-16 23:32:11,158 [INFO] [rank=0] [TRAIN] Epoch 1020/2000 | opt_loss=0.65054718
+2026-06-16 23:32:45,222 [INFO] [rank=0] [TRAIN] Epoch 1030/2000 | opt_loss=0.64233759
+2026-06-16 23:32:46,763 [INFO] [rank=0] [TRAIN] Epoch 1040/2000 | opt_loss=0.63418540
+2026-06-16 23:33:20,423 [INFO] [rank=0] [TRAIN] Epoch 1050/2000 | opt_loss=0.62580789 | train_loss=0.62507105 | train_ppl=1.86837870 | test_loss=0.62507105 | test_ppl=1.86837870
+2026-06-16 23:33:21,910 [INFO] [rank=0] [TRAIN] Epoch 1060/2000 | opt_loss=0.61912923
+2026-06-16 23:33:23,393 [INFO] [rank=0] [TRAIN] Epoch 1070/2000 | opt_loss=0.61375526
+2026-06-16 23:33:57,133 [INFO] [rank=0] [TRAIN] Epoch 1080/2000 | opt_loss=0.60517700
+2026-06-16 23:33:58,654 [INFO] [rank=0] [TRAIN] Epoch 1090/2000 | opt_loss=0.59784784
+2026-06-16 23:34:32,357 [INFO] [rank=0] [TRAIN] Epoch 1100/2000 | opt_loss=0.59085147 | train_loss=0.59014205 | train_ppl=1.80424470 | test_loss=0.59014205 | test_ppl=1.80424470
+2026-06-16 23:34:33,910 [INFO] [rank=0] [TRAIN] Epoch 1110/2000 | opt_loss=0.58377276
+2026-06-16 23:34:35,448 [INFO] [rank=0] [TRAIN] Epoch 1120/2000 | opt_loss=0.57883435
+2026-06-16 23:35:09,590 [INFO] [rank=0] [TRAIN] Epoch 1130/2000 | opt_loss=0.57481394
+2026-06-16 23:35:11,098 [INFO] [rank=0] [TRAIN] Epoch 1140/2000 | opt_loss=0.56933810
+2026-06-16 23:35:44,773 [INFO] [rank=0] [TRAIN] Epoch 1150/2000 | opt_loss=0.56372633 | train_loss=0.56306220 | train_ppl=1.75604162 | test_loss=0.56306220 | test_ppl=1.75604162
+2026-06-16 23:35:44,774 [INFO] [rank=0] [TRAIN] Stop per budget temporale raggiunto a epoch=1150
+2026-06-16 23:35:44,774 [INFO] [rank=0] [EVAL] Valutazione finale su train/test holdout
+2026-06-16 23:36:20,084 [INFO] [rank=0] [EVAL] Final train | loss=0.56306220 | ppl=1.75604162
+2026-06-16 23:36:20,085 [INFO] [rank=0] [EVAL] Final test  | loss=0.56306220 | ppl=1.75604162
+2026-06-16 23:36:20,085 [INFO] [rank=0] [SAVE] Run completata: results\run_20260616_233618_seed42
+2026-06-16 23:36:20,085 [INFO] [rank=0] [SAVE] Matrici: results\run_20260616_233618_seed42\matrices
+2026-06-16 23:36:20,085 [INFO] [rank=0] [SAVE] Parametri: results\run_20260616_233618_seed42\parameters
+2026-06-16 23:36:20,085 [INFO] [rank=0] [SAVE] Summary: results\run_20260616_233618_seed42\summaries
+2026-06-16 23:36:20,085 [INFO] [rank=0] [SAVE] Plots: results\run_20260616_233618_seed42\plots
+2026-06-16 23:36:21,498 [INFO] [rank=0] [Rank 0] Uscita pulita (exit=0)

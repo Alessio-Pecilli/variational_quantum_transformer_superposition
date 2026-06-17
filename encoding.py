@@ -1,3 +1,4 @@
+import jax.numpy as jnp
 import numpy as np
 
 from config import (
@@ -148,12 +149,9 @@ class Encoding:
         if isometrize:
             matrix = self.isometrize_matrix(matrix)
             rotation_matrix = self.isometrize_matrix(rotation_matrix)
-        self.embeddingMatrix = matrix
-        self.embeddingMatrix.setflags(write=False)
-        self.rotationMatrix = rotation_matrix
-        self.rotationMatrix.setflags(write=False)
+        self.embeddingMatrix = jnp.asarray(matrix, dtype=jnp.float64)
+        self.rotationMatrix = jnp.asarray(rotation_matrix, dtype=jnp.float64)
         self.outputEmbeddingMatrix = self.embeddingMatrix @ self.rotationMatrix
-        self.outputEmbeddingMatrix.setflags(write=False)
         return self.embeddingMatrix
 
     # ============================================================
@@ -161,36 +159,35 @@ class Encoding:
     # ============================================================
     def _positionalEncoding(self, seqLen):
         dModel = self.embeddingDim
-        position = np.arange(seqLen)[:, np.newaxis]
-        divTerm = np.exp(np.arange(0, dModel, 2) * -(np.log(10000.0) / dModel))
-        pe = np.zeros((seqLen, dModel))
-        pe[:, 0::2] = np.sin(position * divTerm)
-        pe[:, 1::2] = np.cos(position * divTerm)
+        position = jnp.arange(seqLen)[:, jnp.newaxis]
+        divTerm = jnp.exp(jnp.arange(0, dModel, 2) * -(jnp.log(10000.0) / dModel))
+        pe = jnp.zeros((seqLen, dModel), dtype=jnp.float64)
+        pe = pe.at[:, 0::2].set(jnp.sin(position * divTerm))
+        pe = pe.at[:, 1::2].set(jnp.cos(position * divTerm))
         return pe
 
-    def encode_single(self, sentence):
-        """Restituisce (x, x_target) per UNA sola frase."""
+    def encode_tokens(self, sentence):
         words = sentence.split()
-        embeddings = []
-        targets = []
-        full_inputs = []
         unk_idx = self.vocabulary.get("<UNK>")
-        posEnc = self._positionalEncoding(len(words))
+        indices = []
         for word in words:
             if word not in self.vocabulary:
                 if unk_idx is None:
                     raise KeyError(
                         f"Word '{word}' not in fixed vocabulary; embedding matrix is immutable."
                     )
-                idx = unk_idx
+                indices.append(unk_idx)
             else:
-                idx = self.vocabulary[word]
-            embeddings.append(self.embeddingMatrix[idx])
-            targets.append(self.outputEmbeddingMatrix[idx])
+                indices.append(self.vocabulary[word])
+        return jnp.asarray(indices, dtype=jnp.int32)
 
-        for i, base in enumerate(embeddings):
-            full_inputs.append(base + posEnc[i])
-
+    def encode_single(self, sentence):
+        """Restituisce (x, x_target) per UNA sola frase."""
+        token_ids = self.encode_tokens(sentence)
+        posEnc = self._positionalEncoding(token_ids.shape[0])
+        embeddings = self.embeddingMatrix[token_ids]
+        targets = self.outputEmbeddingMatrix[token_ids]
+        full_inputs = embeddings + posEnc
         return full_inputs, targets
 
     def localPsi(self, sentence, wordIdx):
@@ -198,11 +195,11 @@ class Encoding:
         dim = self.embeddingDim
         phrase, _ = self.encode_single(sentence)
         phrase = phrase[:wordIdx]
-        psi = np.zeros(dim * dim)
+        psi = jnp.zeros((dim * dim,), dtype=jnp.float64)
         for t in phrase:
-            t = t / np.linalg.norm(t)
-            psi += np.kron(t, t)
-        return psi / np.linalg.norm(psi)
+            t = t / jnp.linalg.norm(t)
+            psi = psi + jnp.kron(t, t)
+        return psi / jnp.linalg.norm(psi)
 
     def getAllPsi(self, sentence):
         """Calcola tutti i psi di una frase (equivalente a prima ma lazy)."""
@@ -210,10 +207,10 @@ class Encoding:
         dim = self.embeddingDim
         psiList = []
         for wordIdx in range(0, len(phrase) - 1):
-            psi = np.zeros(dim * dim)
+            psi = jnp.zeros((dim * dim,), dtype=jnp.float64)
             for t in phrase[:wordIdx + 1]:
-                t = t / np.linalg.norm(t)
-                psi += np.kron(t, t)
-            psi /= np.linalg.norm(psi)
+                t = t / jnp.linalg.norm(t)
+                psi = psi + jnp.kron(t, t)
+            psi = psi / jnp.linalg.norm(psi)
             psiList.append(psi)
         return psiList

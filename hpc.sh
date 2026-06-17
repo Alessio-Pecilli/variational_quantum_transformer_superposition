@@ -24,6 +24,9 @@ source /leonardo_work/IscrC_QuSALa/venv_py311/bin/activate
 export OMP_NUM_THREADS=1
 export OPENBLAS_NUM_THREADS=1
 export MKL_NUM_THREADS=1
+export PYTHONUTF8=1
+export JAX_ENABLE_X64=True
+export XLA_PYTHON_CLIENT_PREALLOCATE=false
 # Forza UCX a usare i trasporti corretti (InfiniBand e Shared Memory standard)
 export UCX_TLS=self,shm,rc,ud
 # Aumenta i timeout per dare tempo ai rank di scambiarsi gli indirizzi

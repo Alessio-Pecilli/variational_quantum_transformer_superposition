@@ -1,0 +1,16 @@
+epochs_completed=1536
+best_loss=0.13106060
+best_epoch=1536
+stop_reason=time_budget_reached_0.50h
+elapsed_minutes=30.3254
+n_params_total=233
+n_params_quantum=129
+n_params_embedding=88
+n_params_rotation=16
+n_params_projection=0
+train_num_sequences=80
+train_loss_mean=0.13090416
+train_perplexity=1.13978722
+test_num_sequences=20
+test_loss_mean=0.13169836
+test_perplexity=1.14063392

@@ -4,21 +4,22 @@ Visualization and file I/O utilities for quantum optimization.
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
-from qiskit.visualization import circuit_drawer
-from datasets import load_dataset
 
 
 def show_circuit(qc, filename="quantum_attention_circuit.png"):
     """
-    Display a quantum circuit diagram.
+    Persist a lightweight textual representation of a circuit-like object.
     
     Args:
-        qc (QuantumCircuit): Circuit to display
+        qc: Circuit, callable, matrix, or textual object to display
         filename (str): Filename for saving the image
     """
-    circuit_drawer(qc, output="mpl", filename=filename)
-    Image.open(filename).show()
+    description = str(qc)
+    if callable(qc):
+        description = getattr(qc, "__name__", repr(qc))
+    with open(filename, "w", encoding="utf-8") as handle:
+        handle.write(description)
+    print(f"Circuit description saved to: {filename}")
 
 
 def plot_loss_all(losses, best_losses, worst_losses, times=0, nqubit=16, base_name="loss_plot"):
@@ -149,6 +150,8 @@ def get_dataset_sentences(split="train", max_sentences=100):
     Raises:
         ValueError: If split is not available
     """
+    from datasets import load_dataset
+
     dataset_dict = load_dataset("ptb_text_only", trust_remote_code=True)
     if split not in dataset_dict:
         raise ValueError(f"Split '{split}' not available! Valid splits: {list(dataset_dict.keys())}")

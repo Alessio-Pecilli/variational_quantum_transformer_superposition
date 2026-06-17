@@ -17,6 +17,7 @@ Formula Loss: L = -2 ln(1/T * sum(sqrt(p(y_t|x))))
 Formula PPL: exp(L)
 """
 
+import jax.numpy as jnp
 import numpy as np
 from typing import Optional, Tuple
 
@@ -89,7 +90,10 @@ class QuantumStateProjector:
             )
         
         # Reshape to matrix and store (REAL values for now, can extend to complex)
-        self._P_matrix = params.reshape(self.target_dim, self.source_dim)
+        self._P_matrix = jnp.asarray(
+            params.reshape(self.target_dim, self.source_dim),
+            dtype=jnp.complex128,
+        )
     
     def project(self, quantum_state: np.ndarray) -> np.ndarray:
         """
@@ -110,13 +114,13 @@ class QuantumStateProjector:
             )
         
         # Project: embedding = P @ state (matrix-vector multiplication)
+        quantum_state = jnp.asarray(quantum_state, dtype=jnp.complex128)
         embedding = self._P_matrix @ quantum_state
         
         # Normalize to unit norm (preserve quantum state interpretation)
-        norm = np.linalg.norm(embedding)
-        if norm > 1e-10:
-            embedding = embedding / norm
-        
+        norm = jnp.linalg.norm(embedding)
+        embedding = embedding / jnp.maximum(norm, 1e-10)
+
         return embedding
     
     def project_sequence(self, quantum_states: np.ndarray) -> np.ndarray:
@@ -133,11 +137,11 @@ class QuantumStateProjector:
             raise ValueError("P matrix not set. Call set_params() first.")
         
         seq_len = quantum_states.shape[0]
-        embeddings = np.zeros((seq_len, self.target_dim), dtype=complex)
-        
+        embeddings = jnp.zeros((seq_len, self.target_dim), dtype=jnp.complex128)
+
         for i in range(seq_len):
-            embeddings[i] = self.project(quantum_states[i])
-        
+            embeddings = embeddings.at[i].set(self.project(quantum_states[i]))
+
         return embeddings
     
     def get_initial_params(self, scale: float = 0.1) -> np.ndarray:

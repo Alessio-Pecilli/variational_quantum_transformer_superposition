@@ -1,0 +1,10 @@
+epochs=2
+best_loss=5.84820418
+n_params_total=161
+n_params_quantum=57
+n_params_embedding=88
+n_params_rotation=16
+n_params_projection=0
+eval_num_sequences=4
+eval_loss_mean=5.76271057
+eval_perplexity=312.50176117

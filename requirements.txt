@@ -1,0 +1,17 @@
+# Core backend: PennyLane + JAX + distributed HPC pipeline
+numpy>=1.26
+scipy>=1.11
+jax>=0.4.30
+jaxlib>=0.4.30
+pennylane>=0.38
+mpi4py>=3.1
+matplotlib>=3.8
+psutil>=5.9
+
+# Optional: PTB download / HuggingFace dataset loading
+# Not strictly required if you already use the local `ptb_sentences.txt`.
+datasets>=2.19
+
+# Optional: standalone classical / baseline scripts in this repo (`QSAS.py`, `TNAS.py`)
+torch>=2.2
+scikit-learn>=1.4

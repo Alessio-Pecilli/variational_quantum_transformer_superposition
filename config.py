@@ -14,16 +14,18 @@ TEST_ONLY_CONFIG = {
 OPTIMIZATION_CONFIG = {
     'num_iterations': 20,      # RIDOTTO per test veloce (era 150)
     'num_layers': 5,
-    'max_hours': 1,            # RIDOTTO
+    'max_hours': 0.5,          # ~30 minuti di budget reale
     'embedding_dim': 4,
     'num_qubits': 4,
     'opt_maxiter': 150,        # AUMENTATO per ottimizzazione con embedding
     'opt_maxfev': 60,          # RIDOTTO
     'restarts': 1,             # NUOVO: solo 1 restart per fare presto
-    'epochs': 100,
-    'learning_rate':  0.001,
-    'save_frequency': 10,
+    'epochs': 2000,            # upper bound: il tempo reale viene limitato da max_hours
+    'learning_rate': 0.001,
+    'save_frequency': 25,
     'log_frequency': 10,
+    'eval_frequency': 25,
+    'test_fraction': 0.2,
     'early_stop_threshold': 0.05,
     'numerical_epsilon': 1e-12
 }
@@ -77,18 +79,20 @@ PLOT_CONFIG = {
 # Dataset settings
 DATASET_CONFIG = {
     'default_split': 'train',
-    'max_sentences': 100,           # quante frasi caricare
-    'sentence_length': 5,           # lunghezza ESATTA in parole per ogni frase
+    'max_sentences': 5,           # profilo serio richiesto
+    'sentence_length': 10,           # lunghezza ESATTA in parole per ogni frase
     'dataset_name': 'ptb_text_only',
     'use_ptb': True,                # True = usa PTB dataset, False = usa frasi generate
-    'random_sample': True,          # True = selezione random, False = prime N frasi
+    'random_sample': True,          # campiona 100 frasi dal corpus, in modo deterministico col seed
+    'shuffle_before_split': True,   # rimescola prima dello split train/test
+    'test_fraction': 0.2,           # 80 train / 20 test su 100 frasi
     'local_ptb_file': 'ptb_sentences.txt'  # file locale con frasi PTB pre-scaricate (una per riga)
 }
 
 # Quantum States settings (alternativa a sentences testuali)
 QUANTUM_STATES_CONFIG = {
-    'use_quantum_states': True,    # True = usa stati quantistici, False = usa sentences testuali
-    'num_states': 100,              # N = numero di "frasi quantistiche" da scegliere dallo spazio 2^10
+    'use_quantum_states': False,    # training serio richiesto: modalita' testuale
+    'num_states': 8,                # profilo locale leggero
     'num_qubits': 4,                # Qubit del circuito QSA (escluse ancille) 
     'source_qubits': 10,            # D = 10 qubit sorgente per 2^10 = 1024 dimensioni
     'target_qubits': 2,             # d = 2 qubit target per embedding_dim = 4
@@ -96,9 +100,9 @@ QUANTUM_STATES_CONFIG = {
     'use_Projector': True,          # USA la matrice P per ridurre dimensionalità  
     'max_time': 5,                 # M = 5 evoluzioni temporali per "frase"
     'use_test_mode': True,          # ABILITATO: stabilità numerica con B(t)=1, J=1
-    'num_test_sets': 3,             # Numero di test set diversi da valutare
+    'num_test_sets': 1,             # profilo locale leggero
     'skip_register_analysis': True, # True = salta analisi registri (evita errore AerSimulator con gate custom)
-    'batch_size': 10,              # NUOVO: processa stati in batch per ridurre memoria
+    'batch_size': 4,               # profilo locale leggero
     'use_sparse_matrices': True,   # NUOVO: usa matrici sparse quando possibile
     'memory_optimization': True    # NUOVO: abilita ottimizzazioni di memoria
 }
@@ -178,7 +182,7 @@ ENDINGS = [
 
 
 def generate_sentence():
-    """Genera una frase ESATTAMENTE di 9 parole."""
+    """Genera una frase ESATTAMENTE di 5 parole."""
     tokens = [
         "The",                                  # 1
         random.choice(SUBJECT_ADJS),            # 2
@@ -197,7 +201,7 @@ def generate_sentence():
 
 
 def generate_sentences(n):
-    """Genera n frasi uniche (tutte di 9 parole)."""
+    """Genera n frasi uniche (tutte di 5 parole)."""
     sentences = set()
     while len(sentences) < n:
         s = generate_sentence()
@@ -205,7 +209,7 @@ def generate_sentences(n):
     return list(sentences)
 
 
-def get_ptb_sentences(split="train", max_sentences=100, sentence_length=9, random_sample=True, local_file=None):
+def get_ptb_sentences(split="train", max_sentences=100, sentence_length=5, random_sample=True, local_file=None):
     """
     Carica frasi dal dataset PTB (Penn Treebank).
     
@@ -299,7 +303,7 @@ def get_training_sentences():
         sentences = get_ptb_sentences(
             split=cfg.get('default_split', 'train'),
             max_sentences=cfg.get('max_sentences', 100),
-            sentence_length=cfg.get('sentence_length', 9),
+            sentence_length=cfg.get('sentence_length', 5),
             random_sample=cfg.get('random_sample', True),
             local_file=cfg.get('local_ptb_file', None)
         )

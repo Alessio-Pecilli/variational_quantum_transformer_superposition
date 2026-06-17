@@ -1,293 +1,190 @@
 """
-Utility functions for quantum circuit operations and parameter management.
+Utility numeriche qiskit-free per il backend PennyLane/JAX.
 """
+
+from __future__ import annotations
+
 import gc
+from typing import Dict
+
 import numpy as np
-from qiskit import QuantumCircuit, transpile
-from qiskit import QuantumCircuit, transpile
-from qiskit.circuit import ParameterVector
-from qiskit.circuit.library import UnitaryGate
-from qiskit.quantum_info import Statevector
-
-# Simulatore globale riutilizzabile (evita memory leak)
-_GLOBAL_SIMULATOR = None
-
-def get_simulator():
-    """Ottiene un simulatore riutilizzabile (singleton)."""
-    global _GLOBAL_SIMULATOR
-    if _GLOBAL_SIMULATOR is None:
-        from qiskit_aer import AerSimulator
-        _GLOBAL_SIMULATOR = AerSimulator(method="statevector")
-    return _GLOBAL_SIMULATOR
 
 
 def clear_memory():
-    """Forza la pulizia della memoria. Chiamare periodicamente durante training."""
-    import psutil
+    """Forza una pulizia conservativa della memoria del processo."""
     import os
-    
-    # Log memoria prima della pulizia
-    if hasattr(os, 'getpid'):
+
+    try:
+        import psutil
+    except Exception:
+        psutil = None
+
+    mem_before = -1.0
+    if psutil is not None and hasattr(os, "getpid"):
         try:
             process = psutil.Process(os.getpid())
-            mem_before = process.memory_info().rss / 1024**2  # MB
-        except:
-            mem_before = -1
-    else:
-        mem_before = -1
-    
-    # Garbage collection multiplo
+            mem_before = process.memory_info().rss / 1024**2
+        except Exception:
+            mem_before = -1.0
+
     for _ in range(3):
         gc.collect()
-    
-    # Prova a liberare memoria non usata
+
     try:
         import ctypes
-        # Linux/Unix
-        try:
-            libc = ctypes.CDLL("libc.so.6")
-            libc.malloc_trim(0)
-        except:
-            # macOS/BSD
+
+        for libc_name in ("libc.so.6", "libc.dylib"):
             try:
-                libc = ctypes.CDLL("libc.dylib")
+                libc = ctypes.CDLL(libc_name)
                 libc.malloc_trim(0)
-            except:
-                pass
+                break
+            except Exception:
+                continue
     except Exception:
-        pass  # Non disponibile su Windows/Mac
-    
-    # Log memoria dopo pulizia
-    if mem_before >= 0:
+        pass
+
+    if psutil is not None and mem_before >= 0:
         try:
             process = psutil.Process(os.getpid())
-            mem_after = process.memory_info().rss / 1024**2  # MB
+            mem_after = process.memory_info().rss / 1024**2
             freed_mb = mem_before - mem_after
-            if freed_mb > 1.0:  # Solo se significativo
+            if freed_mb > 1.0:
                 print(f"[MEMORY] Freed {freed_mb:.1f} MB ({mem_before:.1f} -> {mem_after:.1f} MB)")
-        except:
+        except Exception:
             pass
 
 
-def check_memory_usage(threshold_gb=1.5, rank=0):
-    """
-    Controlla l'uso della memoria e avverte se si avvicina al limite.
-    
-    Args:
-        threshold_gb: Soglia di warning in GB
-        rank: MPI rank per logging
-    
-    Returns:
-        bool: True se la memoria è OK, False se vicina al limite
-    """
+def check_memory_usage(threshold_gb: float = 1.5, rank: int = 0) -> bool:
+    """Controlla l'RSS del processo e avvisa se supera la soglia."""
     try:
-        import psutil
         import os
-        
+        import psutil
+
         process = psutil.Process(os.getpid())
         mem_gb = process.memory_info().rss / 1024**3
-        
         if mem_gb > threshold_gb:
-            print(f"[MEMORY WARNING] Rank {rank}: {mem_gb:.2f} GB used (threshold: {threshold_gb:.1f} GB)")
+            print(
+                f"[MEMORY WARNING] Rank {rank}: {mem_gb:.2f} GB used "
+                f"(threshold: {threshold_gb:.1f} GB)"
+            )
             return False
-        
-        return True
     except Exception:
-        return True  # Assume OK se non riusciamo a controllare
+        return True
+
+    return True
 
 
-def get_unitary_from_tk(psi):
+def get_unitary_from_tk(psi) -> np.ndarray:
     """
-    Generate a unitary matrix from a given state vector using Gram-Schmidt process.
-    
-    Args:
-        psi (array): Input state vector
-        
-    Returns:
-        numpy.ndarray: Unitary matrix with psi as first column
+    Costruisce una matrice unitaria con `psi` come prima colonna tramite Gram-Schmidt.
     """
+    psi = np.asarray(psi, dtype=np.complex128)
     psi = psi / np.linalg.norm(psi)
     dim = len(psi)
     base = [psi]
+    rng = np.random.default_rng(0)
 
     while len(base) < dim:
-        vec = np.random.rand(dim) + 1j * np.random.rand(dim)
-
-        for i, b in enumerate(base):
-            coeff = np.vdot(b, vec)
-            vec -= coeff * b
+        vec = rng.standard_normal(dim) + 1j * rng.standard_normal(dim)
+        for basis_vec in base:
+            vec -= np.vdot(basis_vec, vec) * basis_vec
 
         norm = np.linalg.norm(vec)
-
         if norm < 1e-12:
             continue
-        vec /= norm
-        base.append(vec)
 
-    U = np.column_stack(base)
-    return U
+        base.append(vec / norm)
+
+    return np.column_stack(base)
 
 
-def get_params(num_qubits, num_layers):
+def get_param_resolver(num_qubits: int, num_layers: int) -> Dict[str, float]:
     """
-    Generate parameter array for quantum circuit ansatz.
-    
-    Args:
-        num_qubits (int): Number of qubits
-        num_layers (int): Number of layers in the ansatz
-        
-    Returns:
-        numpy.ndarray: Shaped parameter array
+    Restituisce un dizionario di angoli casuali, compatibile con l'API legacy ma senza Qiskit.
     """
-    print(f"[DEBUG] 🧠 Generating params for num_qubits={num_qubits}, num_layers={num_layers}")
-    x = get_param_resolver(num_qubits, num_layers)
-    params = get_params_shape(x, num_qubits, num_layers)
-    return params
-
-
-def get_param_resolver(num_qubits, num_layers):
-    """
-    Create parameter dictionary for optimization.
-    
-    Args:
-        num_qubits (int): Number of qubits
-        num_layers (int): Number of layers
-        
-    Returns:
-        dict: Parameter dictionary mapping symbols to values
-    """
-    print(f"[DEBUG PARAM RESOLVER] num_qubits={num_qubits}, num_layers={num_layers}")
     num_angles = 12 * num_qubits * num_layers
-    angs = np.pi * (2 * np.random.rand(num_angles) - 1)
-    params = ParameterVector('θ', num_angles)
-    param_dict = dict(zip(params, angs))
-    return param_dict
+    angles = np.pi * (2.0 * np.random.rand(num_angles) - 1.0)
+    return {f"theta_{idx}": angle for idx, angle in enumerate(angles)}
 
 
-def get_params_shape(param_list, num_qubits, num_layers):
-    """
-    Reshape parameter values into the required structure.
-    
-    Args:
-        param_list (dict): Parameter dictionary
-        num_qubits (int): Number of qubits
-        num_layers (int): Number of layers
-        
-    Returns:
-        numpy.ndarray: Reshaped parameter array
-    """
-    print(f"[DEBUG SHAPE] num_qubits={num_qubits}, num_layers={num_layers}")
-    param_values = np.array(list(param_list.values()))
+def get_params_shape(param_list: Dict[str, float], num_qubits: int, num_layers: int) -> np.ndarray:
+    """Rimodella il dizionario legacy nel tensore atteso dagli ansatz storici."""
+    param_values = np.asarray(list(param_list.values()), dtype=np.float64)
     x = param_values.reshape(num_layers, 2, num_qubits // 2, 12)
-    x_reshaped = x.reshape(num_layers, 2, num_qubits // 2, 4, 3)
-    return x_reshaped
+    return x.reshape(num_layers, 2, num_qubits // 2, 4, 3)
 
 
-def get_circuit_ux_dagger_from_tk(t_k):
-    """
-    Create a quantum circuit with unitary dagger gate from state vector.
-    
-    Args:
-        t_k (array): State vector
-        
-    Returns:
-        QuantumCircuit: Circuit with unitary dagger gate
-    """
-    t_k = np.array(t_k, dtype=complex)
+def get_params(num_qubits: int, num_layers: int) -> np.ndarray:
+    """Genera direttamente il tensore parametri dell'ansatz legacy."""
+    return get_params_shape(get_param_resolver(num_qubits, num_layers), num_qubits, num_layers)
+
+
+def get_circuit_ux_dagger_from_tk(t_k) -> np.ndarray:
+    """Compat layer legacy: restituisce direttamente `U^dagger` come matrice."""
+    t_k = np.asarray(t_k, dtype=np.complex128)
     t_k = t_k / np.linalg.norm(t_k)
-    dim = len(t_k)
-    n = int(np.log2(dim))
-
-    U = get_unitary_from_tk(t_k)
-    U_dagger = U.conj().T
-    gate = UnitaryGate(U_dagger)
-    qc = QuantumCircuit(n, name="U†_x")
-    qc.append(gate, range(n))
-
-    return qc
+    return get_unitary_from_tk(t_k).conj().T
 
 
-def build_controlled_unitary(U, controls, targets, label, activate_on):
+def build_controlled_unitary(U, controls, targets, label=None, activate_on=0) -> np.ndarray:
     """
-    Build a controlled unitary gate.
+    Costruisce la matrice del controlled-unitary attivata sullo stato `activate_on`.
     """
-    # Normalizza il ctrl_state
+    del label, targets
+
+    U = np.asarray(U, dtype=np.complex128)
+    if U.ndim != 2 or U.shape[0] != U.shape[1]:
+        raise ValueError("U must be a square matrix.")
+
+    n_controls = len(controls)
     if isinstance(activate_on, str):
-        ctrl_state_int = int(activate_on, 2)
+        ctrl_state = int(activate_on, 2)
     else:
-        ctrl_state_int = activate_on
-    
-    # 🔥 FIX: sanitizza il nome per Aer
-    safe_label = "".join(
-        c if (c.isalnum() or c == "_") else "_" 
-        for c in label
+        ctrl_state = int(activate_on)
+
+    control_dim = 2 ** n_controls
+    target_dim = U.shape[0]
+    full_dim = control_dim * target_dim
+    controlled = np.eye(full_dim, dtype=np.complex128)
+    start = ctrl_state * target_dim
+    controlled[start:start + target_dim, start:start + target_dim] = U
+    return controlled
+
+
+def safe_controlled_unitary(U, control_indices, target_indices, label=None) -> np.ndarray:
+    """Alias qiskit-free della costruzione controlled-unitary."""
+    return build_controlled_unitary(
+        U=U,
+        controls=control_indices,
+        targets=target_indices,
+        label=label,
+        activate_on=(2 ** len(control_indices)) - 1,
     )
-    
-    base_gate = UnitaryGate(U, label=safe_label)
-    gate = base_gate.control(len(controls), ctrl_state=ctrl_state_int)
-    return gate
-
-
-
-def safe_controlled_unitary(U, control_indices, target_indices, label):
-    """
-    Create a controlled unitary gate safely.
-    
-    Args:
-        U (numpy.ndarray): Unitary matrix
-        control_indices (list): Control qubit indices
-        target_indices (list): Target qubit indices
-        label (str): Gate label
-        
-    Returns:
-        Gate: Controlled gate
-    """
-    n_target = len(target_indices)
-    inner = QuantumCircuit(n_target)
-    inner.unitary(U, range(n_target), label=label)
-    gate = inner.to_gate(label=label)
-    ctrl_gate = gate.control(len(control_indices))
-    return ctrl_gate
 
 
 def wrap_angles(theta):
-    """
-    Wrap angles to [-π, π] range.
-    
-    Args:
-        theta (array): Input angles
-        
-    Returns:
-        array: Wrapped angles
-    """
+    """Riporta gli angoli in `[-pi, pi]`."""
+    theta = np.asarray(theta, dtype=np.float64)
     return ((theta + np.pi) % (2 * np.pi)) - np.pi
 
 
-def calculate_loss_from_statevector(qc):
+def calculate_loss_from_statevector(statevector_or_probability, eps: float = 1e-12) -> float:
     """
-    Calculate loss from quantum circuit by computing |0...0> probability.
-    
-    Args:
-        qc (QuantumCircuit): Quantum circuit
-        
-    Returns:
-        float: Negative log probability loss
+    Calcola `-log(p_0)` dato:
+    - una probabilità scalare,
+    - uno statevector 1D,
+    - una density matrix 2D.
     """
-    try:
-        # Usa simulatore singleton (evita memory leak)
-        sim = get_simulator()
-        
-        # Transpila il circuito per decomporre gate custom in gate nativi
-        qc_transpiled = transpile(qc, sim, optimization_level=0)
-        
-        qc_transpiled.save_statevector()
-        result = sim.run(qc_transpiled).result()
-        state = result.get_statevector()
-        prob = float(abs(state.data[0]) ** 2)
-        loss = -np.log(prob + 1e-12)
-        
-        return loss
-    finally:
-        # Pulizia esplicita per evitare memory leak
-        del qc_transpiled, result, state
-        gc.collect()
+    value = np.asarray(statevector_or_probability)
+
+    if value.ndim == 0:
+        probability = float(np.real(value))
+    elif value.ndim == 1:
+        probability = float(np.abs(value[0]) ** 2)
+    elif value.ndim == 2:
+        probability = float(np.real(value[0, 0]))
+    else:
+        raise ValueError("Unsupported input shape for loss computation.")
+
+    probability = float(np.clip(probability, eps, 1.0))
+    return float(-np.log(probability))
