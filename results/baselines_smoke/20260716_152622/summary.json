@@ -1,0 +1,52 @@
+{
+  "config": {
+    "T": 8,
+    "d": 8,
+    "k": 2,
+    "layers": 2,
+    "epochs": 80,
+    "max_sentences": 1000,
+    "batch_size": 64,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "n_seeds": 3,
+    "angle_budget": 12
+  },
+  "qsa_csa_max_epoch_gap_first_seed": 0.0,
+  "models": [
+    {
+      "model": "k-QSA",
+      "n_seeds": 3,
+      "final_loss_mean": 4.308713854155729,
+      "final_loss_std": 0.9645221986822571,
+      "n_params_angles": 12,
+      "n_params_model": null,
+      "nl_rank": null,
+      "batch_size": 64
+    },
+    {
+      "model": "k-CSA",
+      "n_seeds": 3,
+      "final_loss_mean": 4.308713854155729,
+      "final_loss_std": 0.9645221986822571,
+      "n_params_angles": 12,
+      "n_params_model": null,
+      "nl_rank": null,
+      "batch_size": 64
+    },
+    {
+      "model": "nl-CSA",
+      "n_seeds": 3,
+      "final_loss_mean": 0.17595023610343,
+      "final_loss_std": 0.004440681302985242,
+      "n_params_angles": null,
+      "n_params_model": 288,
+      "nl_rank": 3,
+      "batch_size": 64
+    }
+  ],
+  "plot_note": "Curves show mean over seeds; shaded band is \u00b11 std; faint lines are individual seeds. Logged metric is full-batch eval loss each epoch (updates use minibatch when batch_size is set)."
+}

@@ -38,10 +38,10 @@ from qsa_section2_circuit import qubit_budget
 ROOT = Path(__file__).resolve().parent
 
 # Sweep fissi dello studio (limite locale: max 14 qubit)
-SWEEP_T = (2, 4, 8, 16)   # d=4, k=2  ->  n_qubits in {8, 10, 12, 14}
-SWEEP_D = (2, 4, 8)       # T=4, k=2  ->  n_qubits in {7, 10, 13}
-SWEEP_D_FIXED = 4
-SWEEP_T_FIXED = 4         # T_lim: obar ~ costante per T >= 4
+SWEEP_T = (2, 4, 8, 16, 32)   # HPC: include 32; local skips if > local_max_qubits
+SWEEP_D = (2, 4, 8, 16, 32)   # HPC: include 16/32 for advantage regime
+SWEEP_D_FIXED = 16            # default complexity d for vs-T on HPC
+SWEEP_T_FIXED = 16            # default T_lim-ish for vs-d on HPC
 T_LIM = 4
 LOCAL_MAX_QUBITS = 15
 
@@ -134,13 +134,43 @@ def _train_point(
     print(f"\n--- {label} | T={T} d={d} k={k} n_qubits={n_q} epochs={epochs} ---")
     print(f"    (equiv. {equiv})")
 
+    metrics_path = out_root / label / "summaries" / "metrics.json"
+    if metrics_path.exists():
+        metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+        print(f"\n--- {label} | resume: already complete -> {metrics_path.parent.parent}")
+        row = {
+            "label": label,
+            "T": T,
+            "d": d,
+            "k": k,
+            "mean_O_ij": float(metrics["mean_O_ij"]),
+            "obar": float(metrics.get("obar", metrics["mean_O_ij"])),
+            "obar_k_root": float(metrics.get("obar_k_root", metrics["mean_O_ij"] ** (1 / max(k, 1)))),
+            "final_loss": float(metrics["final_loss"]),
+            "n_qubits": int(metrics["n_qubits"]),
+            "reference_haar": float(metrics["reference_haar"]),
+            "reference_advantage": float(metrics.get("reference_advantage", 0.0)),
+            "converged": metrics.get("converged"),
+            "training_phases": metrics.get("training_phases"),
+            "elapsed_seconds": float(metrics.get("elapsed_seconds", 0.0)),
+            "wall_seconds": 0.0,
+            "run_dir": str(out_root / label),
+            "main_hpc_cmd": equiv,
+            "resumed": True,
+        }
+        print(
+            f"    obar={row['obar']:.6f}  mean_O={row['mean_O_ij']:.6f}  "
+            f"haar={row['reference_haar']:.6e}  adv={row['reference_advantage']:.6e}  "
+            f"loss={row['final_loss']:.4f}  conv={row.get('converged')}  (skip)"
+        )
+        return row
+
     t0 = time.perf_counter()
     exit_code = run_training(logger=logger, cfg=cfg, comm=None, rank=0, size=1)
     wall = time.perf_counter() - t0
     if exit_code != 0:
         raise RuntimeError(f"Training fallito per {label} (exit={exit_code})")
 
-    metrics_path = out_root / label / "summaries" / "metrics.json"
     metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
     row = {
         "label": label,
@@ -414,6 +444,17 @@ def main() -> int:
     parser.add_argument("--max-epochs", type=int, default=300)
     parser.add_argument("--loss-rel-tol", type=float, default=1e-4)
     parser.add_argument("--convergence-patience", type=int, default=8)
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="fixed study root (skips labels with summaries/metrics.json; default: timestamped)",
+    )
+    parser.add_argument(
+        "--mpi",
+        action="store_true",
+        help="shard sweep points across MPI ranks (use with srun)",
+    )
     args = parser.parse_args()
 
     if args.long:
@@ -421,30 +462,47 @@ def main() -> int:
 
     preset_name = _apply_preset(args)
     logger = _setup_logger()
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_root = Path("results") / "study" / stamp
-    out_root.mkdir(parents=True, exist_ok=True)
 
-    print("=" * 60)
-    print("RUN_STUDY — studio Section 2 (overlap O_ij vs T e d)")
-    print("=" * 60)
-    print(f"Preset: {preset_name} | epoche={args.epochs} | frasi={args.max_sentences} | k={args.k}")
-    if args.train_until_converged:
-        print(f"Convergenza: max_epochs={args.max_epochs} rel_tol={args.loss_rel_tol} patience={args.convergence_patience}")
-    if args.curriculum_k:
-        print("Curriculum k: 1 -> k")
-    if args.warm_start_w:
-        print("Warm-start: W ~ I (weights_w=0)")
-    print(f"Output: {out_root}")
-    print(f"Ogni run = stesso percorso di main_hpc.py --circuit-mode section2")
-    print("=" * 60)
+    from mpi_runtime import barrier, gather_list, init_mpi, shard_items
+
+    comm, rank, size = init_mpi(enabled=args.mpi)
+
+    if args.output_dir:
+        out_root = Path(args.output_dir)
+        stamp = Path(args.output_dir).name
+    else:
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        out_root = Path("results") / "study" / stamp
+    if rank == 0:
+        out_root.mkdir(parents=True, exist_ok=True)
+    barrier(comm)
+
+    if rank == 0:
+        print("=" * 60)
+        print("RUN_STUDY — studio Section 2 (overlap O_ij vs T e d)")
+        print("=" * 60)
+        print(f"Preset: {preset_name} | epoche={args.epochs} | frasi={args.max_sentences} | k={args.k}")
+        if args.train_until_converged:
+            print(
+                f"Convergenza: max_epochs={args.max_epochs} "
+                f"rel_tol={args.loss_rel_tol} patience={args.convergence_patience}"
+            )
+        if args.curriculum_k:
+            print("Curriculum k: 1 -> k")
+        if args.warm_start_w:
+            print("Warm-start: W ~ I (weights_w=0)")
+        print(f"MPI: enabled={args.mpi} ranks={size}")
+        print(f"Output: {out_root}")
+        print(f"Ogni run = stesso percorso di main_hpc.py --circuit-mode section2")
+        print("=" * 60)
 
     t_start = time.perf_counter()
     self_check_ok = True
-    if not args.skip_self_check:
+    if rank == 0 and not args.skip_self_check:
         self_check_ok = _run_self_check()
         if not self_check_ok:
             print("[WARN] Self-check readout fallito; proseguo comunque (usa --skip-self-check per saltare).")
+    barrier(comm)
 
     train_opts = {
         "warm_start_w_identity": args.warm_start_w,
@@ -467,61 +525,95 @@ def main() -> int:
         train_opts=train_opts,
     )
 
-    t_rows: list[dict] = []
-    t_rows_k3: list[dict] = []
-    d_rows: list[dict] = []
-    d_rows_extra: list[dict] = []
     d_sweep_T = args.d_sweep_T
     point_kw = dict(local_max_qubits=args.local_max_qubits)
 
+    # Build independent sweep jobs, then shard across MPI ranks.
+    jobs: list[dict] = []
     if args.only in (None, "T"):
-        print("\n" + "=" * 60)
-        print(f"FASE 2/4 — Sweep vs T  (d={SWEEP_D_FIXED}, k={args.k})")
-        print("=" * 60)
         for T in SWEEP_T:
-            label = f"T{T}_d{SWEEP_D_FIXED}_k{args.k}"
-            t_rows.append(
-                _train_point(T=T, d=SWEEP_D_FIXED, label=label, **point_kw, **train_kw)
+            jobs.append(
+                {
+                    "series": "T",
+                    "T": T,
+                    "d": SWEEP_D_FIXED,
+                    "k": args.k,
+                    "label": f"T{T}_d{SWEEP_D_FIXED}_k{args.k}",
+                }
             )
         if args.extra_k3:
-            print("\n" + "-" * 60)
-            print(f"Extra sweep vs T  (d={SWEEP_D_FIXED}, k=3)")
-            print("-" * 60)
             for T in SWEEP_T:
                 n_q = qubit_budget(T, SWEEP_D_FIXED, 3)
                 if n_q > args.local_max_qubits:
-                    print(f"  [skip] T={T} k=3: n_qubits={n_q} > {args.local_max_qubits}")
+                    if rank == 0:
+                        print(f"  [skip] T={T} k=3: n_qubits={n_q} > {args.local_max_qubits}")
                     continue
-                label = f"T{T}_d{SWEEP_D_FIXED}_k3"
-                kw3 = {**train_kw, "k": 3}
-                t_rows_k3.append(
-                    _train_point(T=T, d=SWEEP_D_FIXED, label=label, **point_kw, **kw3)
+                jobs.append(
+                    {
+                        "series": "T_k3",
+                        "T": T,
+                        "d": SWEEP_D_FIXED,
+                        "k": 3,
+                        "label": f"T{T}_d{SWEEP_D_FIXED}_k3",
+                    }
                 )
-
     if args.only in (None, "d"):
-        print("\n" + "=" * 60)
-        print(f"FASE 3/4 — Sweep vs d  (T={d_sweep_T}, k={args.k})")
-        print("=" * 60)
         for d in SWEEP_D:
-            label = f"T{d_sweep_T}_d{d}_k{args.k}"
-            d_rows.append(
-                _train_point(T=d_sweep_T, d=d, label=label, **point_kw, **train_kw)
+            jobs.append(
+                {
+                    "series": "d",
+                    "T": d_sweep_T,
+                    "d": d,
+                    "k": args.k,
+                    "label": f"T{d_sweep_T}_d{d}_k{args.k}",
+                }
             )
         if args.extra_k_on_d is not None:
             ek = args.extra_k_on_d
-            print("\n" + "-" * 60)
-            print(f"Extra sweep vs d  (T={d_sweep_T}, k={ek})")
-            print("-" * 60)
             for d in SWEEP_D:
                 n_q = qubit_budget(d_sweep_T, d, ek)
                 if n_q > args.local_max_qubits:
-                    print(f"  [skip] d={d} k={ek}: n_qubits={n_q} > {args.local_max_qubits}")
+                    if rank == 0:
+                        print(f"  [skip] d={d} k={ek}: n_qubits={n_q} > {args.local_max_qubits}")
                     continue
-                label = f"T{d_sweep_T}_d{d}_k{ek}"
-                kw_e = {**train_kw, "k": ek}
-                d_rows_extra.append(
-                    _train_point(T=d_sweep_T, d=d, label=label, **point_kw, **kw_e)
+                jobs.append(
+                    {
+                        "series": "d_extra",
+                        "T": d_sweep_T,
+                        "d": d,
+                        "k": ek,
+                        "label": f"T{d_sweep_T}_d{d}_k{ek}",
+                    }
                 )
+
+    my_jobs = shard_items(jobs, rank, size) if args.mpi else jobs
+    if rank == 0:
+        print(f"\n[MPI] {len(jobs)} sweep points total, {size} ranks "
+              f"(~{len(my_jobs)} per rank on rank0)")
+
+    local_rows: list[dict] = []
+    for job in my_jobs:
+        kw = {**train_kw, "k": job["k"]}
+        row = _train_point(
+            T=job["T"],
+            d=job["d"],
+            label=job["label"],
+            **point_kw,
+            **kw,
+        )
+        row["series"] = job["series"]
+        local_rows.append(row)
+
+    barrier(comm)
+    all_rows = gather_list(comm, local_rows) if args.mpi else local_rows
+    if rank != 0:
+        barrier(comm)
+        return 0
+
+    t_rows = [r for r in all_rows if r.get("series") == "T"]
+    t_rows_k3 = [r for r in all_rows if r.get("series") == "T_k3"]
+    d_rows = [r for r in all_rows if r.get("series") == "d"]
+    d_rows_extra = [r for r in all_rows if r.get("series") == "d_extra"]
 
     print("\n" + "=" * 60)
     print("FASE 4/4 — Plot e riassunto")
@@ -558,6 +650,7 @@ def main() -> int:
         "extra_k3": args.extra_k3,
         "extra_k_on_d": args.extra_k_on_d,
         "local_max_qubits": args.local_max_qubits,
+        "mpi_ranks": size,
         "T_sweep": t_rows,
         "T_sweep_k3": t_rows_k3,
         "d_sweep": d_rows,
@@ -570,6 +663,7 @@ def main() -> int:
     )
 
     print(f"\n[FATTO] Tutto in: {out_root}")
+    barrier(comm)
     return 0
 
 

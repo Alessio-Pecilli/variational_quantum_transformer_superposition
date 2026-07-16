@@ -36,9 +36,13 @@ results/study/20260716_143813/**/*
 !results/study/20260716_143813/*.txt
 !results/study/20260716_143813/*.json
 
-# Training curves k-QSA / k-CSA / nl-CSA (check serio locale, fix shared init)
+# Training curves (best practice: mean±std over seeds)
 !results/baselines_smoke/
 results/baselines_smoke/**
+!results/baselines_smoke/20260716_152622/
+results/baselines_smoke/20260716_152622/**
+!results/baselines_smoke/20260716_152622/training_curves.png
+!results/baselines_smoke/20260716_152622/summary.json
 !results/baselines_smoke/20260716_150402/
 results/baselines_smoke/20260716_150402/**
 !results/baselines_smoke/20260716_150402/training_curves.png

@@ -13,6 +13,13 @@
 #SBATCH --mem=0                  # usa TUTTA la RAM del nodo BOOST
 #SBATCH --time=05:30:00
 
+# Legacy / multi-rank VQT entrypoint (main_hpc.py).
+# For Section-2 classical campaign on Leonardo prefer ONE job:
+#   sbatch hpc_all_section2.sh   # complexity → baselines → ppl-vs-k (MPI)
+# Or standalone:
+#   sbatch hpc_complexity.sh / hpc_baselines.sh / hpc_ppl_vs_k.sh
+#   sbatch hpc_qsa_eval.sh       # quantum forward on lightning.gpu
+
 echo "=== JOB $SLURM_JOB_ID STARTED at $(date) on $(hostname) ==="
 
 module purge
@@ -39,4 +46,3 @@ cd /leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superpositio
 mkdir -p logs
 
 srun --mpi=pmix_v3 python3 main_hpc.py
-
