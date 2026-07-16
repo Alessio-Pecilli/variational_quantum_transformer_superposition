@@ -19,12 +19,12 @@ logs/
 results/**
 !results/study/
 results/study/**
-!results/study/20260716_100201/
-results/study/20260716_100201/**/*
-!results/study/20260716_100201/*.png
-!results/study/20260716_100201/*.csv
-!results/study/20260716_100201/*.txt
-!results/study/20260716_100201/*.json
+!results/study/20260716_103916/
+results/study/20260716_103916/**/*
+!results/study/20260716_103916/*.png
+!results/study/20260716_103916/*.csv
+!results/study/20260716_103916/*.txt
+!results/study/20260716_103916/*.json
 
 # Duplicati / scratch locale
 qsa_section2_circuit(1).py
