@@ -66,6 +66,19 @@ class Encoding:
                 if word not in vocab:
                     vocab[word] = idx
                     idx += 1
+        # Include tokens from the actual training sentences (PTB / custom).
+        # Without this, almost all PTB words map to <UNK> and d > ~22 fails
+        # the isometric E constraint (need vocabSize >= embeddingDim).
+        for sentence in self.sentences:
+            for word in sentence:
+                if word not in vocab:
+                    vocab[word] = idx
+                    idx += 1
+        # Pad so QR isometric embedding is always feasible for this d.
+        while len(vocab) < self.embeddingDim:
+            pad = f"<PAD{len(vocab)}>"
+            vocab[pad] = idx
+            idx += 1
         return vocab
 
     def _loadModel(self):

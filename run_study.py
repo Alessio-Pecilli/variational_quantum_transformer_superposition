@@ -594,15 +594,32 @@ def main() -> int:
     local_rows: list[dict] = []
     for job in my_jobs:
         kw = {**train_kw, "k": job["k"]}
-        row = _train_point(
-            T=job["T"],
-            d=job["d"],
-            label=job["label"],
-            **point_kw,
-            **kw,
-        )
-        row["series"] = job["series"]
-        local_rows.append(row)
+        try:
+            row = _train_point(
+                T=job["T"],
+                d=job["d"],
+                label=job["label"],
+                **point_kw,
+                **kw,
+            )
+            row["series"] = job["series"]
+            local_rows.append(row)
+        except Exception as exc:
+            print(f"[WARN] sweep point failed {job['label']}: {exc}")
+            local_rows.append(
+                {
+                    "label": job["label"],
+                    "series": job["series"],
+                    "T": job["T"],
+                    "d": job["d"],
+                    "k": job["k"],
+                    "error": str(exc),
+                    "mean_O_ij": float("nan"),
+                    "obar": float("nan"),
+                    "final_loss": float("nan"),
+                    "n_qubits": int(qubit_budget(job["T"], job["d"], job["k"])),
+                }
+            )
 
     barrier(comm)
     all_rows = gather_list(comm, local_rows) if args.mpi else local_rows
