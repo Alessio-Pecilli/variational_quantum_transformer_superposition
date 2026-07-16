@@ -1,0 +1,38 @@
+RIASSUNTO STUDIO SECTION 2
+==================================================
+Data:        2026-07-16T14:38:25
+Preset:      long
+k:           2
+Epoche:      40
+Frasi:       64
+Seed:        42
+Self-check:  PASS
+Tempo tot.:  11.5 s
+Output:      results\study\20260716_143813
+
+METRICA: obar = mean_{i<=j} |a_ij s_ij^k|  (= absS/Ntri, NO potenza 1/k)
+         obar_k_root = obar^{1/k}  (solo diagnostica, non usata nei plot)
+         s_ij = <x_j|W|x_i>, a_ij = <x_{j+1}|V|x_i>
+Refs: Haar = d^{-(k+1)/2} ; advantage = sqrt(k * k! / d^k)
+
+SWEEP vs d  (T=8, k variabile)
+----------------------------------------
+   d          obar          Haar           adv     >Haar      >adv
+   2      0.305480  3.535534e-01  1.000000e+00        no        no
+   4      0.310976  1.250000e-01  5.000000e-01        si        no
+   8      0.285167  4.419417e-02  2.500000e-01        si        si
+
+  Atteso: obar sopra Haar e possibilmente sopra advantage threshold.
+
+FILE GENERATI
+----------------------------------------
+  summary_vs_T.csv, summary_vs_d.csv
+  mean_O_vs_T.png, mean_O_vs_d.png  (obar vs refs)
+  manifest.json
+  RIASSUNTO.txt  (questo file)
+
+COMANDI EQUIVALENTI (main_hpc.py per un singolo punto)
+----------------------------------------
+  python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 2 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d2_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 4 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d4_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 8 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d8_k2

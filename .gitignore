@@ -15,16 +15,34 @@ logs/
 *.log
 *.npy
 
-# Risultati: tieni solo l'ultimo studio (summary + plot)
+# Risultati: solo summary/plot delle run da condividere
 results/**
 !results/study/
 results/study/**
+
+# Studio complessita (obar corretto, k=2+k=3, T e d)
 !results/study/20260716_103916/
 results/study/20260716_103916/**/*
 !results/study/20260716_103916/*.png
 !results/study/20260716_103916/*.csv
 !results/study/20260716_103916/*.txt
 !results/study/20260716_103916/*.json
+
+# Plot vs d a T=8 (chiave per complessita)
+!results/study/20260716_143813/
+results/study/20260716_143813/**/*
+!results/study/20260716_143813/*.png
+!results/study/20260716_143813/*.csv
+!results/study/20260716_143813/*.txt
+!results/study/20260716_143813/*.json
+
+# Training curves k-QSA / k-CSA / nl-CSA (check serio locale)
+!results/baselines_smoke/
+results/baselines_smoke/**
+!results/baselines_smoke/20260716_144404/
+results/baselines_smoke/20260716_144404/**
+!results/baselines_smoke/20260716_144404/training_curves.png
+!results/baselines_smoke/20260716_144404/summary.json
 
 # Duplicati / scratch locale
 qsa_section2_circuit(1).py

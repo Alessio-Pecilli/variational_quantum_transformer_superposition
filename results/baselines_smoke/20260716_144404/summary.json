@@ -1,0 +1,43 @@
+{
+  "config": {
+    "T": 8,
+    "d": 8,
+    "k": 2,
+    "layers": 2,
+    "epochs": 100,
+    "max_sentences": 1000,
+    "angle_budget": 12
+  },
+  "models": [
+    {
+      "model": "k-QSA",
+      "final_loss": 3.292879998727931,
+      "n_params": 12,
+      "n_params_total": 12,
+      "extra": {
+        "obar": 0.19397829067269254,
+        "ppl_mu": 26.92028249865406
+      }
+    },
+    {
+      "model": "k-CSA",
+      "final_loss": 3.963925144408594,
+      "n_params": 12,
+      "n_params_total": 188,
+      "extra": {
+        "ppl_mu": 52.663633156652
+      }
+    },
+    {
+      "model": "nl-CSA",
+      "final_loss": 2.7469746133989745,
+      "n_params": 80,
+      "n_params_total": 256,
+      "extra": {
+        "final_ppl": 15.595378391365449,
+        "nl_rank": 1,
+        "target_angle_budget": 12
+      }
+    }
+  ]
+}
