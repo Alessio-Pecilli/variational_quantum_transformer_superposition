@@ -12,19 +12,35 @@ TEST_ONLY_CONFIG = {
 
 # Optimization settings
 OPTIMIZATION_CONFIG = {
+    'circuit_mode': 'section2',  # 'section2' = QSA Section 2 (default) | 'legacy' = circuito notebook
     'num_iterations': 20,      # RIDOTTO per test veloce (era 150)
-    'num_layers': 5,
-    'max_hours': 0.5,          # ~30 minuti di budget reale
+    'num_layers': 2,
+    'non_linear_order': 2,     # k in Section 2; registri B aggiuntivi nel circuito legacy
+    'prune_inactive_branches': False,  # True = evita i branch padded oltre quelli attivi
+    'control_readout_mode': 'auto',    # auto = Hadamard normale, oppure uniforme sui branch attivi se potati
+    'analytic_readout': True,          # True = evita i controlled StatePrep nel training su simulatore
+    'max_hours': 0.25,         # fallback legacy: preferire DATASET_CONFIG['max_run_minutes']
     'embedding_dim': 4,
     'num_qubits': 4,
     'opt_maxiter': 150,        # AUMENTATO per ottimizzazione con embedding
     'opt_maxfev': 60,          # RIDOTTO
     'restarts': 1,             # NUOVO: solo 1 restart per fare presto
-    'epochs': 2000,            # upper bound: il tempo reale viene limitato da max_hours
-    'learning_rate': 0.001,
+    'epochs': 6,               # profilo ~1 ora su CPU con lightning.qubit
+    'learning_rate': 0.0001,
     'save_frequency': 25,
-    'log_frequency': 10,
-    'eval_frequency': 25,
+    'log_frequency': 1,
+    'eval_frequency': 3,
+    'quantum_device': 'lightning.qubit',
+    'quantum_interface': 'jax',
+    'quantum_diff_method': 'adjoint',
+    'analytic_quantum_device': 'default.qubit',
+    'analytic_quantum_diff_method': 'backprop',
+    'train_embedding': True,
+    'train_rotation': True,
+    'train_batch_size': 1,
+    'eval_batch_size': 1,
+    'batch_log_interval': 1,
+    'gradient_clip_norm': 0.5,
     'test_fraction': 0.2,
     'early_stop_threshold': 0.05,
     'numerical_epsilon': 1e-12
@@ -79,8 +95,9 @@ PLOT_CONFIG = {
 # Dataset settings
 DATASET_CONFIG = {
     'default_split': 'train',
-    'max_sentences': 5,           # profilo serio richiesto
-    'sentence_length': 10,           # lunghezza ESATTA in parole per ogni frase
+    'max_sentences': 16,            # profilo ~1 ora su CPU
+    'sentence_length': 8,           # riduce padded_sequence_length a 8
+    'max_run_minutes': 60,          # budget temporale training/evaluation
     'dataset_name': 'ptb_text_only',
     'use_ptb': True,                # True = usa PTB dataset, False = usa frasi generate
     'random_sample': True,          # campiona 100 frasi dal corpus, in modo deterministico col seed
@@ -314,6 +331,7 @@ def get_training_sentences():
     return generate_sentences(cfg.get('max_sentences', 100))
 
 
-# Genera le frasi di training in base alla configurazione
-TRAINING_SENTENCES = get_training_sentences()
-#TRAINING_SENTENCES = generate_sentences(5)  # Test genera 5 frasi
+# Non materializzare il dataset a import-time: gli override runtime
+# (es. run_custom_profile.py) devono poter aggiornare DATASET_CONFIG
+# prima del caricamento effettivo delle frasi.
+# TRAINING_SENTENCES resta la fallback statica definita sopra.

@@ -19,17 +19,23 @@ EPSILON = 1e-12
 @dataclass(frozen=True)
 class QuantumParameterLayout:
     sequence_length: int
+    active_branch_count: int
     padded_sequence_length: int
     control_qubits: int
     feature_dimension: int
     feature_qubits: int
     non_linear_order: int
+    prune_inactive_branches: bool
     num_layers: int
     blocks_per_ansatz: int
     weights_v_shape: Tuple[int, int]
     weights_w_shape: Tuple[int, int]
     weights_c_shape: Tuple[int, ...]
     total_parameters: int
+
+
+def _system_dimension(feature_dimension: int, non_linear_order: int) -> int:
+    return feature_dimension ** (non_linear_order + 1)
 
 
 def _safe_log2_power(value: int) -> int:
@@ -39,13 +45,31 @@ def _safe_log2_power(value: int) -> int:
 
 
 def normalize_state(state: jnp.ndarray, eps: float = EPSILON) -> jnp.ndarray:
+    state = jnp.nan_to_num(
+        jnp.asarray(state),
+        nan=0.0,
+        posinf=0.0,
+        neginf=0.0,
+    )
     norm = jnp.linalg.norm(state)
-    return state / jnp.maximum(norm, eps)
+    fallback = jnp.zeros_like(state).at[0].set(1.0 + 0.0j)
+    safe_state = state / jnp.maximum(norm, eps)
+    return jnp.where(jnp.isfinite(norm) & (norm > eps), safe_state, fallback)
 
 
 def normalize_state_batch(states: jnp.ndarray, eps: float = EPSILON) -> jnp.ndarray:
+    states = jnp.nan_to_num(
+        jnp.asarray(states),
+        nan=0.0,
+        posinf=0.0,
+        neginf=0.0,
+    )
     norms = jnp.linalg.norm(states, axis=-1, keepdims=True)
-    return states / jnp.maximum(norms, eps)
+    safe_states = states / jnp.maximum(norms, eps)
+    fallback = jnp.zeros_like(states)
+    fallback = fallback.at[..., 0].set(1.0 + 0.0j)
+    valid = jnp.isfinite(norms) & (norms > eps)
+    return jnp.where(valid, safe_states, fallback)
 
 
 def kronecker_power(state: jnp.ndarray, power: int) -> jnp.ndarray:
@@ -68,11 +92,20 @@ def create_layout(
     feature_dimension: int,
     num_layers: int,
     non_linear_order: int = 1,
+    prune_inactive_branches: bool = False,
+    active_branch_count: Optional[int] = None,
 ) -> QuantumParameterLayout:
     if sequence_length < 1:
         raise ValueError("sequence_length must be >= 1.")
     feature_qubits = _safe_log2_power(feature_dimension)
-    padded_sequence_length = 1 << int(math.ceil(math.log2(max(sequence_length, 2))))
+    if active_branch_count is None:
+        active_branch_count = max(sequence_length - 1, 0)
+    active_branch_count = max(int(active_branch_count), 0)
+    branch_register_length = (
+        active_branch_count if prune_inactive_branches else max(sequence_length, active_branch_count)
+    )
+    padded_sequence_length = 1 << int(math.ceil(math.log2(max(branch_register_length, 2))))
+    active_branch_count = min(active_branch_count, padded_sequence_length)
     control_qubits = int(math.log2(padded_sequence_length))
     blocks_per_ansatz = count_blocks(feature_qubits, num_layers)
     weights_v_shape = (blocks_per_ansatz, 12)
@@ -85,11 +118,13 @@ def create_layout(
     )
     return QuantumParameterLayout(
         sequence_length=sequence_length,
+        active_branch_count=active_branch_count,
         padded_sequence_length=padded_sequence_length,
         control_qubits=control_qubits,
         feature_dimension=feature_dimension,
         feature_qubits=feature_qubits,
         non_linear_order=non_linear_order,
+        prune_inactive_branches=prune_inactive_branches,
         num_layers=num_layers,
         blocks_per_ansatz=blocks_per_ansatz,
         weights_v_shape=weights_v_shape,
@@ -117,6 +152,7 @@ def sequence_to_circuit_inputs(
     next_targets: jnp.ndarray,
     padded_sequence_length: int,
     non_linear_order: int = 1,
+    prune_inactive_branches: bool = False,
 ) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     current_states = normalize_state_batch(jnp.asarray(current_states, dtype=jnp.complex128))
     next_targets = normalize_state_batch(jnp.asarray(next_targets, dtype=jnp.complex128))
@@ -151,7 +187,10 @@ def sequence_to_circuit_inputs(
                 )
             branch_states.append(normalize_state(branch_vec))
         else:
-            branch_states.append(system_zero)
+            if prune_inactive_branches:
+                branch_states.append(jnp.zeros_like(system_zero))
+            else:
+                branch_states.append(system_zero)
 
     return padded_x, padded_targets, jnp.stack(branch_states)
 
@@ -161,18 +200,27 @@ def batch_sequences_to_circuit_inputs(
     next_batch: jnp.ndarray,
     padded_sequence_length: int,
     non_linear_order: int = 1,
+    prune_inactive_branches: bool = False,
 ) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     transform = partial(
         sequence_to_circuit_inputs,
         padded_sequence_length=padded_sequence_length,
         non_linear_order=non_linear_order,
+        prune_inactive_branches=prune_inactive_branches,
     )
     return jax.vmap(transform)(current_batch, next_batch)
 
 
 def isometrize_matrix(matrix: jnp.ndarray) -> jnp.ndarray:
-    matrix = jnp.asarray(matrix, dtype=jnp.float64)
+    matrix = jnp.nan_to_num(
+        jnp.asarray(matrix, dtype=jnp.float64),
+        nan=0.0,
+        posinf=0.0,
+        neginf=0.0,
+    )
     q, r = jnp.linalg.qr(matrix, mode="reduced")
+    q = jnp.nan_to_num(q, nan=0.0, posinf=0.0, neginf=0.0)
+    r = jnp.nan_to_num(r, nan=0.0, posinf=0.0, neginf=0.0)
     diag = jnp.sign(jnp.real(jnp.diag(r)))
     diag = jnp.where(diag == 0, 1.0, diag)
     return q * diag
@@ -205,6 +253,7 @@ def prepare_text_batch(
         next_targets,
         padded_sequence_length=layout.padded_sequence_length,
         non_linear_order=layout.non_linear_order,
+        prune_inactive_branches=layout.prune_inactive_branches,
     )
     return x_batch, tilde_batch, prep_batch, embedding, rotation, output
 
@@ -234,7 +283,29 @@ def prepare_quantum_batch(
         next_targets,
         padded_sequence_length=layout.padded_sequence_length,
         non_linear_order=layout.non_linear_order,
+        prune_inactive_branches=layout.prune_inactive_branches,
     )
+
+
+def combined_targets(
+    x: jnp.ndarray,
+    tilde_x: jnp.ndarray,
+    branch_count: int,
+    non_linear_order: int,
+) -> jnp.ndarray:
+    branch_count = max(int(branch_count), 0)
+    x = jnp.asarray(x, dtype=jnp.complex128)
+    tilde_x = jnp.asarray(tilde_x, dtype=jnp.complex128)
+    targets = tilde_x[1:branch_count + 1]
+    if branch_count == 0:
+        return jnp.zeros(
+            (0, _system_dimension(int(x.shape[-1]), non_linear_order)),
+            dtype=jnp.complex128,
+        )
+    x_prefix = x[:branch_count]
+    for _ in range(non_linear_order):
+        targets = jax.vmap(jnp.kron)(targets, x_prefix)
+    return normalize_state_batch(targets)
 
 
 def circuit_g_block(q1: int, q2: int, block_weights: jnp.ndarray) -> None:
@@ -267,8 +338,85 @@ def apply_sim_ansatz(wires: Tuple[int, ...], ansatz_weights: jnp.ndarray, num_la
             block_idx += 1
 
 
+def _branch_limit(layout: QuantumParameterLayout) -> int:
+    return layout.active_branch_count if layout.prune_inactive_branches else layout.padded_sequence_length
+
+
+def _resolve_readout_mode(layout: QuantumParameterLayout, readout_mode: str) -> str:
+    if readout_mode == "auto":
+        return "uniform_active" if layout.prune_inactive_branches else "hadamard"
+    if readout_mode not in {"hadamard", "uniform_active"}:
+        raise ValueError(
+            f"Unsupported readout_mode '{readout_mode}'. Expected 'auto', 'hadamard', or 'uniform_active'."
+        )
+    return readout_mode
+
+
+def _uniform_readout_state(layout: QuantumParameterLayout) -> jnp.ndarray:
+    state = jnp.zeros((layout.padded_sequence_length,), dtype=jnp.complex128)
+    branch_count = _branch_limit(layout)
+    if branch_count <= 0:
+        return state.at[0].set(1.0 + 0.0j)
+    amplitude = 1.0 / math.sqrt(branch_count)
+    return state.at[:branch_count].set(amplitude + 0.0j)
+
+
+def _rot_matrix(phi: jnp.ndarray, theta: jnp.ndarray, omega: jnp.ndarray) -> jnp.ndarray:
+    """qml.Rot(phi, theta, omega) as a 2x2 unitary matrix."""
+    half_phi = phi / 2.0
+    half_theta = theta / 2.0
+    half_omega = omega / 2.0
+    exp_minus = jnp.exp(-0.5j * omega)
+    exp_plus = jnp.exp(0.5j * omega)
+    exp_phi_minus = jnp.exp(-0.5j * phi)
+    exp_phi_plus = jnp.exp(0.5j * phi)
+    c = jnp.cos(half_theta)
+    s = jnp.sin(half_theta)
+    return jnp.array(
+        [
+            [exp_minus * exp_phi_minus * c, -exp_minus * exp_phi_plus * s],
+            [exp_plus * exp_phi_minus * s, exp_plus * exp_phi_plus * c],
+        ],
+        dtype=jnp.complex128,
+    )
+
+
+def _control_readout_row(
+    layout: QuantumParameterLayout,
+    weights_c: jnp.ndarray,
+    readout_mode: str,
+    uniform_state: jnp.ndarray,
+) -> jnp.ndarray:
+    readout_mode = _resolve_readout_mode(layout, readout_mode)
+    control_matrix = jnp.array([[1.0 + 0.0j]], dtype=jnp.complex128)
+    for wire_idx in range(layout.control_qubits):
+        base = 3 * wire_idx
+        control_matrix = jnp.kron(
+            control_matrix,
+            _rot_matrix(weights_c[base], weights_c[base + 1], weights_c[base + 2]),
+        )
+    if readout_mode == "hadamard":
+        hadamard = (1.0 / math.sqrt(2.0)) * jnp.array(
+            [[1.0, 1.0], [1.0, -1.0]],
+            dtype=jnp.complex128,
+        )
+        hadamard_layer = jnp.array([[1.0 + 0.0j]], dtype=jnp.complex128)
+        for _ in range(layout.control_qubits):
+            hadamard_layer = jnp.kron(hadamard_layer, hadamard)
+        measurement_row = hadamard_layer[0]
+    else:
+        measurement_row = uniform_state.conj()
+    return measurement_row @ control_matrix
+
+
 @lru_cache(maxsize=None)
-def _build_circuit_context(layout: QuantumParameterLayout) -> Dict[str, object]:
+def _build_circuit_context(
+    layout: QuantumParameterLayout,
+    device_name: str = "lightning.qubit",
+    interface: str = "jax",
+    diff_method: str = "adjoint",
+    readout_mode: str = "auto",
+) -> Dict[str, object]:
     wires_c = tuple(range(layout.control_qubits))
     start_a = layout.control_qubits
     wires_a = tuple(range(start_a, start_a + layout.feature_qubits))
@@ -284,9 +432,12 @@ def _build_circuit_context(layout: QuantumParameterLayout) -> Dict[str, object]:
     )
     all_system_wires = wires_a + tuple(wire for register in wires_b for wire in register)
     total_wires = wires_c + all_system_wires
-    device = qml.device("default.qubit", wires=total_wires)
+    device = qml.device(device_name, wires=total_wires)
+    branch_limit = _branch_limit(layout)
+    readout_mode = _resolve_readout_mode(layout, readout_mode)
+    uniform_readout_state = _uniform_readout_state(layout)
 
-    @qml.qnode(device, interface="jax", diff_method="backprop")
+    @qml.qnode(device, interface=interface, diff_method=diff_method)
     def qnode(
         x: jnp.ndarray,
         tilde_x: jnp.ndarray,
@@ -304,7 +455,7 @@ def _build_circuit_context(layout: QuantumParameterLayout) -> Dict[str, object]:
             for register in wires_b:
                 apply_sim_ansatz(register, weights_w, layout.num_layers)
 
-        for branch_idx in range(layout.padded_sequence_length):
+        for branch_idx in range(branch_limit):
             control_values = tuple(
                 int(bit)
                 for bit in format(branch_idx, f"0{layout.control_qubits}b")
@@ -329,29 +480,128 @@ def _build_circuit_context(layout: QuantumParameterLayout) -> Dict[str, object]:
             )
             idx_c += 3
 
-        for wire in wires_c:
-            qml.Hadamard(wires=wire)
+        if readout_mode == "uniform_active":
+            qml.adjoint(qml.StatePrep(uniform_readout_state, wires=wires_c))
+        else:
+            for wire in wires_c:
+                qml.Hadamard(wires=wire)
 
         return qml.expval(qml.Projector([0] * len(total_wires), wires=total_wires))
 
+    @qml.qnode(device, interface=interface, diff_method=diff_method)
+    def state_qnode(
+        precomputed_states: jnp.ndarray,
+        weights_v: jnp.ndarray,
+        weights_w: jnp.ndarray,
+    ) -> jnp.ndarray:
+        global_state = jnp.reshape(precomputed_states, (-1,))
+        global_state = normalize_state(global_state)
+        qml.StatePrep(global_state, wires=total_wires)
+
+        if layout.blocks_per_ansatz > 0:
+            apply_sim_ansatz(wires_a, weights_v, layout.num_layers)
+            for register in wires_b:
+                apply_sim_ansatz(register, weights_w, layout.num_layers)
+
+        return qml.state()
+
+    def overlap_probability(
+        state: jnp.ndarray,
+        x: jnp.ndarray,
+        tilde_x: jnp.ndarray,
+        weights_c: jnp.ndarray,
+    ) -> jnp.ndarray:
+        system_dimension = _system_dimension(layout.feature_dimension, layout.non_linear_order)
+        psi = jnp.reshape(state, (layout.padded_sequence_length, system_dimension))[:branch_limit]
+        targets = combined_targets(x, tilde_x, branch_limit, layout.non_linear_order)
+        branch_overlaps = jnp.einsum("jd,jd->j", targets.conj(), psi)
+        readout_row = _control_readout_row(layout, weights_c, readout_mode, uniform_readout_state)
+        amplitude = readout_row[:branch_limit] @ branch_overlaps
+        return jnp.abs(amplitude) ** 2
+
     vmapped_qnode = jax.vmap(qnode, in_axes=(0, 0, 0, None, None, None))
+    vmapped_state_qnode = jax.vmap(state_qnode, in_axes=(0, None, None))
+    vmapped_overlap_probability = jax.vmap(overlap_probability, in_axes=(0, 0, 0, None))
     return {
         "qnode": qnode,
         "vmapped_qnode": vmapped_qnode,
+        "state_qnode": state_qnode,
+        "vmapped_state_qnode": vmapped_state_qnode,
+        "overlap_probability": overlap_probability,
+        "vmapped_overlap_probability": vmapped_overlap_probability,
         "wires_c": wires_c,
         "wires_a": wires_a,
         "wires_b": wires_b,
         "all_system_wires": all_system_wires,
         "total_wires": total_wires,
+        "device_name": device_name,
+        "interface": interface,
+        "diff_method": diff_method,
+        "readout_mode": readout_mode,
+        "branch_limit": branch_limit,
     }
 
 
-def get_qnode(layout: QuantumParameterLayout):
-    return _build_circuit_context(layout)["qnode"]
+def get_qnode(
+    layout: QuantumParameterLayout,
+    device_name: str = "lightning.qubit",
+    interface: str = "jax",
+    diff_method: str = "adjoint",
+    readout_mode: str = "auto",
+):
+    return _build_circuit_context(layout, device_name, interface, diff_method, readout_mode)["qnode"]
 
 
-def get_vmapped_qnode(layout: QuantumParameterLayout):
-    return _build_circuit_context(layout)["vmapped_qnode"]
+def get_vmapped_qnode(
+    layout: QuantumParameterLayout,
+    device_name: str = "lightning.qubit",
+    interface: str = "jax",
+    diff_method: str = "adjoint",
+    readout_mode: str = "auto",
+):
+    return _build_circuit_context(layout, device_name, interface, diff_method, readout_mode)["vmapped_qnode"]
+
+
+def get_state_qnode(
+    layout: QuantumParameterLayout,
+    device_name: str = "lightning.qubit",
+    interface: str = "jax",
+    diff_method: str = "adjoint",
+    readout_mode: str = "auto",
+):
+    return _build_circuit_context(layout, device_name, interface, diff_method, readout_mode)["state_qnode"]
+
+
+def get_vmapped_state_qnode(
+    layout: QuantumParameterLayout,
+    device_name: str = "lightning.qubit",
+    interface: str = "jax",
+    diff_method: str = "adjoint",
+    readout_mode: str = "auto",
+):
+    return _build_circuit_context(layout, device_name, interface, diff_method, readout_mode)["vmapped_state_qnode"]
+
+
+def get_overlap_probability_fn(
+    layout: QuantumParameterLayout,
+    device_name: str = "lightning.qubit",
+    interface: str = "jax",
+    diff_method: str = "adjoint",
+    readout_mode: str = "auto",
+):
+    return _build_circuit_context(layout, device_name, interface, diff_method, readout_mode)["overlap_probability"]
+
+
+def get_vmapped_overlap_probability_fn(
+    layout: QuantumParameterLayout,
+    device_name: str = "lightning.qubit",
+    interface: str = "jax",
+    diff_method: str = "adjoint",
+    readout_mode: str = "auto",
+):
+    return _build_circuit_context(layout, device_name, interface, diff_method, readout_mode)[
+        "vmapped_overlap_probability"
+    ]
 
 
 def flatten_quantum_parameters(
@@ -440,6 +690,10 @@ def apply_adam_step(
     beta2: float = 0.999,
     epsilon: float = 1e-8,
 ) -> Tuple[Dict[str, jnp.ndarray], Dict[str, jnp.ndarray], Dict[str, jnp.ndarray]]:
+    grads = jax.tree_util.tree_map(
+        lambda g: jnp.nan_to_num(g, nan=0.0, posinf=0.0, neginf=0.0),
+        grads,
+    )
     first_moment = jax.tree_util.tree_map(
         lambda m, g: beta1 * m + (1.0 - beta1) * g,
         first_moment,
@@ -463,6 +717,10 @@ def apply_adam_step(
         params,
         corrected_m,
         corrected_v,
+    )
+    updated_params = jax.tree_util.tree_map(
+        lambda p: jnp.nan_to_num(p, nan=0.0, posinf=0.0, neginf=0.0),
+        updated_params,
     )
     return updated_params, first_moment, second_moment
 

@@ -1,0 +1,47 @@
+# Python / env
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Logs e artefatti pesanti
+logs/
+*.log
+*.npy
+
+# Risultati: tieni solo l'ultimo studio (summary + plot)
+results/**
+!results/study/
+results/study/**
+!results/study/20260716_100201/
+results/study/20260716_100201/**/*
+!results/study/20260716_100201/*.png
+!results/study/20260716_100201/*.csv
+!results/study/20260716_100201/*.txt
+!results/study/20260716_100201/*.json
+
+# Duplicati / scratch locale
+qsa_section2_circuit(1).py
+errore.txt
+2602.06699v1.pdf
+2602.06699v1.txt
+diagnose_tradeoff.py
+readout_equivalence_suite.py
+run_custom_profile.py
+run_nonlinearity_campaign.py
+run_overlap_scaling.py
+run_prof_followup.py
+run_prof_readout_suite.py
+run_readout_comparison.py
+run_readout_followup.py
+run_sweep.py
+run_tradeoff_campaign.py
+summarize_tradeoff.py
+sweep_profiles.py
+vqt_active_branches.py

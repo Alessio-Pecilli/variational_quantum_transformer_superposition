@@ -38,12 +38,12 @@ def _prepare_legacy_inputs(psi, U, Z, embedding_dim: int, num_layers: int):
         sequence_length=sentence_length,
         feature_dimension=embedding_dim,
         num_layers=num_layers,
-        non_linear_order=1,
+        non_linear_order=2,
     )
 
     active_steps = len(U)
     zero_feature = zero_feature_state(embedding_dim)
-    zero_system = zero_system_state(embedding_dim, 1)
+    zero_system = zero_system_state(embedding_dim, 2)
 
     x = jnp.tile(zero_feature, (layout.padded_sequence_length, 1))
     tilde_x = jnp.tile(zero_feature, (layout.padded_sequence_length + 1, 1))
@@ -112,7 +112,7 @@ def compute_loss_variant(args):
         sequence_length=max(len(U) + 1, 2),
         feature_dimension=embedding_dim,
         num_layers=num_layers,
-        non_linear_order=1,
+        non_linear_order=2,
     ))
     params = params + shift_value
     return float(loss_fn(params))

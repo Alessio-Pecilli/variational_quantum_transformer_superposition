@@ -1,0 +1,53 @@
+RIASSUNTO STUDIO SECTION 2
+==================================================
+Data:        2026-07-16T10:02:15
+Preset:      long
+k:           2
+Epoche:      40
+Frasi:       64
+Seed:        42
+Self-check:  PASS
+Tempo tot.:  14.1 s
+Output:      results\study\20260716_100201
+
+METRICA: obar = mean_{i<=j} |a_ij s_ij^k|  (= absS/Ntri, NO potenza 1/k)
+         obar_k_root = obar^{1/k}  (solo diagnostica, non usata nei plot)
+         s_ij = <x_j|W|x_i>, a_ij = <x_{j+1}|V|x_i>
+Refs: Haar = d^{-(k+1)/2} ; advantage = sqrt(k * k! / d^k)
+
+SWEEP vs T  (d=4, k=2)
+----------------------------------------
+   T          obar          Haar           adv  n_qubits
+   2      0.635679  1.250000e-01  5.000000e-01         8
+   4      0.439503  1.250000e-01  5.000000e-01        10
+   8      0.313207  1.250000e-01  5.000000e-01        12
+  16      0.300033  1.250000e-01  5.000000e-01        14
+
+  T>=4: media obar=0.3509, spread=0.1395
+  Atteso: circa costante in T per T >= T_lim=4 (T=2 spesso outlier).
+
+SWEEP vs d  (T=4, k variabile)
+----------------------------------------
+   d          obar          Haar           adv     >Haar      >adv
+   2      0.287040  3.535534e-01  1.000000e+00        no        no
+   4      0.438836  1.250000e-01  5.000000e-01        si        no
+   8      0.353378  4.419417e-02  2.500000e-01        si        si
+
+  Atteso: obar sopra Haar e possibilmente sopra advantage threshold.
+
+FILE GENERATI
+----------------------------------------
+  summary_vs_T.csv, summary_vs_d.csv
+  mean_O_vs_T.png, mean_O_vs_d.png  (obar vs refs)
+  manifest.json
+  RIASSUNTO.txt  (questo file)
+
+COMANDI EQUIVALENTI (main_hpc.py per un singolo punto)
+----------------------------------------
+  python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 4 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d4_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 4 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d4_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 4 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d4_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 4 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d4_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 2 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d2_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 4 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d4_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 8 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d8_k2

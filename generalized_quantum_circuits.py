@@ -54,7 +54,7 @@ def process_sentence_states(states, targets=None):
 class GeneralizedQuantumCircuitBuilder:
     embedding_dim: int
     sentence_length: int
-    non_linear_order: int = 1
+    non_linear_order: int = 2
 
     def __post_init__(self):
         self.n_control_qubits = int(math.ceil(math.log2(max(self.sentence_length, 2))))

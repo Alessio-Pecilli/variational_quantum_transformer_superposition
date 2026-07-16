@@ -29,7 +29,9 @@ from pennylane_jax_vqt import (
     compute_overlap_loss,
     create_layout,
     flatten_quantum_parameters,
-    get_vmapped_qnode,
+    get_overlap_probability_fn,
+    get_qnode,
+    get_state_qnode,
     initialize_quantum_parameters,
     materialize_text_matrices,
     prepare_quantum_batch,
@@ -297,15 +299,19 @@ def _build_layout(
             else int(quantum_data["state_batch"].shape[-1])
         )
         sequence_length = int(quantum_data["state_batch"].shape[1])
+        active_branch_count = max(sequence_length - 1, 0)
     else:
         feature_dimension = int(cfg["embedding_dim"])
         sequence_length = int(text_data["token_batch"].shape[1])
+        active_branch_count = max(sequence_length - 1, 0)
 
     return create_layout(
         sequence_length=sequence_length,
         feature_dimension=feature_dimension,
         num_layers=cfg["num_layers"],
-        non_linear_order=1,
+        non_linear_order=int(cfg.get("non_linear_order", 2)),
+        prune_inactive_branches=bool(cfg.get("prune_inactive_branches", False)),
+        active_branch_count=active_branch_count,
     )
 
 
@@ -384,6 +390,136 @@ def _unflatten_native_parameters(
     return params
 
 
+def _resolve_checkpoint_path(path_like) -> Path:
+    checkpoint_path = Path(path_like)
+    if checkpoint_path.is_dir():
+        full = checkpoint_path / "best_checkpoint.npz"
+        direct = checkpoint_path / "best_params_native.npy"
+        nested = checkpoint_path / "matrices" / "best_params_native.npy"
+        if full.exists():
+            return full
+        if direct.exists():
+            return direct
+        if nested.exists():
+            return nested
+    return checkpoint_path
+
+
+def _unflatten_like(
+    flat_params: np.ndarray,
+    layout: QuantumParameterLayout,
+    template_params: Dict[str, jnp.ndarray],
+):
+    return _unflatten_native_parameters(
+        flat_params=flat_params,
+        layout=layout,
+        embedding_shape=template_params["embedding"].shape if "embedding" in template_params else None,
+        rotation_shape=template_params["rotation"].shape if "rotation" in template_params else None,
+        projection_shape=template_params["projection"].shape if "projection" in template_params else None,
+    )
+
+
+def _save_training_checkpoint(
+    checkpoint_dir: Path,
+    params: Dict[str, jnp.ndarray],
+    first_moment: Dict[str, jnp.ndarray],
+    second_moment: Dict[str, jnp.ndarray],
+    best_epoch: int,
+    best_loss: float,
+    optimizer_step: int,
+    run_label,
+):
+    flat_params = _as_numpy(_flatten_native_parameters(params))
+    flat_first = _as_numpy(_flatten_native_parameters(first_moment))
+    flat_second = _as_numpy(_flatten_native_parameters(second_moment))
+    np.save(checkpoint_dir / "best_params_native.npy", flat_params)
+    np.savez(
+        checkpoint_dir / "best_checkpoint.npz",
+        params=flat_params,
+        first_moment=flat_first,
+        second_moment=flat_second,
+        best_epoch=np.asarray(best_epoch, dtype=np.int64),
+        best_loss=np.asarray(best_loss, dtype=np.float64),
+        optimizer_step=np.asarray(optimizer_step, dtype=np.int64),
+        run_label=np.asarray(str(run_label or "")),
+    )
+    with open(checkpoint_dir / "checkpoint_info.txt", "w", encoding="utf-8") as handle:
+        handle.write(f"best_epoch={best_epoch}\n")
+        handle.write(f"best_loss={best_loss:.12f}\n")
+        handle.write(f"optimizer_step={optimizer_step}\n")
+        handle.write(f"run_label={run_label}\n")
+
+
+def _read_checkpoint_info(checkpoint_path: Path) -> dict:
+    info_path = checkpoint_path / "checkpoint_info.txt" if checkpoint_path.is_dir() else checkpoint_path.parent / "checkpoint_info.txt"
+    info = {}
+    if not info_path.exists():
+        return info
+    with open(info_path, "r", encoding="utf-8") as handle:
+        for raw_line in handle:
+            line = raw_line.strip()
+            if not line or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            info[key.strip()] = value.strip()
+    return info
+
+
+def _load_resume_state(
+    checkpoint,
+    layout: QuantumParameterLayout,
+    template_params: Dict[str, jnp.ndarray],
+    logger,
+    rank: int = 0,
+):
+    if not checkpoint:
+        return None, None, None, 0, None
+
+    checkpoint_path = _resolve_checkpoint_path(checkpoint)
+    if not checkpoint_path.exists():
+        raise FileNotFoundError(f"Checkpoint non trovato: {checkpoint_path}")
+
+    loaded = np.load(checkpoint_path)
+    first_moment = None
+    second_moment = None
+    optimizer_step = 0
+    resume_best_loss = None
+    if checkpoint_path.suffix == ".npz":
+        flat_params = loaded["params"]
+        first_moment = loaded["first_moment"] if "first_moment" in loaded else None
+        second_moment = loaded["second_moment"] if "second_moment" in loaded else None
+        optimizer_step = int(np.asarray(loaded["optimizer_step"]).item()) if "optimizer_step" in loaded else 0
+        resume_best_loss = float(np.asarray(loaded["best_loss"]).item()) if "best_loss" in loaded else None
+    else:
+        flat_params = loaded
+        info = _read_checkpoint_info(checkpoint_path)
+        if "optimizer_step" in info:
+            optimizer_step = int(info["optimizer_step"])
+        elif "best_epoch" in info:
+            optimizer_step = int(info["best_epoch"])
+        if "best_loss" in info:
+            resume_best_loss = float(info["best_loss"])
+
+    expected_size = int(_as_numpy(_flatten_native_parameters(template_params)).size)
+    actual_size = int(np.asarray(flat_params).size)
+    if actual_size != expected_size:
+        raise ValueError(
+            f"Checkpoint incompatibile: size={actual_size}, atteso={expected_size}. "
+            "Usare la stessa configurazione di T, d, layer, pruning e parametri trainabili."
+        )
+
+    params = _unflatten_like(flat_params, layout, template_params)
+    first_tree = _unflatten_like(first_moment, layout, template_params) if first_moment is not None else None
+    second_tree = _unflatten_like(second_moment, layout, template_params) if second_moment is not None else None
+    if rank == 0:
+        logger.info(f"[RESUME] Parametri inizializzati da checkpoint: {checkpoint_path}")
+        if first_tree is not None and second_tree is not None:
+            logger.info(f"[RESUME] Stato Adam ripristinato | optimizer_step={optimizer_step}")
+        else:
+            logger.info("[RESUME] Stato Adam non presente nel checkpoint; riparto dai pesi migliori con momenti azzerati")
+    return params, first_tree, second_tree, optimizer_step, resume_best_loss
+
+
 def _compute_param_counts(params: Dict[str, jnp.ndarray], layout: QuantumParameterLayout):
     n_quantum = layout.total_parameters
     n_embedding = int(np.prod(params["embedding"].shape)) if "embedding" in params else 0
@@ -392,32 +528,172 @@ def _compute_param_counts(params: Dict[str, jnp.ndarray], layout: QuantumParamet
     return n_quantum, n_embedding, n_rotation, n_projection
 
 
-def _build_text_functions(layout: QuantumParameterLayout):
-    vmapped_qnode = get_vmapped_qnode(layout)
+def _sum_tree(accumulator, increment):
+    return jax.tree_util.tree_map(lambda acc, inc: acc + inc, accumulator, increment)
+
+
+def _sanitize_tree(tree):
+    return jax.tree_util.tree_map(
+        lambda leaf: jnp.nan_to_num(leaf, nan=0.0, posinf=0.0, neginf=0.0),
+        tree,
+    )
+
+
+def _clip_grad_tree(tree, max_norm: float):
+    sanitized = _sanitize_tree(tree)
+    if max_norm <= 0:
+        return sanitized, 0.0
+    squared_norm = jax.tree_util.tree_reduce(
+        lambda acc, leaf: acc + jnp.sum(jnp.abs(leaf) ** 2),
+        sanitized,
+        initializer=jnp.asarray(0.0, dtype=jnp.float64),
+    )
+    global_norm = jnp.sqrt(squared_norm)
+    clip_coef = jnp.minimum(1.0, max_norm / jnp.maximum(global_norm, 1e-12))
+    clipped = jax.tree_util.tree_map(lambda leaf: leaf * clip_coef, sanitized)
+    return clipped, float(global_norm)
+
+
+def _slice_text_batch(text_data: dict, start: int, stop: int) -> dict:
+    return {
+        "token_batch": text_data["token_batch"][start:stop],
+        "positional_encoding": text_data["positional_encoding"],
+    }
+
+
+def _slice_quantum_batch(quantum_data: dict, start: int, stop: int) -> dict:
+    return {
+        "state_batch": quantum_data["state_batch"][start:stop],
+    }
+
+
+def _batch_ranges(total: int, batch_size: int):
+    if total <= 0:
+        return
+    batch_size = max(1, min(int(batch_size), total))
+    for start in range(0, total, batch_size):
+        yield start, min(start + batch_size, total)
+
+
+def _stacked_qnode_eval(qnode, x_batch, tilde_batch, prep_batch, weights_v, weights_w, weights_c):
+    overlaps = [
+        qnode(x_item, tilde_item, prep_item, weights_v, weights_w, weights_c)
+        for x_item, tilde_item, prep_item in zip(x_batch, tilde_batch, prep_batch)
+    ]
+    if not overlaps:
+        return jnp.zeros((0,), dtype=jnp.float64)
+    return jnp.stack(overlaps)
+
+
+def _stacked_state_eval(state_qnode, prep_batch, weights_v, weights_w):
+    states = [state_qnode(prep_item, weights_v, weights_w) for prep_item in prep_batch]
+    if not states:
+        return jnp.zeros((0,), dtype=jnp.complex128)
+    return jnp.stack(states)
+
+
+def _get_backend_settings(cfg: dict) -> Tuple[str, str, str]:
+    return (
+        str(cfg.get("quantum_device", "lightning.qubit")),
+        str(cfg.get("quantum_interface", "jax")),
+        str(cfg.get("quantum_diff_method", "adjoint")),
+    )
+
+
+def _get_readout_settings(cfg: dict) -> Tuple[str, bool]:
+    return (
+        str(cfg.get("control_readout_mode", "auto")),
+        bool(cfg.get("analytic_readout", True)),
+    )
+
+
+def _get_text_trainability(cfg: dict) -> Tuple[bool, bool]:
+    return (
+        bool(cfg.get("train_embedding", True)),
+        bool(cfg.get("train_rotation", True)),
+    )
+
+
+def _get_analytic_backend_settings(cfg: dict, default_interface: str) -> Tuple[str, str, str]:
+    return (
+        str(cfg.get("analytic_quantum_device", "default.qubit")),
+        default_interface,
+        str(cfg.get("analytic_quantum_diff_method", "backprop")),
+    )
+
+
+def _build_text_functions(layout: QuantumParameterLayout, cfg: dict):
+    device_name, interface, diff_method = _get_backend_settings(cfg)
+    readout_mode, analytic_readout = _get_readout_settings(cfg)
+    train_embedding, train_rotation = _get_text_trainability(cfg)
+    analytic_device_name, analytic_interface, analytic_diff_method = _get_analytic_backend_settings(
+        cfg,
+        interface,
+    )
+    qnode = get_qnode(
+        layout,
+        device_name=device_name,
+        interface=interface,
+        diff_method=diff_method,
+        readout_mode=readout_mode,
+    )
+    state_qnode = get_state_qnode(
+        layout,
+        device_name=analytic_device_name,
+        interface=analytic_interface,
+        diff_method=analytic_diff_method,
+        readout_mode=readout_mode,
+    )
+    overlap_probability = get_overlap_probability_fn(
+        layout,
+        device_name=analytic_device_name,
+        interface=analytic_interface,
+        diff_method=analytic_diff_method,
+        readout_mode=readout_mode,
+    )
 
     def _loss_sum_impl(params, token_batch, positional_encoding):
+        embedding_param = params["embedding"]
+        rotation_param = params["rotation"]
+        if not train_embedding:
+            embedding_param = jax.lax.stop_gradient(embedding_param)
+        if not train_rotation:
+            rotation_param = jax.lax.stop_gradient(rotation_param)
         x_batch, tilde_batch, prep_batch, _, _, _ = prepare_text_batch(
             token_batch=token_batch,
             positional_encoding=positional_encoding,
-            raw_embedding=params["embedding"],
-            raw_rotation=params["rotation"],
+            raw_embedding=embedding_param,
+            raw_rotation=rotation_param,
             layout=layout,
         )
-        overlaps = vmapped_qnode(
-            x_batch,
-            tilde_batch,
-            prep_batch,
-            params["weights_v"],
-            params["weights_w"],
-            params["weights_c"],
-        )
+        if analytic_readout:
+            states = _stacked_state_eval(
+                state_qnode,
+                prep_batch,
+                params["weights_v"],
+                params["weights_w"],
+            )
+            overlaps = jax.vmap(overlap_probability, in_axes=(0, 0, 0, None))(
+                states,
+                x_batch,
+                tilde_batch,
+                params["weights_c"],
+            )
+        else:
+            overlaps = _stacked_qnode_eval(
+                qnode,
+                x_batch,
+                tilde_batch,
+                prep_batch,
+                params["weights_v"],
+                params["weights_w"],
+                params["weights_c"],
+            )
         return jnp.sum(_overlaps_to_losses(overlaps))
 
-    @jax.jit
     def compute_loss_sum(params, token_batch, positional_encoding):
         return _loss_sum_impl(params, token_batch, positional_encoding)
 
-    @jax.jit
     def infer_overlaps(params, token_batch, positional_encoding):
         x_batch, tilde_batch, prep_batch, _, _, _ = prepare_text_batch(
             token_batch=token_batch,
@@ -426,7 +702,21 @@ def _build_text_functions(layout: QuantumParameterLayout):
             raw_rotation=params["rotation"],
             layout=layout,
         )
-        return vmapped_qnode(
+        if analytic_readout:
+            states = _stacked_state_eval(
+                state_qnode,
+                prep_batch,
+                params["weights_v"],
+                params["weights_w"],
+            )
+            return jax.vmap(overlap_probability, in_axes=(0, 0, 0, None))(
+                states,
+                x_batch,
+                tilde_batch,
+                params["weights_c"],
+            )
+        return _stacked_qnode_eval(
+            qnode,
             x_batch,
             tilde_batch,
             prep_batch,
@@ -435,7 +725,6 @@ def _build_text_functions(layout: QuantumParameterLayout):
             params["weights_c"],
         )
 
-    @jax.jit
     def loss_and_grad(params, token_batch, positional_encoding):
         return jax.value_and_grad(_loss_sum_impl)(params, token_batch, positional_encoding)
 
@@ -453,8 +742,34 @@ def _build_text_functions(layout: QuantumParameterLayout):
     return compute_loss_sum, infer_overlaps, loss_and_grad, optimizer_step
 
 
-def _build_quantum_functions(layout: QuantumParameterLayout):
-    vmapped_qnode = get_vmapped_qnode(layout)
+def _build_quantum_functions(layout: QuantumParameterLayout, cfg: dict):
+    device_name, interface, diff_method = _get_backend_settings(cfg)
+    readout_mode, analytic_readout = _get_readout_settings(cfg)
+    analytic_device_name, analytic_interface, analytic_diff_method = _get_analytic_backend_settings(
+        cfg,
+        interface,
+    )
+    qnode = get_qnode(
+        layout,
+        device_name=device_name,
+        interface=interface,
+        diff_method=diff_method,
+        readout_mode=readout_mode,
+    )
+    state_qnode = get_state_qnode(
+        layout,
+        device_name=analytic_device_name,
+        interface=analytic_interface,
+        diff_method=analytic_diff_method,
+        readout_mode=readout_mode,
+    )
+    overlap_probability = get_overlap_probability_fn(
+        layout,
+        device_name=analytic_device_name,
+        interface=analytic_interface,
+        diff_method=analytic_diff_method,
+        readout_mode=readout_mode,
+    )
 
     def _loss_sum_impl(params, state_batch):
         x_batch, tilde_batch, prep_batch = prepare_quantum_batch(
@@ -462,28 +777,55 @@ def _build_quantum_functions(layout: QuantumParameterLayout):
             layout=layout,
             raw_projection=params.get("projection"),
         )
-        overlaps = vmapped_qnode(
-            x_batch,
-            tilde_batch,
-            prep_batch,
-            params["weights_v"],
-            params["weights_w"],
-            params["weights_c"],
-        )
+        if analytic_readout:
+            states = _stacked_state_eval(
+                state_qnode,
+                prep_batch,
+                params["weights_v"],
+                params["weights_w"],
+            )
+            overlaps = jax.vmap(overlap_probability, in_axes=(0, 0, 0, None))(
+                states,
+                x_batch,
+                tilde_batch,
+                params["weights_c"],
+            )
+        else:
+            overlaps = _stacked_qnode_eval(
+                qnode,
+                x_batch,
+                tilde_batch,
+                prep_batch,
+                params["weights_v"],
+                params["weights_w"],
+                params["weights_c"],
+            )
         return jnp.sum(_overlaps_to_losses(overlaps))
 
-    @jax.jit
     def compute_loss_sum(params, state_batch):
         return _loss_sum_impl(params, state_batch)
 
-    @jax.jit
     def infer_overlaps(params, state_batch):
         x_batch, tilde_batch, prep_batch = prepare_quantum_batch(
             state_batch=state_batch,
             layout=layout,
             raw_projection=params.get("projection"),
         )
-        return vmapped_qnode(
+        if analytic_readout:
+            states = _stacked_state_eval(
+                state_qnode,
+                prep_batch,
+                params["weights_v"],
+                params["weights_w"],
+            )
+            return jax.vmap(overlap_probability, in_axes=(0, 0, 0, None))(
+                states,
+                x_batch,
+                tilde_batch,
+                params["weights_c"],
+            )
+        return _stacked_qnode_eval(
+            qnode,
             x_batch,
             tilde_batch,
             prep_batch,
@@ -492,7 +834,6 @@ def _build_quantum_functions(layout: QuantumParameterLayout):
             params["weights_c"],
         )
 
-    @jax.jit
     def loss_and_grad(params, state_batch):
         return jax.value_and_grad(_loss_sum_impl)(params, state_batch)
 
@@ -510,10 +851,14 @@ def _build_quantum_functions(layout: QuantumParameterLayout):
     return compute_loss_sum, infer_overlaps, loss_and_grad, optimizer_step
 
 
-def _prepare_output_dirs(timestamp: str, seed: int) -> Tuple[Path, Path, Path, Path]:
+def _prepare_output_dirs(timestamp: str, seed: int, run_label: Optional[str] = None) -> Tuple[Path, Path, Path, Path]:
     results_dir = Path("results")
     results_dir.mkdir(exist_ok=True)
-    run_dir = results_dir / f"run_{timestamp}_seed{seed}"
+    suffix = f"_seed{seed}"
+    if run_label:
+        safe_label = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in str(run_label))
+        suffix += f"_{safe_label}"
+    run_dir = results_dir / f"run_{timestamp}{suffix}"
     run_dir.mkdir(exist_ok=True)
     matrices_dir = run_dir / "matrices"
     parameters_dir = run_dir / "parameters"
@@ -572,6 +917,7 @@ def _save_matrices_and_metadata(
         "run_id": run_id,
         "timestamp": datetime.now().isoformat(),
         "seed": cfg.get("seed", 42),
+        "run_label": cfg.get("run_label"),
         "use_quantum_states": use_quantum_states,
         "sequence_length": layout.sequence_length,
         "padded_sequence_length": layout.padded_sequence_length,
@@ -580,6 +926,14 @@ def _save_matrices_and_metadata(
         "control_qubits": layout.control_qubits,
         "num_layers": layout.num_layers,
         "non_linear_order": layout.non_linear_order,
+        "active_branch_count": layout.active_branch_count,
+        "prune_inactive_branches": layout.prune_inactive_branches,
+        "control_readout_mode": cfg.get("control_readout_mode", "auto"),
+        "analytic_readout": cfg.get("analytic_readout", True),
+        "analytic_quantum_device": cfg.get("analytic_quantum_device", "default.qubit"),
+        "analytic_quantum_diff_method": cfg.get("analytic_quantum_diff_method", "backprop"),
+        "train_embedding": cfg.get("train_embedding", True),
+        "train_rotation": cfg.get("train_rotation", True),
         "weights_v_shape": layout.weights_v_shape,
         "weights_w_shape": layout.weights_w_shape,
         "weights_c_shape": layout.weights_c_shape,
@@ -738,28 +1092,48 @@ def _evaluate_text_batch(params, layout, sentences: List[str], cfg: dict, comm=N
         encoding=encoding,
         suppress_output=True,
     )
-    _, infer_overlaps, _, _ = _build_text_functions(layout)
+    _, infer_overlaps, _, _ = _build_text_functions(layout, cfg)
 
     if text_data["token_batch"].shape[0] == 0:
         overlaps = np.empty((0,), dtype=np.float64)
     else:
-        overlaps = _as_numpy(
-            infer_overlaps(params, text_data["token_batch"], text_data["positional_encoding"])
-        )
+        eval_batch_size = int(cfg.get("eval_batch_size", cfg.get("train_batch_size", 4)))
+        overlap_batches = []
+        total = int(text_data["token_batch"].shape[0])
+        for start, stop in _batch_ranges(total, eval_batch_size):
+            batch = _slice_text_batch(text_data, start, stop)
+            overlap_batches.append(
+                _as_numpy(infer_overlaps(params, batch["token_batch"], batch["positional_encoding"]))
+            )
+        overlaps = np.concatenate(overlap_batches, axis=0) if overlap_batches else np.empty((0,), dtype=np.float64)
 
     return _aggregate_overlap_metrics(overlaps, comm, rank)
 
 
-def _evaluate_quantum_batch(params, layout, sequences: np.ndarray, comm=None, rank: int = 0, size: int = 1):
+def _evaluate_quantum_batch(
+    params,
+    layout,
+    sequences: np.ndarray,
+    cfg: Optional[dict] = None,
+    comm=None,
+    rank: int = 0,
+    size: int = 1,
+):
     local_sequences = _shard_array(sequences, rank, size)
-    _, infer_overlaps, _, _ = _build_quantum_functions(layout)
+    cfg = dict(OPTIMIZATION_CONFIG if cfg is None else cfg)
+    _, infer_overlaps, _, _ = _build_quantum_functions(layout, cfg)
 
     if local_sequences.shape[0] == 0:
         overlaps = np.empty((0,), dtype=np.float64)
     else:
-        overlaps = _as_numpy(
-            infer_overlaps(params, jnp.asarray(local_sequences, dtype=jnp.complex128))
-        )
+        eval_batch_size = int(cfg.get("eval_batch_size", cfg.get("train_batch_size", 4)))
+        quantum_data = {"state_batch": jnp.asarray(local_sequences, dtype=jnp.complex128)}
+        overlap_batches = []
+        total = int(quantum_data["state_batch"].shape[0])
+        for start, stop in _batch_ranges(total, eval_batch_size):
+            batch = _slice_quantum_batch(quantum_data, start, stop)
+            overlap_batches.append(_as_numpy(infer_overlaps(params, batch["state_batch"])))
+        overlaps = np.concatenate(overlap_batches, axis=0) if overlap_batches else np.empty((0,), dtype=np.float64)
 
     return _aggregate_overlap_metrics(overlaps, comm, rank)
 
@@ -792,7 +1166,7 @@ def _run_cross_validation(
         else:
             sequences = None
         sequences = _broadcast(comm, sequences, root=0)
-        return _evaluate_quantum_batch(params, layout, sequences, comm=comm, rank=rank, size=size)
+        return _evaluate_quantum_batch(params, layout, sequences, cfg=cfg, comm=comm, rank=rank, size=size)
 
     if rank == 0:
         sentences = _load_text_sentences(logger, seed=int(cfg.get("seed", 42)))
@@ -816,12 +1190,21 @@ def run_saved_model_evaluation(matrices_dir: Path, cfg: dict, logger, comm=None,
 
     metadata = _broadcast(comm, metadata, root=0)
     best_params_native = _broadcast(comm, best_params_native, root=0)
+    cfg = dict(cfg)
+    cfg.setdefault("control_readout_mode", metadata.get("control_readout_mode", "auto"))
+    cfg.setdefault("analytic_readout", metadata.get("analytic_readout", True))
+    cfg.setdefault("analytic_quantum_device", metadata.get("analytic_quantum_device", "default.qubit"))
+    cfg.setdefault("analytic_quantum_diff_method", metadata.get("analytic_quantum_diff_method", "backprop"))
+    cfg.setdefault("train_embedding", metadata.get("train_embedding", True))
+    cfg.setdefault("train_rotation", metadata.get("train_rotation", True))
     use_quantum_states = bool(metadata.get("use_quantum_states", False))
     layout = create_layout(
         sequence_length=int(metadata["sequence_length"]),
         feature_dimension=int(metadata["feature_dimension"]),
         num_layers=int(metadata["num_layers"]),
         non_linear_order=int(metadata.get("non_linear_order", 1)),
+        prune_inactive_branches=bool(metadata.get("prune_inactive_branches", False)),
+        active_branch_count=int(metadata.get("active_branch_count", max(int(metadata["sequence_length"]) - 1, 0))),
     )
 
     params = _unflatten_native_parameters(
@@ -866,6 +1249,12 @@ def run_saved_model_evaluation(matrices_dir: Path, cfg: dict, logger, comm=None,
 
 
 def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
+    circuit_mode = str(cfg.get("circuit_mode", "section2")).lower()
+    if circuit_mode == "section2":
+        from qsa_training import run_qsa_training
+
+        return run_qsa_training(logger=logger, cfg=cfg, comm=comm, rank=rank, size=size)
+
     seed = int(cfg.get("seed", 42))
     use_quantum_states = QUANTUM_STATES_CONFIG.get("use_quantum_states", False)
 
@@ -936,12 +1325,25 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
     )
     first_moment = zeros_like_tree(params)
     second_moment = zeros_like_tree(params)
+    resume_params, resume_first_moment, resume_second_moment, resume_step_offset, resume_best_loss = _load_resume_state(
+        checkpoint=cfg.get("resume_checkpoint"),
+        layout=layout,
+        template_params=params,
+        logger=logger,
+        rank=rank,
+    )
+    if resume_params is not None:
+        params = resume_params
+    if resume_first_moment is not None:
+        first_moment = resume_first_moment
+    if resume_second_moment is not None:
+        second_moment = resume_second_moment
 
     if use_quantum_states:
-        _, _, loss_and_grad, optimizer_step = _build_quantum_functions(layout)
+        _, _, loss_and_grad, optimizer_step = _build_quantum_functions(layout, cfg)
         local_count = int(quantum_data["state_batch"].shape[0])
     else:
-        _, _, loss_and_grad, optimizer_step = _build_text_functions(layout)
+        _, _, loss_and_grad, optimizer_step = _build_text_functions(layout, cfg)
         local_count = int(text_data["token_batch"].shape[0])
 
     global_count = int(round(_allreduce_scalar(comm, np.asarray(local_count, dtype=np.float64))))
@@ -950,48 +1352,102 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
 
     learning_rate = float(cfg.get("learning_rate", 1e-3))
     epochs = int(cfg.get("epochs", 100))
+    train_batch_size = max(1, int(cfg.get("train_batch_size", local_count if local_count > 0 else 1)))
+    batch_log_interval = max(1, int(cfg.get("batch_log_interval", 1)))
+    gradient_clip_norm = float(cfg.get("gradient_clip_norm", 0.0))
     log_frequency = max(1, int(cfg.get("log_frequency", 10)))
     eval_frequency = max(1, int(cfg.get("eval_frequency", log_frequency)))
-    max_hours = float(cfg.get("max_hours", 0.0))
-    max_seconds = max_hours * 3600.0 if max_hours > 0 else None
+    device_name, interface, diff_method = _get_backend_settings(cfg)
+    max_run_minutes = float(
+        DATASET_CONFIG.get(
+            "max_run_minutes",
+            float(cfg.get("max_hours", 0.0)) * 60.0,
+        )
+    )
+    max_seconds = max_run_minutes * 60.0 if max_run_minutes > 0 else None
 
     optimization_loss_history = []
     eval_history = []
-    best_loss = float("inf")
+    best_loss = float(resume_best_loss) if resume_best_loss is not None else float("inf")
     best_params = _copy_tree(params)
-    best_epoch = 0
+    best_epoch = int(resume_step_offset) if resume_best_loss is not None else 0
     stop_reason = "epochs_completed"
     start_time = time.perf_counter()
+    checkpoint_dir = None
 
     if rank == 0:
+        run_label = cfg.get("run_label")
+        safe_label = "unlabeled"
+        if run_label:
+            safe_label = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in str(run_label))
+        checkpoint_dir = (
+            Path("results")
+            / "checkpoints"
+            / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{safe_label}"
+        )
+        checkpoint_dir.mkdir(parents=True, exist_ok=True)
         logger.info(
             f"[TRAIN] Backend JAX+PennyLane+MPI | epochs={epochs} | lr={learning_rate} "
             f"| padded_sequence_length={layout.padded_sequence_length}"
+        )
+        if resume_step_offset > 0:
+            logger.info(
+                f"[RESUME] Continuazione da epoch={resume_step_offset}; "
+                f"target totale={epochs}; epoche rimanenti={max(epochs - resume_step_offset, 0)}"
+            )
+        if run_label:
+            logger.info(f"[TRAIN] Run label={run_label}")
+        logger.info(
+            f"[TRAIN] Device={device_name} | interface={interface} | diff_method={diff_method} "
+            f"| train_batch_size={train_batch_size}"
         )
         logger.info(
             f"[MPI] ranks={size} | sample_globali={global_count} | "
             f"sample_locali_medi~={math.ceil(global_count / max(size, 1))}"
         )
         if max_seconds is not None:
-            logger.info(f"[TRAIN] Time budget attivo: {max_hours:.2f} ore (~{max_seconds / 60.0:.1f} minuti)")
-        logger.info("[TRAIN] Warmup JIT alla prima iterazione di ogni rank")
+            logger.info(
+                f"[TRAIN] Time budget attivo: {max_run_minutes:.1f} minuti "
+                f"(~{max_seconds / 3600.0:.2f} ore)"
+            )
+        logger.info("[TRAIN] Esecuzione quantistica in mini-batch con backend Lightning")
 
-    for epoch in range(1, epochs + 1):
+    for epoch in range(resume_step_offset + 1, epochs + 1):
         if local_count == 0:
             local_loss_sum = jnp.asarray(0.0, dtype=jnp.float64)
             local_grads = zeros_like_tree(params)
         else:
-            if use_quantum_states:
-                local_loss_sum, local_grads = loss_and_grad(
-                    params,
-                    quantum_data["state_batch"],
-                )
-            else:
-                local_loss_sum, local_grads = loss_and_grad(
-                    params,
-                    text_data["token_batch"],
-                    text_data["positional_encoding"],
-                )
+            local_loss_sum = jnp.asarray(0.0, dtype=jnp.float64)
+            local_grads = zeros_like_tree(params)
+            batch_ranges = list(_batch_ranges(local_count, train_batch_size))
+            total_local_batches = len(batch_ranges)
+            epoch_batch_start = time.perf_counter()
+            for batch_idx, (start, stop) in enumerate(batch_ranges, start=1):
+                if use_quantum_states:
+                    batch = _slice_quantum_batch(quantum_data, start, stop)
+                    batch_loss_sum, batch_grads = loss_and_grad(
+                        params,
+                        batch["state_batch"],
+                    )
+                else:
+                    batch = _slice_text_batch(text_data, start, stop)
+                    batch_loss_sum, batch_grads = loss_and_grad(
+                        params,
+                        batch["token_batch"],
+                        batch["positional_encoding"],
+                    )
+                local_loss_sum = local_loss_sum + batch_loss_sum
+                local_grads = _sum_tree(local_grads, batch_grads)
+                if rank == 0 and (
+                    batch_idx == 1
+                    or batch_idx == total_local_batches
+                    or batch_idx % batch_log_interval == 0
+                ):
+                    elapsed_batch = time.perf_counter() - epoch_batch_start
+                    logger.info(
+                        f"[TRAIN] epoch={epoch}/{epochs} | batch={batch_idx}/{total_local_batches} "
+                        f"| sample_locali={stop}/{local_count} | elapsed_epoch={elapsed_batch:.1f}s"
+                    )
 
         global_loss_sum = _allreduce_scalar(comm, np.asarray(_as_float(local_loss_sum), dtype=np.float64))
         global_grads = _allreduce_tree(comm, local_grads)
@@ -999,6 +1455,8 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
             lambda grad: grad / global_count,
             global_grads,
         )
+        mean_grads, grad_norm = _clip_grad_tree(mean_grads, gradient_clip_norm)
+        params = _sanitize_tree(params)
         params, first_moment, second_moment = optimizer_step(
             params,
             mean_grads,
@@ -1007,6 +1465,9 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
             epoch,
             learning_rate,
         )
+        first_moment = _sanitize_tree(first_moment)
+        second_moment = _sanitize_tree(second_moment)
+        params = _sanitize_tree(params)
 
         loss_value = global_loss_sum / global_count
         optimization_loss_history.append(loss_value)
@@ -1014,6 +1475,17 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
             best_loss = loss_value
             best_params = _copy_tree(params)
             best_epoch = epoch
+            if rank == 0 and checkpoint_dir is not None:
+                _save_training_checkpoint(
+                    checkpoint_dir=checkpoint_dir,
+                    params=best_params,
+                    first_moment=first_moment,
+                    second_moment=second_moment,
+                    best_epoch=best_epoch,
+                    best_loss=best_loss,
+                    optimizer_step=epoch,
+                    run_label=cfg.get("run_label"),
+                )
 
         should_log = epoch == 1 or epoch % log_frequency == 0 or epoch == epochs
         should_eval = epoch == 1 or epoch % eval_frequency == 0 or epoch == epochs
@@ -1027,6 +1499,7 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
                     params,
                     layout,
                     train_sequences,
+                    cfg=cfg,
                     comm=comm,
                     rank=rank,
                     size=size,
@@ -1035,6 +1508,7 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
                     params,
                     layout,
                     test_sequences,
+                    cfg=cfg,
                     comm=comm,
                     rank=rank,
                     size=size,
@@ -1074,7 +1548,10 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
                 )
 
         if rank == 0 and should_log:
-            message = f"[TRAIN] Epoch {epoch:04d}/{epochs:04d} | opt_loss={loss_value:.8f}"
+            message = (
+                f"[TRAIN] Epoch {epoch:04d}/{epochs:04d} | opt_loss={loss_value:.8f}"
+                f" | grad_norm={grad_norm:.6f}"
+            )
             if current_train_metrics is not None:
                 message += (
                     f" | train_loss={current_train_metrics['loss_mean']:.8f}"
@@ -1091,7 +1568,7 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
             local_stop_flag = 1.0 if (time.perf_counter() - start_time) >= max_seconds else 0.0
             global_stop_flag = _allreduce_scalar(comm, np.asarray(local_stop_flag, dtype=np.float64))
             if global_stop_flag > 0.0:
-                stop_reason = f"time_budget_reached_{max_hours:.2f}h"
+                stop_reason = f"time_budget_reached_{max_run_minutes:.1f}m"
                 if rank == 0:
                     logger.info(f"[TRAIN] Stop per budget temporale raggiunto a epoch={epoch}")
                 break
@@ -1101,6 +1578,7 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
             best_params,
             layout,
             train_sequences,
+            cfg=cfg,
             comm=comm,
             rank=rank,
             size=size,
@@ -1109,6 +1587,7 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
             best_params,
             layout,
             test_sequences,
+            cfg=cfg,
             comm=comm,
             rank=rank,
             size=size,
@@ -1142,6 +1621,7 @@ def run_training(logger, cfg: dict, comm=None, rank: int = 0, size: int = 1):
         run_dir, matrices_dir, parameters_dir, summaries_dir, plots_dir = _prepare_output_dirs(
             timestamp=timestamp,
             seed=seed,
+            run_label=cfg.get("run_label"),
         )
         run_id = run_dir.name
 
