@@ -42,7 +42,9 @@ export UCX_CONNECT_TIMEOUT=300s
 # Risolve spesso il problema "Shared memory error" su architetture NVIDIA/Atos
 export UCX_MEMTYPE_CACHE=n
 
-cd /leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superposition || exit 1
+cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
+echo "workdir=$(pwd)"
+test -f main_hpc.py || { echo "ERROR: main_hpc.py not found in $(pwd)"; exit 1; }
 mkdir -p logs
 
 srun --mpi=pmix_v3 python3 main_hpc.py

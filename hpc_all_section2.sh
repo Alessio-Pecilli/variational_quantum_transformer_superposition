@@ -78,7 +78,10 @@ export UCX_RECONNECT_WAIT=15s
 export UCX_CONNECT_TIMEOUT=300s
 export UCX_MEMTYPE_CACHE=n
 
-cd /leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superposition || exit 1
+# Use submit dir (works for both .../superposition and .../sovrapposition clones)
+cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
+echo "workdir=$(pwd)"
+test -f run_study.py || { echo "ERROR: run_study.py not found in $(pwd)"; exit 1; }
 mkdir -p logs "$COMPLEXITY_DIR" "$BASELINES_DIR" "$PPL_ROOT"
 
 run_mpi() {

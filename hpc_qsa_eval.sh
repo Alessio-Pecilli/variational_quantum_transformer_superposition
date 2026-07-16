@@ -47,7 +47,9 @@ export PYTHONUTF8=1
 export JAX_ENABLE_X64=True
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
-cd /leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superposition || exit 1
+cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
+echo "workdir=$(pwd)"
+test -f qsa_run.py || { echo "ERROR: qsa_run.py not found in $(pwd)"; exit 1; }
 mkdir -p logs
 
 # Single-GPU overlap readout (no MPI gather needed).

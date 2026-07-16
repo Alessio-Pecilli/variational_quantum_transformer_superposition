@@ -51,7 +51,9 @@ export JAX_ENABLE_X64=True
 export JAX_PLATFORMS=cpu
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
-cd /leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superposition || exit 1
+cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
+echo "workdir=$(pwd)"
+test -f run_baselines_smoke.py || { echo "ERROR: run_baselines_smoke.py not found in $(pwd)"; exit 1; }
 mkdir -p logs "$OUTPUT_ROOT"
 
 for K in $KS; do

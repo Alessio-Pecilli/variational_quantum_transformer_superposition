@@ -52,7 +52,9 @@ export UCX_MEMTYPE_CACHE=n
 
 OUTPUT_DIR="${OUTPUT_DIR:-results/study/definitive_complexity_T${T_FIXED}_mode${MODE}}"
 
-cd /leonardo_work/IscrC_QuSALa/vqt2/variational_quantum_transformer_superposition || exit 1
+cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
+echo "workdir=$(pwd)"
+test -f run_study.py || { echo "ERROR: run_study.py not found in $(pwd)"; exit 1; }
 mkdir -p logs "$OUTPUT_DIR"
 
 ARGS=(--long --skip-self-check --mpi --local-max-qubits "$LOCAL_MAX_QUBITS" --output-dir "$OUTPUT_DIR")
