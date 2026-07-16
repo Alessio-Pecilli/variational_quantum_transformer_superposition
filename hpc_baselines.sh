@@ -49,9 +49,8 @@ module load python/3.11.7
 # GPU modules if lightning/jax-cuda present in venv (harmless if unused)
 module load cuda/12.1 2>/dev/null || true
 
-VENV_PY="/leonardo_work/IscrC_QuSALa/venv_py311/bin/python3"
-source /leonardo_work/IscrC_QuSALa/venv_py311/bin/activate
-test -x "$VENV_PY" || { echo "ERROR: missing $VENV_PY"; exit 1; }
+# shellcheck source=hpc_env.sh
+source "${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/hpc_env.sh"
 
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-4}"
 export OPENBLAS_NUM_THREADS=1
@@ -61,8 +60,6 @@ export JAX_ENABLE_X64=True
 export JAX_PLATFORMS=cpu
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
-cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
-echo "workdir=$(pwd) python=$VENV_PY"
 test -f run_baselines_smoke.py || { echo "ERROR: run_baselines_smoke.py not found in $(pwd)"; exit 1; }
 mkdir -p logs "$OUTPUT_DIR"
 

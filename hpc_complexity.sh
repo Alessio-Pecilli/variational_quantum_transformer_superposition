@@ -38,9 +38,8 @@ module purge
 module load openmpi/4.1.6--gcc--12.2.0
 module load python/3.11.7
 
-VENV_PY="/leonardo_work/IscrC_QuSALa/venv_py311/bin/python3"
-source /leonardo_work/IscrC_QuSALa/venv_py311/bin/activate
-test -x "$VENV_PY" || { echo "ERROR: missing $VENV_PY"; exit 1; }
+# shellcheck source=hpc_env.sh
+source "${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/hpc_env.sh"
 
 export OMP_NUM_THREADS=1
 export OPENBLAS_NUM_THREADS=1
@@ -54,8 +53,6 @@ export UCX_MEMTYPE_CACHE=n
 
 OUTPUT_DIR="${OUTPUT_DIR:-results/study/definitive_complexity_T${T_FIXED}_mode${MODE}}"
 
-cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
-echo "workdir=$(pwd) python=$VENV_PY"
 test -f run_study.py || { echo "ERROR: run_study.py not found in $(pwd)"; exit 1; }
 mkdir -p logs "$OUTPUT_DIR"
 

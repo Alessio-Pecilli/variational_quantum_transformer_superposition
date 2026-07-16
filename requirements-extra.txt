@@ -1,0 +1,11 @@
+# Optional extras (not needed for hpc_all_section2 classical campaign).
+#   pip install -r requirements-extra.txt
+
+-r requirements.txt
+
+# PTB / HuggingFace download helpers
+datasets>=2.19
+
+# Standalone classical scripts (QSAS.py, TNAS.py)
+torch>=2.2
+scikit-learn>=1.4

@@ -1,22 +1,20 @@
-# Bootstrap tooling for a fresh virtualenv
+# Core runtime for Section-2 classical campaign + VQT (Leonardo CPU path).
+# Install on login node:
+#   bash hpc_setup_env.sh
+# or:
+#   /leonardo_work/IscrC_QuSALa/venv_py311/bin/python -m pip install -r requirements.txt
+
 pip>=24.0
 setuptools>=68.0
 wheel>=0.43
 
-# Core runtime: PennyLane + JAX + distributed HPC pipeline
-numpy>=1.26
+numpy>=1.26,<3
 scipy>=1.11
+# CPU JAX (training / baselines use JAX_PLATFORMS=cpu)
 jax>=0.4.30
 jaxlib>=0.4.30
 pennylane>=0.38
+pennylane-lightning>=0.38
 mpi4py>=3.1
 matplotlib>=3.8
 psutil>=5.9
-
-# Optional: PTB download / HuggingFace dataset loading
-# Not required if you already use the local `ptb_sentences.txt`.
-datasets>=2.19
-
-# Optional: standalone classical / baseline scripts in this repo (`QSAS.py`, `TNAS.py`)
-torch>=2.2
-scikit-learn>=1.4
