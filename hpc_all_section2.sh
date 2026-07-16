@@ -64,7 +64,13 @@ module purge
 module load openmpi/4.1.6--gcc--12.2.0
 module load python/3.11.7
 
+VENV_PY="/leonardo_work/IscrC_QuSALa/venv_py311/bin/python3"
 source /leonardo_work/IscrC_QuSALa/venv_py311/bin/activate
+# srun often ignores activate PATH — use absolute venv interpreter
+test -x "$VENV_PY" || { echo "ERROR: missing $VENV_PY"; exit 1; }
+"$VENV_PY" -c "import jax; print('jax', jax.__version__)" || {
+  echo "ERROR: jax not importable in venv"; exit 1;
+}
 
 export OMP_NUM_THREADS=1
 export OPENBLAS_NUM_THREADS=1
@@ -80,14 +86,14 @@ export UCX_MEMTYPE_CACHE=n
 
 # Use submit dir (works for both .../superposition and .../sovrapposition clones)
 cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
-echo "workdir=$(pwd)"
+echo "workdir=$(pwd) python=$VENV_PY"
 test -f run_study.py || { echo "ERROR: run_study.py not found in $(pwd)"; exit 1; }
 mkdir -p logs "$COMPLEXITY_DIR" "$BASELINES_DIR" "$PPL_ROOT"
 
 run_mpi() {
   echo ""
-  echo ">>>>> srun: $* <<<<<"
-  srun --mpi=pmix_v3 "$@"
+  echo ">>>>> srun: $VENV_PY $* <<<<<"
+  srun --mpi=pmix_v3 --export=ALL "$VENV_PY" "$@"
 }
 
 # --------------------------------------------------------------------------- #
@@ -112,7 +118,7 @@ if [[ "$SKIP_COMPLEXITY" != "1" ]]; then
     both) ;;
     *) echo "Unknown MODE=$MODE"; exit 1 ;;
   esac
-  run_mpi python3 run_study.py "${CARGS[@]}"
+  run_mpi run_study.py "${CARGS[@]}"
   echo "=== PHASE 1 DONE at $(date) ==="
 else
   echo "=== PHASE 1 SKIPPED ==="
@@ -124,7 +130,7 @@ fi
 if [[ "$SKIP_BASELINES" != "1" ]]; then
   echo ""
   echo "========== PHASE 2/3: BASELINES (MPI shard seeds) =========="
-  run_mpi python3 run_baselines_smoke.py \
+  run_mpi run_baselines_smoke.py \
     --T "$T" \
     --d "$D" \
     --k "$K" \
@@ -155,7 +161,7 @@ if [[ "$SKIP_PPL_K" != "1" ]]; then
     OUT="$PPL_ROOT/k${KK}"
     mkdir -p "$OUT"
     echo "----- k=$KK -> $OUT -----"
-    run_mpi python3 run_baselines_smoke.py \
+    run_mpi run_baselines_smoke.py \
       --T "$T" \
       --d "$D" \
       --k "$KK" \

@@ -26,7 +26,9 @@ module purge
 module load openmpi/4.1.6--gcc--12.2.0
 module load python/3.11.7
 
+VENV_PY="/leonardo_work/IscrC_QuSALa/venv_py311/bin/python3"
 source /leonardo_work/IscrC_QuSALa/venv_py311/bin/activate
+test -x "$VENV_PY" || { echo "ERROR: missing $VENV_PY"; exit 1; }
 
 export OMP_NUM_THREADS=1
 export OPENBLAS_NUM_THREADS=1
@@ -43,8 +45,8 @@ export UCX_CONNECT_TIMEOUT=300s
 export UCX_MEMTYPE_CACHE=n
 
 cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
-echo "workdir=$(pwd)"
+echo "workdir=$(pwd) python=$VENV_PY"
 test -f main_hpc.py || { echo "ERROR: main_hpc.py not found in $(pwd)"; exit 1; }
 mkdir -p logs
 
-srun --mpi=pmix_v3 python3 main_hpc.py
+srun --mpi=pmix_v3 --export=ALL "$VENV_PY" main_hpc.py
