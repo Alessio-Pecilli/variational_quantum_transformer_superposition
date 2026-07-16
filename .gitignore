@@ -36,13 +36,13 @@ results/study/20260716_143813/**/*
 !results/study/20260716_143813/*.txt
 !results/study/20260716_143813/*.json
 
-# Training curves k-QSA / k-CSA / nl-CSA (check serio locale)
+# Training curves k-QSA / k-CSA / nl-CSA (check serio locale, fix shared init)
 !results/baselines_smoke/
 results/baselines_smoke/**
-!results/baselines_smoke/20260716_144404/
-results/baselines_smoke/20260716_144404/**
-!results/baselines_smoke/20260716_144404/training_curves.png
-!results/baselines_smoke/20260716_144404/summary.json
+!results/baselines_smoke/20260716_150402/
+results/baselines_smoke/20260716_150402/**
+!results/baselines_smoke/20260716_150402/training_curves.png
+!results/baselines_smoke/20260716_150402/summary.json
 
 # Duplicati / scratch locale
 qsa_section2_circuit(1).py

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local smoke / serious check: training curves for k-QSA, k-CSA, nl-CSA."""
+"""Training curves: k-QSA / k-CSA / nl-CSA with shared data+init for mu-models."""
 from __future__ import annotations
 
 import argparse
@@ -8,9 +8,9 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-from config import DATASET_CONFIG
 from classical_baselines import (
     BaselineConfig,
+    prepare_shared_bundle,
     plot_training_curves,
     qsa_angle_param_count,
     train_kcsa,
@@ -28,8 +28,10 @@ def main() -> int:
     p.add_argument("--epochs", type=int, default=100)
     p.add_argument("--max-sentences", type=int, default=1000)
     p.add_argument("--learning-rate", type=float, default=1e-3)
+    p.add_argument("--nl-learning-rate", type=float, default=5e-3)
+    p.add_argument("--nl-rank", type=int, default=None)
     p.add_argument("--seed", type=int, default=42)
-    p.add_argument("--quick", action="store_true", help="T=4 d=4 30ep 32 frasi")
+    p.add_argument("--quick", action="store_true")
     args = p.parse_args()
 
     if args.quick:
@@ -37,9 +39,6 @@ def main() -> int:
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     log = logging.getLogger("baselines")
-
-    DATASET_CONFIG["sentence_length"] = args.T
-    DATASET_CONFIG["max_sentences"] = args.max_sentences
 
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out = Path("results") / "baselines_smoke" / stamp
@@ -55,24 +54,37 @@ def main() -> int:
         max_sentences=args.max_sentences,
         seed=args.seed,
         output_dir=str(out),
-        run_label="serious",
+        run_label="fixed",
+        nl_rank=args.nl_rank,
+        nl_learning_rate=args.nl_learning_rate,
     )
 
     budget = qsa_angle_param_count(cfg.d, cfg.layers)
     print("=" * 60)
-    print("BASELINES — training curves (k-QSA / k-CSA / nl-CSA)")
+    print("BASELINES (fixed) — shared data/init for k-QSA & k-CSA")
     print(f"T={cfg.T} d={cfg.d} k={cfg.k} L={cfg.layers} epochs={cfg.epochs} frasi={cfg.max_sentences}")
-    print(f"Target angle budget (W+V): {budget} = 2*L*log2(d)")
+    print(f"Angle budget W+V: {budget}")
     print(f"Output: {out}")
     print("=" * 60)
 
+    bundle = prepare_shared_bundle(cfg)
+    print(f"Shared vocab={bundle['encoding'].vocabSize} sentences={len(bundle['sentences'])}")
+
     results = []
-    print("\n--- k-QSA ---")
-    results.append(train_kqsa(cfg, logger=log))
-    print("\n--- k-CSA ---")
-    results.append(train_kcsa(cfg, logger=log))
+    print("\n--- k-QSA (classical mu path) ---")
+    results.append(train_kqsa(cfg, bundle, logger=log))
+    print("\n--- k-CSA (same mu, shared init) ---")
+    results.append(train_kcsa(cfg, bundle, logger=log))
     print("\n--- nl-CSA ---")
-    results.append(train_nlcsa(cfg, logger=log))
+    results.append(train_nlcsa(cfg, bundle, logger=log))
+
+    # identity check
+    gap = abs(results[0]["final_loss"] - results[1]["final_loss"])
+    max_ep_gap = max(
+        abs(a - b) for a, b in zip(results[0]["loss_history"], results[1]["loss_history"])
+    )
+    print(f"\n[CHECK] max |loss_QSA - loss_CSA| over epochs = {max_ep_gap:.3e}")
+    print(f"[CHECK] |final_QSA - final_CSA| = {gap:.3e}")
 
     plot_training_curves(results, out / "training_curves.png")
     summary = {
@@ -80,17 +92,22 @@ def main() -> int:
             "T": cfg.T, "d": cfg.d, "k": cfg.k, "layers": cfg.layers,
             "epochs": cfg.epochs, "max_sentences": cfg.max_sentences,
             "angle_budget": budget,
+            "vocab_size": int(bundle["encoding"].vocabSize),
         },
+        "qsa_csa_max_epoch_gap": max_ep_gap,
         "models": [
             {
                 "model": r["model"],
                 "final_loss": r["final_loss"],
-                "n_params": r.get("n_params_angles") or r.get("n_params_model"),
+                "n_params_angles_or_model": r.get("n_params_angles") or r.get("n_params_model"),
                 "n_params_embedding": r.get("n_params_embedding"),
-                "n_params_total": r.get("n_params_total") or r.get("n_params_angles"),
+                "n_params_total": r.get("n_params_total"),
                 "extra": {
                     k: r[k]
-                    for k in ("obar", "ppl_mu", "final_ppl", "nl_rank", "target_angle_budget")
+                    for k in (
+                        "ppl_mu", "final_ppl", "nl_rank", "nl_learning_rate",
+                        "target_angle_budget", "note",
+                    )
                     if k in r
                 },
             }

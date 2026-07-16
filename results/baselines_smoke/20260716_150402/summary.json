@@ -1,0 +1,51 @@
+{
+  "config": {
+    "T": 8,
+    "d": 8,
+    "k": 2,
+    "layers": 2,
+    "epochs": 100,
+    "max_sentences": 1000,
+    "angle_budget": 12,
+    "vocab_size": 22
+  },
+  "qsa_csa_max_epoch_gap": 0.0,
+  "models": [
+    {
+      "model": "k-QSA",
+      "final_loss": 3.2944040278629556,
+      "n_params_angles_or_model": 12,
+      "n_params_embedding": 176,
+      "n_params_total": 188,
+      "extra": {
+        "ppl_mu": 26.9613410727896,
+        "note": "Same classical -log(mu) objective and shared init/data as the other mu-model. Local k-QSA training does not use the quantum circuit."
+      }
+    },
+    {
+      "model": "k-CSA",
+      "final_loss": 3.2944040278629556,
+      "n_params_angles_or_model": 12,
+      "n_params_embedding": 176,
+      "n_params_total": 188,
+      "extra": {
+        "ppl_mu": 26.9613410727896,
+        "note": "Same classical -log(mu) objective and shared init/data as the other mu-model. Local k-QSA training does not use the quantum circuit."
+      }
+    },
+    {
+      "model": "nl-CSA",
+      "final_loss": 0.16651463787899323,
+      "n_params_angles_or_model": 288,
+      "n_params_embedding": 176,
+      "n_params_total": 464,
+      "extra": {
+        "final_ppl": 1.181180825725826,
+        "nl_rank": 3,
+        "nl_learning_rate": 0.005,
+        "target_angle_budget": 12,
+        "note": "Renyi next-token loss (not -log mu); plotted separately from mu-models when needed."
+      }
+    }
+  ]
+}
