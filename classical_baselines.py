@@ -2,11 +2,11 @@
 Classical baselines for comparison with k-QSA (Section 2).
 
 Important (referee-facing):
-- Local k-QSA training already optimizes the classical mu = |sum a s^k|^2 path.
+- Local k-QSA training optimizes the classical mu path (circuit is for readout).
   Therefore k-QSA and k-CSA MUST share data + init and produce matching curves.
-  The quantum/classical distinction is how mu is *evaluated* (circuit vs classical sum),
-  not a different training objective in this setup.
-- nl-CSA: softmax + FFN, Renyi next-token loss, isometric embedding.
+  Default kernel is the LCU polynomial g(s)=sum_p c_p s^p (softmax truncation);
+  legacy monomial s^k is available via kernel_mode='monomial'.
+- nl-CSA: softmax + FFN, Renyi next-token loss, isometric embedding (unchanged).
 """
 from __future__ import annotations
 
@@ -70,6 +70,8 @@ class BaselineConfig:
     batch_size: Optional[int] = None
     checkpoint_every: int = 20
     resume: bool = True
+    # "poly" = LCU softmax truncation; "monomial" = legacy s^k
+    kernel_mode: str = "poly"
 
 
 def _load_sentences(cfg: BaselineConfig) -> List[str]:
@@ -111,6 +113,7 @@ def prepare_shared_bundle(cfg: BaselineConfig):
         train_embedding=cfg.train_embedding,
         epsilon=cfg.epsilon,
         local_max_qubits=32,
+        kernel_mode=cfg.kernel_mode,
     )
     key = jax.random.PRNGKey(cfg.seed)
     params0 = init_qsa_params(encoding.vocabSize, qcfg, key)
@@ -132,7 +135,7 @@ def mu_loss_sentence(params, token_ids, pe, cfg: BaselineConfig):
     X, Y = sequence_xy_from_tokens(token_ids, emb, pe)
     W = ortho_matrix_jax(params["weights_w"], cfg.d)
     V = ortho_matrix_jax(params["weights_v"], cfg.d)
-    mu = classical_mu_jax(X, Y, W, V, cfg.k)
+    mu = classical_mu_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode)
     return -jnp.log(jnp.maximum(mu, cfg.epsilon))
 
 

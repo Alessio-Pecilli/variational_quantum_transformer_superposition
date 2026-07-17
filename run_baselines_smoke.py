@@ -74,6 +74,12 @@ def main() -> int:
         help="shard seeds across MPI ranks (use with srun)",
     )
     p.add_argument("--quick", action="store_true")
+    p.add_argument(
+        "--kernel-mode",
+        choices=("poly", "monomial"),
+        default="poly",
+        help="attention kernel: poly = sum c_p s^p (LCU/softmax); monomial = s^k (legacy)",
+    )
     args = p.parse_args()
 
     if args.quick:
@@ -107,6 +113,7 @@ def main() -> int:
             f"epochs={args.epochs} frasi={args.max_sentences}"
         )
         print(f"seeds={seeds} batch_size={batch_size or 'full'} angle_budget={budget}")
+        print(f"kernel_mode={args.kernel_mode}")
         print(f"resume={args.resume} checkpoint_every={args.checkpoint_every}")
         print(f"MPI: enabled={args.mpi} ranks={size}")
         print(f"Output: {out}")
@@ -132,6 +139,7 @@ def main() -> int:
             batch_size=batch_size,
             checkpoint_every=args.checkpoint_every,
             resume=args.resume,
+            kernel_mode=args.kernel_mode,
         )
         print(f"\n===== seed {s} (rank {rank}/{size}) =====")
         bundle = prepare_shared_bundle(cfg)

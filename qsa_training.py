@@ -59,6 +59,8 @@ class QSATrainConfig:
     # If set, keep training until loss <= target_loss (or max_epochs). Relative
     # early-stop alone is not enough for large d (can "converge" at loss >> 3).
     target_loss: Optional[float] = None
+    # "monomial" = a * s^k (legacy); "poly" = a * sum_p c_p s^p with c_p=beta^p/p!, beta=sqrt(d)
+    kernel_mode: str = "poly"
     local_max_qubits: int = 15
 
 
@@ -85,6 +87,7 @@ def qsa_config_from_dict(cfg: dict) -> QSATrainConfig:
         loss_rel_tol=float(cfg.get("loss_rel_tol", 1e-4)),
         convergence_patience=int(cfg.get("convergence_patience", 8)),
         target_loss=(None if raw_target is None else float(raw_target)),
+        kernel_mode=str(cfg.get("kernel_mode", "poly")),
         local_max_qubits=int(cfg.get("local_max_qubits", 15)),
     )
 
@@ -145,15 +148,51 @@ def ortho_matrix_jax(params: jnp.ndarray, d: int) -> jnp.ndarray:
     return jnp.real(full)[:d, :d]
 
 
-def classical_mu_jax(X: jnp.ndarray, Y: jnp.ndarray, W: jnp.ndarray, V: jnp.ndarray, k: int) -> jnp.ndarray:
+def classical_mu_jax(
+    X: jnp.ndarray,
+    Y: jnp.ndarray,
+    W: jnp.ndarray,
+    V: jnp.ndarray,
+    k: int,
+    kernel_mode: str = "poly",
+    beta: Optional[float] = None,
+) -> jnp.ndarray:
+    """mu = |sum_{i<=j} a_ij * kernel(s_ij)|^2 / norm^2.
+
+    kernel_mode:
+      - "monomial": kernel = s^k  (legacy sharpener)
+      - "poly":     kernel = sum_{p=0..k} c_p s^p with c_p = beta^p/p!,
+                    beta = sqrt(d) by default, divided by lam = sum c_p
+                    (matches LCU / softmax truncation in qsa_section2_circuit_polynomial)
+    """
+    from math import factorial
+
     # s[j,i] = <x_j|W|x_i>, a[j,i] = <y_j|V|x_i>  (ket on the right; W not transposed)
     s = X @ W @ X.T
     a = Y @ V @ X.T
-    w = a * (s ** k)
     mask = jnp.tril(jnp.ones((X.shape[0], X.shape[0]), dtype=jnp.float64))
-    S = jnp.sum(w * mask)
     ntri = X.shape[0] * (X.shape[0] + 1) / 2.0
-    return (S ** 2) / (ntri ** 2)
+    d = X.shape[1]
+    if kernel_mode == "monomial":
+        w = a * (s ** k)
+        S = jnp.sum(w * mask)
+        return (S ** 2) / (ntri ** 2)
+
+    # polynomial LCU kernel
+    if beta is None:
+        beta = jnp.sqrt(jnp.asarray(d, dtype=jnp.float64))
+    g = jnp.zeros_like(s)
+    s_pow = jnp.ones_like(s)
+    lam = jnp.asarray(0.0, dtype=jnp.float64)
+    for p in range(k + 1):
+        c_p = (beta ** p) / float(factorial(p))
+        if p > 0:
+            s_pow = s_pow * s
+        g = g + c_p * s_pow
+        lam = lam + c_p
+    w = a * g
+    S = jnp.sum(w * mask)
+    return (S / (lam * ntri)) ** 2
 
 
 def _prepare_dataset(cfg: QSATrainConfig) -> Tuple[Encoding, List[str], jnp.ndarray, jnp.ndarray]:
@@ -183,7 +222,7 @@ def _loss_for_sentence(
     X, Y = sequence_xy_from_tokens(token_ids, embedding, positional_encoding)
     W = ortho_matrix_jax(params["weights_w"], cfg.d)
     V = ortho_matrix_jax(params["weights_v"], cfg.d)
-    mu = classical_mu_jax(X, Y, W, V, cfg.k)
+    mu = classical_mu_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode)
     return -jnp.log(jnp.maximum(mu, cfg.epsilon))
 
 
@@ -271,24 +310,34 @@ def evaluate_mean_O(
     positional_encoding: jnp.ndarray,
     cfg: QSATrainConfig,
 ) -> Tuple[float, float, float]:
-    """Return (mean_O_ij, obar, obar_k_root) averaged over the training batch."""
-    from qsa_section2_circuit import classical_report
-
-    qml_backend, _, _ = set_backends()
+    """Return (mean_O_ij, obar/rbar, root) averaged over the training batch."""
     embedding = np.asarray(isometrize_matrix(params["embedding"]))
+    qml_backend, _, _ = set_backends()
     W = np.asarray(extract_ortho_matrix(qml_backend, params["weights_w"], cfg.d))
     V = np.asarray(extract_ortho_matrix(qml_backend, params["weights_v"], cfg.d))
-    pe = np.asarray(positional_encoding)
+
     mean_os, obars, obar_roots = [], [], []
-    for token_ids in np.asarray(token_batch):
-        x_rows = embedding[token_ids] + pe
-        x_rows = x_rows / np.maximum(np.linalg.norm(x_rows, axis=1, keepdims=True), 1e-12)
-        y_rows = np.roll(x_rows, shift=-1, axis=0)
-        y_rows[-1] = x_rows[-1]
-        rep = classical_report(x_rows, y_rows, W, V, cfg.k)
-        mean_os.append(rep["mean_O_ij"])
-        obars.append(rep["obar"])
-        obar_roots.append(rep["obar_k_root"])
+    for ids in np.asarray(token_batch):
+        X, Y = sequence_xy_from_tokens(
+            jnp.asarray(ids), jnp.asarray(embedding), positional_encoding
+        )
+        X_np = np.asarray(X)
+        Y_np = np.asarray(Y)
+        if cfg.kernel_mode == "poly":
+            from qsa_section2_circuit_polynomial import classical_report as poly_report
+
+            rep = poly_report(X_np, Y_np, W, V, cfg.k)
+            # rbar is the poly analogue of mean |a g(s)| (signed-sum mu is separate)
+            mean_os.append(float(rep["rbar"]))
+            obars.append(float(rep["rbar"]))
+            obar_roots.append(float(rep["rbar"]))
+        else:
+            from qsa_section2_circuit import classical_report
+
+            rep = classical_report(X_np, Y_np, W, V, cfg.k)
+            mean_os.append(rep["mean_O_ij"])
+            obars.append(rep["obar"])
+            obar_roots.append(rep["obar_k_root"])
     return (
         float(np.mean(mean_os)) if mean_os else 0.0,
         float(np.mean(obars)) if obars else 0.0,
