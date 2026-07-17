@@ -42,8 +42,16 @@ SWEEP_T = (2, 4, 8, 16, 32)   # HPC: include 32; local skips if > local_max_qubi
 SWEEP_D = (2, 4, 8, 16, 32)   # HPC: include 16/32 for advantage regime
 SWEEP_D_FIXED = 16            # default complexity d for vs-T on HPC
 SWEEP_T_FIXED = 16            # default T_lim-ish for vs-d on HPC
+# Extra panels: same k, vary the other axis
+PANEL_D_ON_T = (4, 8, 16)     # obar vs T curves at these d (fixed k)
+PANEL_T_ON_D = (8, 16, 32)    # obar vs d curves at these T (fixed k)
 T_LIM = 4
 LOCAL_MAX_QUBITS = 15
+DEFAULT_TARGET_LOSS = 3.0
+
+# Distinct styles: data = solid + marker; refs = dashed / dotted (no shared dash type).
+_DATA_MARKERS = ("o", "s", "D", "^", "v")
+_DATA_COLORS = ("#1f77b4", "#d62728", "#2ca02c", "#9467bd", "#ff7f0e")
 
 
 def _setup_logger() -> logging.Logger:
@@ -135,36 +143,43 @@ def _train_point(
     print(f"    (equiv. {equiv})")
 
     metrics_path = out_root / label / "summaries" / "metrics.json"
+    target_loss = train_opts.get("target_loss")
     if metrics_path.exists():
         metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
-        print(f"\n--- {label} | resume: already complete -> {metrics_path.parent.parent}")
-        row = {
-            "label": label,
-            "T": T,
-            "d": d,
-            "k": k,
-            "mean_O_ij": float(metrics["mean_O_ij"]),
-            "obar": float(metrics.get("obar", metrics["mean_O_ij"])),
-            "obar_k_root": float(metrics.get("obar_k_root", metrics["mean_O_ij"] ** (1 / max(k, 1)))),
-            "final_loss": float(metrics["final_loss"]),
-            "n_qubits": int(metrics["n_qubits"]),
-            "reference_haar": float(metrics["reference_haar"]),
-            "reference_advantage": float(metrics.get("reference_advantage", 0.0)),
-            "converged": metrics.get("converged"),
-            "training_phases": metrics.get("training_phases"),
-            "elapsed_seconds": float(metrics.get("elapsed_seconds", 0.0)),
-            "wall_seconds": 0.0,
-            "run_dir": str(out_root / label),
-            "main_hpc_cmd": equiv,
-            "resumed": True,
-        }
+        final_loss = float(metrics["final_loss"])
+        ok_target = target_loss is None or final_loss <= float(target_loss)
+        if ok_target:
+            print(f"\n--- {label} | resume: already complete -> {metrics_path.parent.parent}")
+            row = {
+                "label": label,
+                "T": T,
+                "d": d,
+                "k": k,
+                "mean_O_ij": float(metrics["mean_O_ij"]),
+                "obar": float(metrics.get("obar", metrics["mean_O_ij"])),
+                "obar_k_root": float(metrics.get("obar_k_root", metrics["mean_O_ij"] ** (1 / max(k, 1)))),
+                "final_loss": final_loss,
+                "n_qubits": int(metrics["n_qubits"]),
+                "reference_haar": float(metrics["reference_haar"]),
+                "reference_advantage": float(metrics.get("reference_advantage", 0.0)),
+                "converged": metrics.get("converged"),
+                "training_phases": metrics.get("training_phases"),
+                "elapsed_seconds": float(metrics.get("elapsed_seconds", 0.0)),
+                "wall_seconds": 0.0,
+                "run_dir": str(out_root / label),
+                "main_hpc_cmd": equiv,
+                "resumed": True,
+            }
+            print(
+                f"    obar={row['obar']:.6f}  mean_O={row['mean_O_ij']:.6f}  "
+                f"haar={row['reference_haar']:.6e}  adv={row['reference_advantage']:.6e}  "
+                f"loss={row['final_loss']:.4f}  conv={row.get('converged')}  (skip)"
+            )
+            return row
         print(
-            f"    obar={row['obar']:.6f}  mean_O={row['mean_O_ij']:.6f}  "
-            f"haar={row['reference_haar']:.6e}  adv={row['reference_advantage']:.6e}  "
-            f"loss={row['final_loss']:.4f}  conv={row.get('converged')}  (skip)"
+            f"\n--- {label} | resume REJECTED: loss={final_loss:.4f} > target_loss={target_loss} "
+            f"-> retrain"
         )
-        return row
-
     t0 = time.perf_counter()
     exit_code = run_training(logger=logger, cfg=cfg, comm=None, rank=0, size=1)
     wall = time.perf_counter() - t0
@@ -215,22 +230,59 @@ def _plot_vs_T(
     out_path: Path,
     t_lim: int = T_LIM,
 ) -> None:
-    """Plot obar vs T — solo curve numeriche (niente refs teoriche)."""
+    """Plot obar vs T with horizontal d^{-(k+1)/2} (and advantage) refs."""
+    from qsa_section2_circuit import advantage_threshold, haar_floor
+
     fig, ax = plt.subplots(figsize=(8, 5))
-    for label, rows in series:
+    all_T: set[int] = set()
+    for si, (label, rows) in enumerate(series):
+        if not rows:
+            continue
         rows = sorted(rows, key=lambda r: int(r["T"]))
         T_vals = [int(r["T"]) for r in rows]
         obar = [float(r["obar"]) for r in rows]
-        ax.plot(T_vals, obar, "o-", linewidth=2, markersize=8, label=label)
-    ax.axvline(t_lim, color="0.5", linestyle=":", linewidth=1.2, label=rf"$T_{{\mathrm{{lim}}}}$={t_lim}")
+        all_T.update(T_vals)
+        color = _DATA_COLORS[si % len(_DATA_COLORS)]
+        marker = _DATA_MARKERS[si % len(_DATA_MARKERS)]
+        ax.plot(
+            T_vals,
+            obar,
+            color=color,
+            marker=marker,
+            linestyle="-",
+            linewidth=2.2,
+            markersize=8,
+            label=label,
+        )
+        k_val = int(rows[0]["k"])
+        d_val = int(rows[0].get("d", d_fixed))
+        # Refs depend only on (d,k): horizontal lines vs T.
+        floor = haar_floor(d_val, k_val)
+        adv = advantage_threshold(d_val, k_val)
+        ax.axhline(
+            floor,
+            color=color,
+            linestyle="--",
+            linewidth=1.6,
+            label=rf"$d^{{-(k+1)/2}}$ (k={k_val}, d={d_val})",
+        )
+        ax.axhline(
+            adv,
+            color=color,
+            linestyle=":",
+            linewidth=1.6,
+            label=rf"$\sqrt{{k\,k!/d^k}}$ (k={k_val}, d={d_val})",
+        )
+
+    ax.axvline(t_lim, color="0.45", linestyle="-.", linewidth=1.2, label=rf"$T_{{\mathrm{{lim}}}}$={t_lim}")
     ax.set_xlabel("T (lunghezza sequenza)")
     ax.set_ylabel(r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^k|$")
     k_labels = ", ".join(lbl for lbl, _ in series)
     ax.set_title(f"obar vs T  (d={d_fixed}; {k_labels})")
-    all_T = sorted({int(r["T"]) for _, rows in series for r in rows})
-    ax.set_xticks(all_T)
+    ax.set_xticks(sorted(all_T) if all_T else [])
+    ax.set_yscale("linear")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)
@@ -241,42 +293,169 @@ def _plot_vs_d(
     T_fixed: int,
     out_path: Path,
 ) -> None:
-    """Plot obar vs d con riferimenti Haar e advantage (stessa scala di obar)."""
+    """Plot obar vs d; primary ref is d^{-(k+1)/2}, plus advantage. Linear y."""
     from qsa_section2_circuit import advantage_threshold, haar_floor
 
     fig, ax = plt.subplots(figsize=(8, 5))
     all_d: set[int] = set()
-    for label, rows in series:
+    for si, (label, rows) in enumerate(series):
+        if not rows:
+            continue
         rows = sorted(rows, key=lambda r: int(r["d"]))
         d_vals = np.array([int(r["d"]) for r in rows], dtype=float)
         obar = np.array([float(r["obar"]) for r in rows])
         all_d.update(int(d) for d in d_vals)
-        ax.plot(d_vals, obar, "o-", linewidth=2, markersize=8, label=label)
-
-    d_ref = np.array(sorted(all_d), dtype=float)
-    k_for_refs = int(series[0][1][0]["k"]) if series and series[0][1] else 2
-    if len(series) == 1:
-        k_for_refs = int(series[0][1][0]["k"])
-        haar = np.array([haar_floor(int(d), k_for_refs) for d in d_ref])
-        adv = np.array([advantage_threshold(int(d), k_for_refs) for d in d_ref])
-        ax.plot(d_ref, haar, "s--", linewidth=1.5, color="C1", label=rf"$d^{{-(k+1)/2}}$ Haar (k={k_for_refs})")
-        ax.plot(d_ref, adv, "^--", linewidth=1.5, color="C2", label=rf"$\sqrt{{k\,k!/d^k}}$ adv (k={k_for_refs})")
-    else:
-        for ki, (label, rows) in enumerate(series):
-            k_val = int(rows[0]["k"])
-            d_vals = np.array(sorted({int(r["d"]) for r in rows}), dtype=float)
-            haar = np.array([haar_floor(int(d), k_val) for d in d_vals])
-            adv = np.array([advantage_threshold(int(d), k_val) for d in d_vals])
-            ax.plot(d_vals, haar, "--", linewidth=1.2, color=f"C{ki + 1}", alpha=0.7, label=rf"Haar k={k_val}")
-            ax.plot(d_vals, adv, ":", linewidth=1.2, color=f"C{ki + 1}", alpha=0.7, label=rf"adv k={k_val}")
+        color = _DATA_COLORS[si % len(_DATA_COLORS)]
+        marker = _DATA_MARKERS[si % len(_DATA_MARKERS)]
+        ax.plot(
+            d_vals,
+            obar,
+            color=color,
+            marker=marker,
+            linestyle="-",
+            linewidth=2.2,
+            markersize=8,
+            label=label,
+        )
+        k_val = int(rows[0]["k"])
+        floor = np.array([haar_floor(int(d), k_val) for d in d_vals])
+        adv = np.array([advantage_threshold(int(d), k_val) for d in d_vals])
+        ax.plot(
+            d_vals,
+            floor,
+            color=color,
+            linestyle="--",
+            linewidth=1.6,
+            marker=None,
+            label=rf"$d^{{-(k+1)/2}}$ (k={k_val})",
+        )
+        ax.plot(
+            d_vals,
+            adv,
+            color=color,
+            linestyle=":",
+            linewidth=1.6,
+            marker=None,
+            label=rf"$\sqrt{{k\,k!/d^k}}$ (k={k_val})",
+        )
 
     ax.set_xlabel("d (dimensione embedding)")
     ax.set_ylabel(r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^k|$")
     ax.set_title(f"obar vs d  (T={T_fixed})")
-    ax.set_xticks(sorted(all_d))
-    ax.set_yscale("log")
-    ax.grid(True, alpha=0.3, which="both")
-    ax.legend(fontsize=8)
+    ax.set_xticks(sorted(all_d) if all_d else [])
+    ax.set_yscale("linear")
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=8, loc="best")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=200)
+    plt.close(fig)
+
+
+def _plot_vs_T_by_d(
+    rows: list[dict],
+    k_fixed: int,
+    out_path: Path,
+    t_lim: int = T_LIM,
+) -> None:
+    """obar vs T: same k, one curve per d (+ d^{-(k+1)/2} refs)."""
+    from qsa_section2_circuit import haar_floor
+
+    by_d: dict[int, list[dict]] = {}
+    for r in rows:
+        if int(r["k"]) != k_fixed:
+            continue
+        by_d.setdefault(int(r["d"]), []).append(r)
+    if len(by_d) < 2:
+        return
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    for si, d_val in enumerate(sorted(by_d)):
+        pts = sorted(by_d[d_val], key=lambda r: int(r["T"]))
+        color = _DATA_COLORS[si % len(_DATA_COLORS)]
+        marker = _DATA_MARKERS[si % len(_DATA_MARKERS)]
+        ax.plot(
+            [int(r["T"]) for r in pts],
+            [float(r["obar"]) for r in pts],
+            color=color,
+            marker=marker,
+            linestyle="-",
+            linewidth=2.2,
+            markersize=8,
+            label=rf"trained $d={d_val}$",
+        )
+        floor = haar_floor(d_val, k_fixed)
+        ax.axhline(
+            floor,
+            color=color,
+            linestyle="--",
+            linewidth=1.4,
+            label=rf"$d^{{-(k+1)/2}}$ ($d={d_val}$)",
+        )
+
+    ax.axvline(t_lim, color="0.45", linestyle="-.", linewidth=1.2, label=rf"$T_{{\mathrm{{lim}}}}$={t_lim}")
+    ax.set_xlabel("T (lunghezza sequenza)")
+    ax.set_ylabel(r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^k|$")
+    ax.set_title(f"obar vs T  (k={k_fixed}, curves = different d)")
+    ax.set_yscale("linear")
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=8, loc="best")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=200)
+    plt.close(fig)
+
+
+def _plot_vs_d_by_T(
+    rows: list[dict],
+    k_fixed: int,
+    out_path: Path,
+) -> None:
+    """obar vs d: same k, one curve per T (+ d^{-(k+1)/2} refs). Linear y."""
+    from qsa_section2_circuit import haar_floor
+
+    by_T: dict[int, list[dict]] = {}
+    for r in rows:
+        if int(r["k"]) != k_fixed:
+            continue
+        by_T.setdefault(int(r["T"]), []).append(r)
+    if len(by_T) < 2:
+        return
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    # Shared floor depends only on d,k — plot once from union of d.
+    all_d = sorted({int(r["d"]) for pts in by_T.values() for r in pts})
+    if all_d:
+        floor = [haar_floor(d, k_fixed) for d in all_d]
+        ax.plot(
+            all_d,
+            floor,
+            color="0.15",
+            linestyle="--",
+            linewidth=2.0,
+            label=rf"$d^{{-(k+1)/2}}$ (k={k_fixed})",
+        )
+
+    for si, T_val in enumerate(sorted(by_T)):
+        pts = sorted(by_T[T_val], key=lambda r: int(r["d"]))
+        color = _DATA_COLORS[si % len(_DATA_COLORS)]
+        marker = _DATA_MARKERS[si % len(_DATA_MARKERS)]
+        ax.plot(
+            [int(r["d"]) for r in pts],
+            [float(r["obar"]) for r in pts],
+            color=color,
+            marker=marker,
+            linestyle="-",
+            linewidth=2.2,
+            markersize=8,
+            label=rf"trained $T={T_val}$",
+        )
+
+    ax.set_xlabel("d (dimensione embedding)")
+    ax.set_ylabel(r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^k|$")
+    ax.set_title(f"obar vs d  (k={k_fixed}, curves = different T)")
+    ax.set_xticks(all_d)
+    ax.set_yscale("linear")
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)
@@ -310,7 +489,8 @@ def _write_summary(
         "METRICA: obar = mean_{i<=j} |a_ij s_ij^k|  (= absS/Ntri, NO potenza 1/k)",
         "         obar_k_root = obar^{1/k}  (solo diagnostica, non usata nei plot)",
         "         s_ij = <x_j|W|x_i>, a_ij = <x_{j+1}|V|x_i>",
-        "Refs: Haar = d^{-(k+1)/2} ; advantage = sqrt(k * k! / d^k)",
+        "Refs: primary = d^{-(k+1)/2} ; secondary advantage = sqrt(k * k! / d^k)",
+        "      (Haar floor in code == d^{-(k+1)/2}; use that as the main theory line)",
         "",
     ]
 
@@ -356,7 +536,8 @@ def _write_summary(
         "FILE GENERATI",
         "-" * 40,
         "  summary_vs_T.csv, summary_vs_d.csv",
-        "  mean_O_vs_T.png, mean_O_vs_d.png  (obar vs refs)",
+        "  mean_O_vs_T.png, mean_O_vs_d.png  (obar + d^{-(k+1)/2} + adv, y linear)",
+        "  mean_O_vs_T_by_d.png, mean_O_vs_d_by_T.png  (panel curves)",
         "  manifest.json",
         "  RIASSUNTO.txt  (questo file)",
         "",
@@ -371,6 +552,56 @@ def _write_summary(
     print("\n" + text)
 
 
+def _parse_int_list(raw: str | None) -> list[int]:
+    if raw is None:
+        return []
+    text = str(raw).strip()
+    if not text:
+        return []
+    return [int(x.strip()) for x in text.split(",") if x.strip()]
+
+
+def _replot_study_dir(out_root: Path, args) -> int:
+    """Regenerate PNGs from manifest.json / CSVs without retraining."""
+    manifest_path = out_root / "manifest.json"
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"missing {manifest_path}")
+    man = json.loads(manifest_path.read_text(encoding="utf-8"))
+    t_rows = man.get("T_sweep") or []
+    t_rows_k3 = man.get("T_sweep_k3") or []
+    d_rows = man.get("d_sweep") or []
+    d_rows_extra = man.get("d_sweep_extra") or []
+    t_by_d = man.get("T_by_d") or []
+    d_by_T = man.get("d_by_T") or []
+    k = int(man.get("k", args.k))
+    d_fixed = SWEEP_D_FIXED
+    T_fixed = int(man.get("d_sweep_T", SWEEP_T_FIXED))
+    ek = man.get("extra_k_on_d")
+
+    if t_rows or t_rows_k3:
+        t_series = [(f"k={k} (trained)", t_rows)]
+        if t_rows_k3:
+            t_series.append(("k=3 (trained)", t_rows_k3))
+        _plot_vs_T(t_series, d_fixed=d_fixed, out_path=out_root / "mean_O_vs_T.png")
+        print(f"wrote {out_root / 'mean_O_vs_T.png'}")
+    if d_rows or d_rows_extra:
+        d_series = [(f"k={k} (trained)", d_rows)]
+        if d_rows_extra:
+            d_series.append((f"k={ek} (trained)", d_rows_extra))
+        _plot_vs_d(d_series, T_fixed=T_fixed, out_path=out_root / "mean_O_vs_d.png")
+        print(f"wrote {out_root / 'mean_O_vs_d.png'}")
+
+    panel_T = t_rows + t_by_d
+    if panel_T:
+        _plot_vs_T_by_d(panel_T, k_fixed=k, out_path=out_root / "mean_O_vs_T_by_d.png")
+        print(f"wrote {out_root / 'mean_O_vs_T_by_d.png'}")
+    panel_d = d_rows + d_by_T
+    if panel_d:
+        _plot_vs_d_by_T(panel_d, k_fixed=k, out_path=out_root / "mean_O_vs_d_by_T.png")
+        print(f"wrote {out_root / 'mean_O_vs_d_by_T.png'}")
+    return 0
+
+
 def _apply_preset(args) -> str:
     if args.quick:
         args.epochs = 6
@@ -381,6 +612,8 @@ def _apply_preset(args) -> str:
         args.max_sentences = 64
         args.train_until_converged = True
         args.max_epochs = 300
+        if args.target_loss is None:
+            args.target_loss = DEFAULT_TARGET_LOSS
         return "long"
     if args.full:
         args.epochs = 40
@@ -445,6 +678,31 @@ def main() -> int:
     parser.add_argument("--loss-rel-tol", type=float, default=1e-4)
     parser.add_argument("--convergence-patience", type=int, default=8)
     parser.add_argument(
+        "--target-loss",
+        type=float,
+        default=None,
+        help=f"keep training until loss<=this (default {DEFAULT_TARGET_LOSS} with --long); "
+        f"resume skips only if metrics already meet the target",
+    )
+    parser.add_argument(
+        "--panel-d-on-T",
+        type=str,
+        default=",".join(str(x) for x in PANEL_D_ON_T),
+        help="extra obar-vs-T panel: comma-separated d values at fixed k (empty to disable)",
+    )
+    parser.add_argument(
+        "--panel-T-on-d",
+        type=str,
+        default=",".join(str(x) for x in PANEL_T_ON_D),
+        help="extra obar-vs-d panel: comma-separated T values at fixed k (empty to disable)",
+    )
+    parser.add_argument(
+        "--replot-only",
+        type=str,
+        default=None,
+        help="only regenerate PNGs from existing manifest/CSVs in this study dir",
+    )
+    parser.add_argument(
         "--output-dir",
         type=str,
         default=None,
@@ -459,6 +717,11 @@ def main() -> int:
 
     if args.long:
         args.train_until_converged = True
+    if args.target_loss is not None:
+        args.train_until_converged = True
+
+    if args.replot_only:
+        return _replot_study_dir(Path(args.replot_only), args)
 
     preset_name = _apply_preset(args)
     logger = _setup_logger()
@@ -486,6 +749,7 @@ def main() -> int:
             print(
                 f"Convergenza: max_epochs={args.max_epochs} "
                 f"rel_tol={args.loss_rel_tol} patience={args.convergence_patience}"
+                + (f" target_loss={args.target_loss}" if args.target_loss is not None else "")
             )
         if args.curriculum_k:
             print("Curriculum k: 1 -> k")
@@ -511,6 +775,7 @@ def main() -> int:
         "max_epochs": args.max_epochs,
         "loss_rel_tol": args.loss_rel_tol,
         "convergence_patience": args.convergence_patience,
+        "target_loss": args.target_loss,
     }
     train_kw = dict(
         k=args.k,
@@ -586,6 +851,49 @@ def main() -> int:
                     }
                 )
 
+    # Extra panels: same k, vary the other axis (skip duplicates already scheduled).
+    scheduled = {(j["T"], j["d"], j["k"]) for j in jobs}
+    panel_ds = _parse_int_list(args.panel_d_on_T)
+    panel_Ts = _parse_int_list(args.panel_T_on_d)
+    if args.only in (None, "T") and panel_ds:
+        for d_panel in panel_ds:
+            for T in SWEEP_T:
+                key = (T, d_panel, args.k)
+                if key in scheduled:
+                    continue
+                n_q = qubit_budget(T, d_panel, args.k)
+                if n_q > args.local_max_qubits:
+                    continue
+                jobs.append(
+                    {
+                        "series": "T_by_d",
+                        "T": T,
+                        "d": d_panel,
+                        "k": args.k,
+                        "label": f"T{T}_d{d_panel}_k{args.k}",
+                    }
+                )
+                scheduled.add(key)
+    if args.only in (None, "d") and panel_Ts:
+        for T_panel in panel_Ts:
+            for d in SWEEP_D:
+                key = (T_panel, d, args.k)
+                if key in scheduled:
+                    continue
+                n_q = qubit_budget(T_panel, d, args.k)
+                if n_q > args.local_max_qubits:
+                    continue
+                jobs.append(
+                    {
+                        "series": "d_by_T",
+                        "T": T_panel,
+                        "d": d,
+                        "k": args.k,
+                        "label": f"T{T_panel}_d{d}_k{args.k}",
+                    }
+                )
+                scheduled.add(key)
+
     my_jobs = shard_items(jobs, rank, size) if args.mpi else jobs
     if rank == 0:
         print(f"\n[MPI] {len(jobs)} sweep points total, {size} ranks "
@@ -631,6 +939,8 @@ def main() -> int:
     t_rows_k3 = [r for r in all_rows if r.get("series") == "T_k3"]
     d_rows = [r for r in all_rows if r.get("series") == "d"]
     d_rows_extra = [r for r in all_rows if r.get("series") == "d_extra"]
+    t_by_d_rows = [r for r in all_rows if r.get("series") == "T_by_d"]
+    d_by_T_rows = [r for r in all_rows if r.get("series") == "d_by_T"]
 
     print("\n" + "=" * 60)
     print("FASE 4/4 — Plot e riassunto")
@@ -650,6 +960,31 @@ def main() -> int:
         if d_rows_extra:
             d_series.append((f"k={args.extra_k_on_d} (trained)", d_rows_extra))
         _plot_vs_d(d_series, T_fixed=d_sweep_T, out_path=out_root / "mean_O_vs_d.png")
+
+    # Extra panels (same k, vary other axis). Merge with primary series points.
+    panel_T_src = t_rows + t_by_d_rows
+    if panel_T_src:
+        _write_csv(out_root / "summary_vs_T_by_d.csv", panel_T_src)
+        _plot_vs_T_by_d(panel_T_src, k_fixed=args.k, out_path=out_root / "mean_O_vs_T_by_d.png")
+    panel_d_src = d_rows + d_by_T_rows
+    if panel_d_src:
+        _write_csv(out_root / "summary_vs_d_by_T.csv", panel_d_src)
+        _plot_vs_d_by_T(panel_d_src, k_fixed=args.k, out_path=out_root / "mean_O_vs_d_by_T.png")
+
+    # Flag under-trained d points (loss above target).
+    if args.target_loss is not None:
+        bad = [
+            r for r in (d_rows + d_rows_extra + d_by_T_rows)
+            if r.get("final_loss") is not None
+            and float(r["final_loss"]) > float(args.target_loss)
+        ]
+        if bad and rank == 0:
+            print("\n[WARN] Punti con loss > target_loss (da ritrenare):")
+            for r in sorted(bad, key=lambda x: (int(x["T"]), int(x["d"]), int(x["k"]))):
+                print(
+                    f"  {r['label']}: loss={float(r['final_loss']):.4f} "
+                    f"> {args.target_loss}  (obar={float(r.get('obar', float('nan'))):.4f})"
+                )
 
     total_wall = time.perf_counter() - t_start
     manifest = {
@@ -672,6 +1007,8 @@ def main() -> int:
         "T_sweep_k3": t_rows_k3,
         "d_sweep": d_rows,
         "d_sweep_extra": d_rows_extra,
+        "T_by_d": t_by_d_rows,
+        "d_by_T": d_by_T_rows,
     }
     (out_root / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     _write_summary(

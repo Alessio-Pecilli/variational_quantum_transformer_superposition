@@ -50,6 +50,11 @@ SKIP_COMPLEXITY="${SKIP_COMPLEXITY:-0}"
 SKIP_BASELINES="${SKIP_BASELINES:-0}"
 SKIP_PPL_K="${SKIP_PPL_K:-0}"
 
+TARGET_LOSS="${TARGET_LOSS:-3}"
+MAX_EPOCHS="${MAX_EPOCHS:-800}"
+PANEL_D_ON_T="${PANEL_D_ON_T:-4,8,16}"
+PANEL_T_ON_D="${PANEL_T_ON_D:-8,16,32}"
+
 COMPLEXITY_DIR="${COMPLEXITY_DIR:-results/study/definitive_complexity_T${T_FIXED}_mode${MODE}}"
 BASELINES_DIR="${BASELINES_DIR:-results/baselines_smoke/definitive_T${T}_d${D}_k${K}_ep${EPOCHS}_n${N_SEEDS}}"
 PPL_ROOT="${PPL_ROOT:-results/baselines_smoke/ppl_vs_k_T${T}_d${D}_ep${EPOCHS}_n${N_SEEDS}}"
@@ -100,6 +105,10 @@ if [[ "$SKIP_COMPLEXITY" != "1" ]]; then
     --output-dir "$COMPLEXITY_DIR"
     --d-sweep-T "$T_FIXED"
     --extra-k-on-d "$EXTRA_K"
+    --target-loss "$TARGET_LOSS"
+    --max-epochs "$MAX_EPOCHS"
+    --panel-d-on-T "$PANEL_D_ON_T"
+    --panel-T-on-d "$PANEL_T_ON_D"
   )
   if [[ "$EXTRA_K3" == "1" ]]; then
     CARGS+=(--extra-k3)
@@ -170,6 +179,8 @@ if [[ "$SKIP_PPL_K" != "1" ]]; then
       --resume \
       --mpi
   done
+  echo "----- aggregate final_loss vs k -----"
+  "$VENV_PY" plot_ppl_vs_k.py --root "$PPL_ROOT" --ks "$(echo $KS | tr ' ' ',')"
   echo "=== PHASE 3 DONE at $(date) ==="
 else
   echo "=== PHASE 3 SKIPPED ==="

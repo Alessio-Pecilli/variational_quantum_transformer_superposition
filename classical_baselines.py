@@ -664,3 +664,57 @@ def plot_training_curves(
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)
+
+
+def plot_final_loss_vs_k(
+    points: List[dict],
+    out_path: Path,
+    title: str = "Final loss vs k (mean ± std over seeds)",
+) -> None:
+    """
+    Line plot with error bars for baselines across k.
+
+    Each point dict needs: k, model, final_loss_mean, final_loss_std.
+    """
+    import matplotlib.pyplot as plt
+
+    by_model: dict[str, list[dict]] = {}
+    for p in points:
+        by_model.setdefault(str(p["model"]), []).append(p)
+
+    styles = {
+        "k-QSA": dict(color="#1f77b4", marker="o", linestyle="-"),
+        "k-CSA": dict(color="#d62728", marker="s", linestyle="-"),
+        "nl-CSA": dict(color="#2ca02c", marker="D", linestyle="-"),
+    }
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    for model, rows in by_model.items():
+        rows = sorted(rows, key=lambda r: int(r["k"]))
+        ks = [int(r["k"]) for r in rows]
+        means = [float(r["final_loss_mean"]) for r in rows]
+        stds = [float(r.get("final_loss_std", 0.0)) for r in rows]
+        st = styles.get(model, dict(color="0.3", marker="o", linestyle="-"))
+        ax.errorbar(
+            ks,
+            means,
+            yerr=stds,
+            color=st["color"],
+            marker=st["marker"],
+            linestyle=st["linestyle"],
+            linewidth=2.2,
+            markersize=8,
+            capsize=4,
+            label=model,
+        )
+
+    ax.set_xlabel("k")
+    ax.set_ylabel("final loss (mean ± std)")
+    ax.set_title(title)
+    ax.set_xticks(sorted({int(p["k"]) for p in points}))
+    ax.set_yscale("linear")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=200)
+    plt.close(fig)

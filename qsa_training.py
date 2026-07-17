@@ -56,11 +56,15 @@ class QSATrainConfig:
     max_epochs: int = 300
     loss_rel_tol: float = 1e-4
     convergence_patience: int = 8
+    # If set, keep training until loss <= target_loss (or max_epochs). Relative
+    # early-stop alone is not enough for large d (can "converge" at loss >> 3).
+    target_loss: Optional[float] = None
     local_max_qubits: int = 15
 
 
 def qsa_config_from_dict(cfg: dict) -> QSATrainConfig:
     """Build QSA config from the shared OPTIMIZATION_CONFIG / CLI overrides."""
+    raw_target = cfg.get("target_loss", None)
     return QSATrainConfig(
         T=int(DATASET_CONFIG.get("sentence_length", cfg.get("sentence_length", 8))),
         d=int(cfg.get("embedding_dim", 4)),
@@ -80,6 +84,7 @@ def qsa_config_from_dict(cfg: dict) -> QSATrainConfig:
         max_epochs=int(cfg.get("max_epochs", 300)),
         loss_rel_tol=float(cfg.get("loss_rel_tol", 1e-4)),
         convergence_patience=int(cfg.get("convergence_patience", 8)),
+        target_loss=(None if raw_target is None else float(raw_target)),
         local_max_qubits=int(cfg.get("local_max_qubits", 15)),
     )
 
@@ -228,7 +233,19 @@ def _run_training_phase(
         if epoch == 1 or epoch % log_frequency == 0 or epoch == max_epochs:
             log.info(f"[QSA] k={cfg.k} epoch={epoch:03d}/{max_epochs} loss={float(loss):.6f}")
 
+        hit_target = cfg.target_loss is not None and losses[-1] <= cfg.target_loss
+        if hit_target:
+            log.info(
+                f"[QSA] target loss reached at epoch={epoch}: "
+                f"{losses[-1]:.6f} <= {cfg.target_loss}"
+            )
+            return params, losses, epoch, True
+
         if cfg.train_until_converged and epoch > 1:
+            # Do not early-stop on flat loss while still above target_loss.
+            if cfg.target_loss is not None and losses[-1] > cfg.target_loss:
+                stagnant = 0
+                continue
             rel_change = abs(losses[-2] - losses[-1]) / max(abs(losses[-2]), 1e-12)
             if rel_change < cfg.loss_rel_tol:
                 stagnant += 1
@@ -241,7 +258,10 @@ def _run_training_phase(
                 )
                 return params, losses, epoch, True
 
-    converged = cfg.train_until_converged and stagnant >= cfg.convergence_patience
+    converged = (
+        (cfg.target_loss is not None and losses[-1] <= cfg.target_loss)
+        or (cfg.train_until_converged and stagnant >= cfg.convergence_patience)
+    )
     return params, losses, max_epochs, converged
 
 
@@ -364,6 +384,7 @@ def train_qsa(
         f"[QSA] Section-2 training | T={cfg.T} d={cfg.d} k={cfg.k} "
         f"n_qubits={qubit_budget(cfg.T, cfg.d, cfg.k)} "
         f"epochs={cfg.epochs if not cfg.train_until_converged else f'<= {cfg.max_epochs} (converge)'} "
+        f"target_loss={cfg.target_loss} "
         f"curriculum_k={cfg.curriculum_k} warm_start_W={cfg.warm_start_w_identity}"
     )
 
