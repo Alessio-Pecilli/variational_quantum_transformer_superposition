@@ -660,21 +660,29 @@ def _apply_preset(args) -> str:
         args.max_sentences = 16
         return "quick"
     if args.long:
-        args.epochs = 40
-        args.max_sentences = 64
+        if args.epochs is None:
+            args.epochs = 40
+        if args.max_sentences is None:
+            args.max_sentences = 64
         args.train_until_converged = True
-        args.max_epochs = 300
+        # Do NOT overwrite CLI --max-epochs (HPC passes 800).
+        if args.max_epochs is None:
+            args.max_epochs = 300
         if args.target_loss is None:
             args.target_loss = DEFAULT_TARGET_LOSS
         return "long"
     if args.full:
-        args.epochs = 40
-        args.max_sentences = 64
+        if args.epochs is None:
+            args.epochs = 40
+        if args.max_sentences is None:
+            args.max_sentences = 64
         return "full"
     if args.epochs is None:
         args.epochs = 20
     if args.max_sentences is None:
         args.max_sentences = 32
+    if args.max_epochs is None:
+        args.max_epochs = 300
     return "medium"
 
 
@@ -726,7 +734,7 @@ def main() -> int:
     parser.add_argument("--curriculum-k", action="store_true", help="train k=1 poi k target (warm-start params)")
     parser.add_argument("--warm-start-w", action="store_true", help="inizializza W~I (weights_w=0)")
     parser.add_argument("--train-until-converged", action="store_true")
-    parser.add_argument("--max-epochs", type=int, default=300)
+    parser.add_argument("--max-epochs", type=int, default=None, help="cap when training to target/convergence (default 300; HPC uses 800)")
     parser.add_argument("--loss-rel-tol", type=float, default=1e-4)
     parser.add_argument("--convergence-patience", type=int, default=8)
     parser.add_argument(
@@ -782,6 +790,8 @@ def main() -> int:
         return _replot_study_dir(Path(args.replot_only), args)
 
     preset_name = _apply_preset(args)
+    if args.max_epochs is None:
+        args.max_epochs = 300
     logger = _setup_logger()
 
     from mpi_runtime import barrier, gather_list, init_mpi, shard_items
