@@ -54,13 +54,15 @@ TARGET_LOSS="${TARGET_LOSS:-3}"
 MAX_EPOCHS="${MAX_EPOCHS:-800}"
 PANEL_D_ON_T="${PANEL_D_ON_T:-4,8,16}"
 PANEL_T_ON_D="${PANEL_T_ON_D:-8,16,32}"
+KERNEL_MODE="${KERNEL_MODE:-poly}"
 
-COMPLEXITY_DIR="${COMPLEXITY_DIR:-results/study/definitive_complexity_T${T_FIXED}_mode${MODE}}"
-BASELINES_DIR="${BASELINES_DIR:-results/baselines_smoke/definitive_T${T}_d${D}_k${K}_ep${EPOCHS}_n${N_SEEDS}}"
-PPL_ROOT="${PPL_ROOT:-results/baselines_smoke/ppl_vs_k_T${T}_d${D}_ep${EPOCHS}_n${N_SEEDS}}"
+COMPLEXITY_DIR="${COMPLEXITY_DIR:-results/study/definitive_complexity_${KERNEL_MODE}_T${T_FIXED}_mode${MODE}}"
+BASELINES_DIR="${BASELINES_DIR:-results/baselines_smoke/definitive_${KERNEL_MODE}_T${T}_d${D}_k${K}_ep${EPOCHS}_n${N_SEEDS}}"
+PPL_ROOT="${PPL_ROOT:-results/baselines_smoke/ppl_vs_k_${KERNEL_MODE}_T${T}_d${D}_ep${EPOCHS}_n${N_SEEDS}}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
 echo "nodes=${SLURM_JOB_NUM_NODES:-?} tasks=${SLURM_NTASKS:-?} (MPI via srun)"
+echo "kernel_mode=${KERNEL_MODE}"
 echo "phases: complexity=$([ "$SKIP_COMPLEXITY" = 1 ] && echo SKIP || echo RUN) |" \
      "baselines=$([ "$SKIP_BASELINES" = 1 ] && echo SKIP || echo RUN) |" \
      "ppl_vs_k=$([ "$SKIP_PPL_K" = 1 ] && echo SKIP || echo RUN)"
@@ -109,6 +111,7 @@ if [[ "$SKIP_COMPLEXITY" != "1" ]]; then
     --max-epochs "$MAX_EPOCHS"
     --panel-d-on-T "$PANEL_D_ON_T"
     --panel-T-on-d "$PANEL_T_ON_D"
+    --kernel-mode "$KERNEL_MODE"
   )
   if [[ "$EXTRA_K3" == "1" ]]; then
     CARGS+=(--extra-k3)
@@ -145,6 +148,7 @@ if [[ "$SKIP_BASELINES" != "1" ]]; then
     --nl-learning-rate "$NL_LR" \
     --checkpoint-every "$CHECKPOINT_EVERY" \
     --output-dir "$BASELINES_DIR" \
+    --kernel-mode "$KERNEL_MODE" \
     --resume \
     --mpi
   echo "=== PHASE 2 DONE at $(date) ==="
@@ -176,6 +180,7 @@ if [[ "$SKIP_PPL_K" != "1" ]]; then
       --nl-learning-rate "$NL_LR" \
       --checkpoint-every "$CHECKPOINT_EVERY" \
       --output-dir "$OUT" \
+      --kernel-mode "$KERNEL_MODE" \
       --resume \
       --mpi
   done

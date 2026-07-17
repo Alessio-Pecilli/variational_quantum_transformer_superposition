@@ -685,6 +685,12 @@ def main() -> int:
         f"resume skips only if metrics already meet the target",
     )
     parser.add_argument(
+        "--kernel-mode",
+        choices=("poly", "monomial"),
+        default="poly",
+        help="attention kernel: poly = LCU softmax truncation; monomial = legacy s^k",
+    )
+    parser.add_argument(
         "--panel-d-on-T",
         type=str,
         default=",".join(str(x) for x in PANEL_D_ON_T),
@@ -745,6 +751,7 @@ def main() -> int:
         print("RUN_STUDY — studio Section 2 (overlap O_ij vs T e d)")
         print("=" * 60)
         print(f"Preset: {preset_name} | epoche={args.epochs} | frasi={args.max_sentences} | k={args.k}")
+        print(f"kernel_mode={args.kernel_mode}")
         if args.train_until_converged:
             print(
                 f"Convergenza: max_epochs={args.max_epochs} "
@@ -776,6 +783,7 @@ def main() -> int:
         "loss_rel_tol": args.loss_rel_tol,
         "convergence_patience": args.convergence_patience,
         "target_loss": args.target_loss,
+        "kernel_mode": args.kernel_mode,
     }
     train_kw = dict(
         k=args.k,

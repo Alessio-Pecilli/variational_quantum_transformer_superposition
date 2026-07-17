@@ -29,7 +29,8 @@ BATCH_SIZE="${BATCH_SIZE:-64}"
 SEED="${SEED:-42}"
 KS="${KS:-1 2 3 4}"
 CHECKPOINT_EVERY="${CHECKPOINT_EVERY:-20}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-results/baselines_smoke/ppl_vs_k_T${T}_d${D}_ep${EPOCHS}_n${N_SEEDS}}"
+KERNEL_MODE="${KERNEL_MODE:-poly}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-results/baselines_smoke/ppl_vs_k_${KERNEL_MODE}_T${T}_d${D}_ep${EPOCHS}_n${N_SEEDS}}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
 echo "ppl vs k: T=$T d=$D ks=($KS) epochs=$EPOCHS frasi=$MAX_SENTENCES n_seeds=$N_SEEDS"
@@ -69,8 +70,10 @@ for K in $KS; do
     --seed "$SEED" \
     --checkpoint-every "$CHECKPOINT_EVERY" \
     --output-dir "$OUT" \
+    --kernel-mode "$KERNEL_MODE" \
     --resume \
     --mpi
 done
 
 echo "=== JOB FINISHED at $(date) ==="
+"$VENV_PY" plot_ppl_vs_k.py --root "$OUTPUT_ROOT" --ks "$(echo $KS | tr ' ' ',')" || true

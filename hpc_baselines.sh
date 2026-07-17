@@ -36,7 +36,8 @@ SEED="${SEED:-42}"
 LR="${LR:-1e-3}"
 NL_LR="${NL_LR:-5e-3}"
 CHECKPOINT_EVERY="${CHECKPOINT_EVERY:-20}"
-OUTPUT_DIR="${OUTPUT_DIR:-results/baselines_smoke/definitive_T${T}_d${D}_k${K}_ep${EPOCHS}_n${N_SEEDS}}"
+KERNEL_MODE="${KERNEL_MODE:-poly}"
+OUTPUT_DIR="${OUTPUT_DIR:-results/baselines_smoke/definitive_${KERNEL_MODE}_T${T}_d${D}_k${K}_ep${EPOCHS}_n${N_SEEDS}}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
 echo "baselines: T=$T d=$D k=$K epochs=$EPOCHS frasi=$MAX_SENTENCES n_seeds=$N_SEEDS batch=$BATCH_SIZE"
@@ -77,6 +78,7 @@ srun --mpi=pmix_v3 --export=ALL "$VENV_PY" run_baselines_smoke.py \
   --nl-learning-rate "$NL_LR" \
   --checkpoint-every "$CHECKPOINT_EVERY" \
   --output-dir "$OUTPUT_DIR" \
+  --kernel-mode "$KERNEL_MODE" \
   --resume \
   --mpi
 
