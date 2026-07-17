@@ -33,7 +33,6 @@ import numpy as np
 
 from config import DATASET_CONFIG, OPTIMIZATION_CONFIG
 from jax_training_pipeline import run_training
-from qsa_section2_circuit import qubit_budget
 
 ROOT = Path(__file__).resolve().parent
 
@@ -49,9 +48,24 @@ T_LIM = 4
 LOCAL_MAX_QUBITS = 15
 DEFAULT_TARGET_LOSS = 3.0
 
-# Distinct styles: data = solid + marker; refs = dashed / dotted (no shared dash type).
+# Previous-style palette: data curves vs theory refs must NOT share dash/color.
+# Data = solid + distinct markers; Haar floor = dashed squares; advantage = dotted triangles.
 _DATA_MARKERS = ("o", "s", "D", "^", "v")
-_DATA_COLORS = ("#1f77b4", "#d62728", "#2ca02c", "#9467bd", "#ff7f0e")
+_DATA_COLORS = ("#0072B2", "#E69F00", "#009E73", "#CC79A7", "#56B4E9")
+_REF_HAAR_COLOR = "#000000"
+_REF_ADV_COLOR = "#666666"
+
+
+def _qubit_budget(T: int, d: int, k: int, kernel_mode: str = "poly") -> int:
+    if kernel_mode == "poly":
+        from qsa_section2_circuit_polynomial import qubit_budget as qb
+    else:
+        from qsa_section2_circuit import qubit_budget as qb
+    return int(qb(T, d, k))
+
+
+def _obar_ylabel() -> str:
+    return r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^{k}|$  (monomial diagnostic)"
 
 
 def _setup_logger() -> logging.Logger:
@@ -73,21 +87,30 @@ def _main_hpc_equivalent(T: int, d: int, k: int, epochs: int, max_sentences: int
     )
 
 
-def _run_self_check() -> bool:
+def _run_self_check(kernel_mode: str = "poly") -> bool:
     print("\n" + "=" * 60)
-    print("FASE 1/4 — Self-check circuito Section 2")
+    print(f"FASE 1/4 — Self-check circuito Section 2 (kernel={kernel_mode})")
     print("=" * 60)
     try:
-        from qsa_section2_circuit import self_check, set_backends
+        if kernel_mode == "poly":
+            from qsa_section2_circuit_polynomial import self_check, set_backends
 
-        set_backends()
-        ok = True
-        ok &= self_check(T=2, d=2, k=1, check_projector=True)
-        ok &= self_check(T=4, d=4, k=2, check_projector=True)
-        if ok:
-            print("[SELF-CHECK] PASS (readout overlap == projector)\n")
+            set_backends()
+            ok = True
+            ok &= self_check(T=3, d=4, k=1, check_projector=True)
+            ok &= self_check(T=3, d=4, k=2, check_projector=True)
+            ok &= self_check(T=2, d=4, k=3, check_projector=True)
         else:
-            print("[SELF-CHECK] FAIL — readout overlap != projector.\n")
+            from qsa_section2_circuit import self_check, set_backends
+
+            set_backends()
+            ok = True
+            ok &= self_check(T=2, d=2, k=1, check_projector=True)
+            ok &= self_check(T=4, d=4, k=2, check_projector=True)
+        if ok:
+            print("[SELF-CHECK] PASS (readout overlap == projector == analytic)\n")
+        else:
+            print("[SELF-CHECK] FAIL — readout mismatch.\n")
         return ok
     except Exception as exc:
         print(f"[SELF-CHECK] SKIP (ambiente: {exc})\n")
@@ -110,7 +133,8 @@ def _train_point(
     train_opts: dict,
     local_max_qubits: int = LOCAL_MAX_QUBITS,
 ) -> dict:
-    n_q = qubit_budget(T, d, k)
+    kernel_mode = str(train_opts.get("kernel_mode", "poly"))
+    n_q = _qubit_budget(T, d, k, kernel_mode=kernel_mode)
     if n_q > local_max_qubits:
         raise ValueError(
             f"{label}: n_qubits={n_q} > {local_max_qubits} (limite locale). "
@@ -230,11 +254,18 @@ def _plot_vs_T(
     out_path: Path,
     t_lim: int = T_LIM,
 ) -> None:
-    """Plot obar vs T with horizontal d^{-(k+1)/2} (and advantage) refs."""
+    """Plot obar vs T with primary d^{-(k+1)/2} and secondary advantage refs.
+
+    Style: data = solid+markers (distinct colors); Haar floor = black dashed;
+    advantage = grey dotted. Linear y.
+    """
     from qsa_section2_circuit import advantage_threshold, haar_floor
 
     fig, ax = plt.subplots(figsize=(8, 5))
     all_T: set[int] = set()
+    drawn_refs: set[tuple[int, int]] = set()
+    haar_colors = ("#000000", "#4D4D4D", "#7F7F7F")
+    adv_colors = ("#666666", "#999999", "#BBBBBB")
     for si, (label, rows) in enumerate(series):
         if not rows:
             continue
@@ -253,30 +284,36 @@ def _plot_vs_T(
             linewidth=2.2,
             markersize=8,
             label=label,
+            zorder=3,
         )
         k_val = int(rows[0]["k"])
         d_val = int(rows[0].get("d", d_fixed))
-        # Refs depend only on (d,k): horizontal lines vs T.
-        floor = haar_floor(d_val, k_val)
-        adv = advantage_threshold(d_val, k_val)
-        ax.axhline(
-            floor,
-            color=color,
-            linestyle="--",
-            linewidth=1.6,
-            label=rf"$d^{{-(k+1)/2}}$ (k={k_val}, d={d_val})",
-        )
-        ax.axhline(
-            adv,
-            color=color,
-            linestyle=":",
-            linewidth=1.6,
-            label=rf"$\sqrt{{k\,k!/d^k}}$ (k={k_val}, d={d_val})",
-        )
+        key = (d_val, k_val)
+        if key not in drawn_refs:
+            ri = len(drawn_refs)
+            drawn_refs.add(key)
+            floor = haar_floor(d_val, k_val)
+            adv = advantage_threshold(d_val, k_val)
+            ax.axhline(
+                floor,
+                color=haar_colors[ri % len(haar_colors)],
+                linestyle="--",
+                linewidth=1.8,
+                label=rf"$d^{{-(k+1)/2}}$ (k={k_val}, d={d_val})",
+                zorder=1,
+            )
+            ax.axhline(
+                adv,
+                color=adv_colors[ri % len(adv_colors)],
+                linestyle=":",
+                linewidth=1.8,
+                label=rf"$\sqrt{{k\,k!/d^k}}$ adv (k={k_val}, d={d_val})",
+                zorder=1,
+            )
 
     ax.axvline(t_lim, color="0.45", linestyle="-.", linewidth=1.2, label=rf"$T_{{\mathrm{{lim}}}}$={t_lim}")
     ax.set_xlabel("T (lunghezza sequenza)")
-    ax.set_ylabel(r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^k|$")
+    ax.set_ylabel(_obar_ylabel())
     k_labels = ", ".join(lbl for lbl, _ in series)
     ax.set_title(f"obar vs T  (d={d_fixed}; {k_labels})")
     ax.set_xticks(sorted(all_T) if all_T else [])
@@ -293,11 +330,12 @@ def _plot_vs_d(
     T_fixed: int,
     out_path: Path,
 ) -> None:
-    """Plot obar vs d; primary ref is d^{-(k+1)/2}, plus advantage. Linear y."""
+    """Plot obar vs d; primary ref d^{-(k+1)/2}, plus advantage. Linear y."""
     from qsa_section2_circuit import advantage_threshold, haar_floor
 
     fig, ax = plt.subplots(figsize=(8, 5))
     all_d: set[int] = set()
+    drawn_k: set[int] = set()
     for si, (label, rows) in enumerate(series):
         if not rows:
             continue
@@ -316,31 +354,38 @@ def _plot_vs_d(
             linewidth=2.2,
             markersize=8,
             label=label,
+            zorder=3,
         )
         k_val = int(rows[0]["k"])
-        floor = np.array([haar_floor(int(d), k_val) for d in d_vals])
-        adv = np.array([advantage_threshold(int(d), k_val) for d in d_vals])
-        ax.plot(
-            d_vals,
-            floor,
-            color=color,
-            linestyle="--",
-            linewidth=1.6,
-            marker=None,
-            label=rf"$d^{{-(k+1)/2}}$ (k={k_val})",
-        )
-        ax.plot(
-            d_vals,
-            adv,
-            color=color,
-            linestyle=":",
-            linewidth=1.6,
-            marker=None,
-            label=rf"$\sqrt{{k\,k!/d^k}}$ (k={k_val})",
-        )
+        if k_val not in drawn_k:
+            drawn_k.add(k_val)
+            floor = np.array([haar_floor(int(d), k_val) for d in d_vals])
+            adv = np.array([advantage_threshold(int(d), k_val) for d in d_vals])
+            ax.plot(
+                d_vals,
+                floor,
+                color=_REF_HAAR_COLOR,
+                linestyle="--",
+                linewidth=1.8,
+                marker="s",
+                markersize=5,
+                label=rf"$d^{{-(k+1)/2}}$ (k={k_val})",
+                zorder=1,
+            )
+            ax.plot(
+                d_vals,
+                adv,
+                color=_REF_ADV_COLOR,
+                linestyle=":",
+                linewidth=1.8,
+                marker="^",
+                markersize=5,
+                label=rf"$\sqrt{{k\,k!/d^k}}$ adv (k={k_val})",
+                zorder=1,
+            )
 
     ax.set_xlabel("d (dimensione embedding)")
-    ax.set_ylabel(r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^k|$")
+    ax.set_ylabel(_obar_ylabel())
     ax.set_title(f"obar vs d  (T={T_fixed})")
     ax.set_xticks(sorted(all_d) if all_d else [])
     ax.set_yscale("linear")
@@ -382,6 +427,7 @@ def _plot_vs_T_by_d(
             linewidth=2.2,
             markersize=8,
             label=rf"trained $d={d_val}$",
+            zorder=3,
         )
         floor = haar_floor(d_val, k_fixed)
         ax.axhline(
@@ -389,12 +435,14 @@ def _plot_vs_T_by_d(
             color=color,
             linestyle="--",
             linewidth=1.4,
+            alpha=0.85,
             label=rf"$d^{{-(k+1)/2}}$ ($d={d_val}$)",
+            zorder=1,
         )
 
     ax.axvline(t_lim, color="0.45", linestyle="-.", linewidth=1.2, label=rf"$T_{{\mathrm{{lim}}}}$={t_lim}")
     ax.set_xlabel("T (lunghezza sequenza)")
-    ax.set_ylabel(r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^k|$")
+    ax.set_ylabel(_obar_ylabel())
     ax.set_title(f"obar vs T  (k={k_fixed}, curves = different d)")
     ax.set_yscale("linear")
     ax.grid(True, alpha=0.3)
@@ -421,17 +469,19 @@ def _plot_vs_d_by_T(
         return
 
     fig, ax = plt.subplots(figsize=(8, 5))
-    # Shared floor depends only on d,k — plot once from union of d.
     all_d = sorted({int(r["d"]) for pts in by_T.values() for r in pts})
     if all_d:
         floor = [haar_floor(d, k_fixed) for d in all_d]
         ax.plot(
             all_d,
             floor,
-            color="0.15",
+            color=_REF_HAAR_COLOR,
             linestyle="--",
             linewidth=2.0,
+            marker="s",
+            markersize=5,
             label=rf"$d^{{-(k+1)/2}}$ (k={k_fixed})",
+            zorder=1,
         )
 
     for si, T_val in enumerate(sorted(by_T)):
@@ -447,10 +497,11 @@ def _plot_vs_d_by_T(
             linewidth=2.2,
             markersize=8,
             label=rf"trained $T={T_val}$",
+            zorder=3,
         )
 
     ax.set_xlabel("d (dimensione embedding)")
-    ax.set_ylabel(r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^k|$")
+    ax.set_ylabel(_obar_ylabel())
     ax.set_title(f"obar vs d  (k={k_fixed}, curves = different T)")
     ax.set_xticks(all_d)
     ax.set_yscale("linear")
@@ -489,7 +540,8 @@ def _write_summary(
         "METRICA: obar = mean_{i<=j} |a_ij s_ij^k|  (= absS/Ntri, NO potenza 1/k)",
         "         obar_k_root = obar^{1/k}  (solo diagnostica, non usata nei plot)",
         "         s_ij = <x_j|W|x_i>, a_ij = <x_{j+1}|V|x_i>",
-        "Refs: primary = d^{-(k+1)/2} ; secondary advantage = sqrt(k * k! / d^k)",
+        "Refs: PRIMARY bug-check = d^{-(k+1)/2} ; secondary advantage = sqrt(k * k! / d^k)",
+        "      (obar always monomial mean|a s^k| even when training uses poly kernel)",
         "      (Haar floor in code == d^{-(k+1)/2}; use that as the main theory line)",
         "",
     ]
@@ -770,7 +822,7 @@ def main() -> int:
     t_start = time.perf_counter()
     self_check_ok = True
     if rank == 0 and not args.skip_self_check:
-        self_check_ok = _run_self_check()
+        self_check_ok = _run_self_check(kernel_mode=args.kernel_mode)
         if not self_check_ok:
             print("[WARN] Self-check readout fallito; proseguo comunque (usa --skip-self-check per saltare).")
     barrier(comm)
@@ -816,7 +868,7 @@ def main() -> int:
             )
         if args.extra_k3:
             for T in SWEEP_T:
-                n_q = qubit_budget(T, SWEEP_D_FIXED, 3)
+                n_q = _qubit_budget(T, SWEEP_D_FIXED, 3, kernel_mode=args.kernel_mode)
                 if n_q > args.local_max_qubits:
                     if rank == 0:
                         print(f"  [skip] T={T} k=3: n_qubits={n_q} > {args.local_max_qubits}")
@@ -844,7 +896,7 @@ def main() -> int:
         if args.extra_k_on_d is not None:
             ek = args.extra_k_on_d
             for d in SWEEP_D:
-                n_q = qubit_budget(d_sweep_T, d, ek)
+                n_q = _qubit_budget(d_sweep_T, d, ek, kernel_mode=args.kernel_mode)
                 if n_q > args.local_max_qubits:
                     if rank == 0:
                         print(f"  [skip] d={d} k={ek}: n_qubits={n_q} > {args.local_max_qubits}")
@@ -869,7 +921,7 @@ def main() -> int:
                 key = (T, d_panel, args.k)
                 if key in scheduled:
                     continue
-                n_q = qubit_budget(T, d_panel, args.k)
+                n_q = _qubit_budget(T, d_panel, args.k, kernel_mode=args.kernel_mode)
                 if n_q > args.local_max_qubits:
                     continue
                 jobs.append(
@@ -888,7 +940,7 @@ def main() -> int:
                 key = (T_panel, d, args.k)
                 if key in scheduled:
                     continue
-                n_q = qubit_budget(T_panel, d, args.k)
+                n_q = _qubit_budget(T_panel, d, args.k, kernel_mode=args.kernel_mode)
                 if n_q > args.local_max_qubits:
                     continue
                 jobs.append(
@@ -933,7 +985,7 @@ def main() -> int:
                     "mean_O_ij": float("nan"),
                     "obar": float("nan"),
                     "final_loss": float("nan"),
-                    "n_qubits": int(qubit_budget(job["T"], job["d"], job["k"])),
+                    "n_qubits": int(_qubit_budget(job["T"], job["d"], job["k"], kernel_mode=args.kernel_mode)),
                 }
             )
 

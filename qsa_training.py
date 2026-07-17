@@ -309,39 +309,43 @@ def evaluate_mean_O(
     token_batch: jnp.ndarray,
     positional_encoding: jnp.ndarray,
     cfg: QSATrainConfig,
-) -> Tuple[float, float, float]:
-    """Return (mean_O_ij, obar/rbar, root) averaged over the training batch."""
+) -> Tuple[float, float, float, float]:
+    """Return (mean_O_ij, obar, obar_k_root, rbar) averaged over the batch.
+
+    obar is ALWAYS the monomial diagnostic mean_{i<=j}|a_ij s_ij^k| so that
+    Haar / d^{-(k+1)/2} and advantage refs stay on the same scale (bug-check).
+    Training may use kernel_mode='poly'; rbar = mean |a g(s)| / lam is extra.
+    """
+    from qsa_section2_circuit import classical_report
+
     embedding = np.asarray(isometrize_matrix(params["embedding"]))
     qml_backend, _, _ = set_backends()
     W = np.asarray(extract_ortho_matrix(qml_backend, params["weights_w"], cfg.d))
     V = np.asarray(extract_ortho_matrix(qml_backend, params["weights_v"], cfg.d))
 
-    mean_os, obars, obar_roots = [], [], []
+    mean_os, obars, obar_roots, rbars = [], [], [], []
     for ids in np.asarray(token_batch):
         X, Y = sequence_xy_from_tokens(
             jnp.asarray(ids), jnp.asarray(embedding), positional_encoding
         )
         X_np = np.asarray(X)
         Y_np = np.asarray(Y)
+        rep = classical_report(X_np, Y_np, W, V, cfg.k)
+        mean_os.append(rep["mean_O_ij"])
+        obars.append(rep["obar"])
+        obar_roots.append(rep["obar_k_root"])
         if cfg.kernel_mode == "poly":
             from qsa_section2_circuit_polynomial import classical_report as poly_report
 
-            rep = poly_report(X_np, Y_np, W, V, cfg.k)
-            # rbar is the poly analogue of mean |a g(s)| (signed-sum mu is separate)
-            mean_os.append(float(rep["rbar"]))
-            obars.append(float(rep["rbar"]))
-            obar_roots.append(float(rep["rbar"]))
+            prep = poly_report(X_np, Y_np, W, V, cfg.k)
+            rbars.append(float(prep["rbar"]))
         else:
-            from qsa_section2_circuit import classical_report
-
-            rep = classical_report(X_np, Y_np, W, V, cfg.k)
-            mean_os.append(rep["mean_O_ij"])
-            obars.append(rep["obar"])
-            obar_roots.append(rep["obar_k_root"])
+            rbars.append(float(rep["obar"]))
     return (
         float(np.mean(mean_os)) if mean_os else 0.0,
         float(np.mean(obars)) if obars else 0.0,
         float(np.mean(obar_roots)) if obar_roots else 0.0,
+        float(np.mean(rbars)) if rbars else 0.0,
     )
 
 
@@ -393,6 +397,8 @@ def _save_qsa_artifacts(
         "n_qubits": result["n_qubits"],
         "mean_O_ij": result["mean_O_ij"],
         "obar": result["obar"],
+        "rbar": result.get("rbar"),
+        "kernel_mode": result.get("kernel_mode", cfg.kernel_mode),
         "reference_haar": result["reference_haar"],
         "reference_advantage": result["reference_advantage"],
         "num_sentences": result["num_sentences"],
@@ -455,20 +461,31 @@ def train_qsa(
         )
 
     elapsed = time.perf_counter() - start
-    mean_o, mean_obar, mean_obar_k = evaluate_mean_O(params, token_batch, positional_encoding, cfg)
+    mean_o, mean_obar, mean_obar_k, mean_rbar = evaluate_mean_O(
+        params, token_batch, positional_encoding, cfg
+    )
+
+    if cfg.kernel_mode == "poly":
+        from qsa_section2_circuit_polynomial import qubit_budget as poly_qubit_budget
+
+        n_qubits = poly_qubit_budget(cfg.T, cfg.d, cfg.k)
+    else:
+        n_qubits = qubit_budget(cfg.T, cfg.d, cfg.k)
 
     result = {
         "config": asdict(cfg),
         "circuit_mode": "section2",
+        "kernel_mode": cfg.kernel_mode,
         "mean_O_ij": mean_o,
         "obar": mean_obar,
         "obar_k_root": mean_obar_k,
+        "rbar": mean_rbar,
         "final_loss": all_losses[-1] if all_losses else float("nan"),
         "loss_history": all_losses,
         "training_phases": phase_summaries,
         "converged": all(s.get("converged", False) for s in phase_summaries) if cfg.train_until_converged else None,
         "elapsed_seconds": elapsed,
-        "n_qubits": qubit_budget(cfg.T, cfg.d, cfg.k),
+        "n_qubits": n_qubits,
         "num_sentences": int(token_batch.shape[0]),
         "reference_haar": haar_floor(cfg.d, cfg.k),
         "reference_advantage": advantage_threshold(cfg.d, cfg.k),
@@ -487,8 +504,9 @@ def train_qsa(
         _save_qsa_artifacts(params, cfg, result, sentences, run_dir, matrices_dir, parameters_dir, summaries_dir)
 
     log.info(
-        f"[QSA] mean_O_ij={mean_o:.6f} obar={mean_obar:.6f} | "
-        f"haar=d^(-(k+1)/2)={result['reference_haar']:.6f} "
+        f"[QSA] mean_O_ij={mean_o:.6f} obar(monomial)={mean_obar:.6f} "
+        f"rbar(poly)={mean_rbar:.6f} | "
+        f"d^(-(k+1)/2)={result['reference_haar']:.6f} "
         f"| adv=sqrt(k*k!/d^k)={result['reference_advantage']:.6f}"
     )
 

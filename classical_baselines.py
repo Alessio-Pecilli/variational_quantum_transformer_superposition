@@ -686,9 +686,9 @@ def plot_final_loss_vs_k(
         by_model.setdefault(str(p["model"]), []).append(p)
 
     styles = {
-        "k-QSA": dict(color="#1f77b4", marker="o", linestyle="-"),
-        "k-CSA": dict(color="#d62728", marker="s", linestyle="-"),
-        "nl-CSA": dict(color="#2ca02c", marker="D", linestyle="-"),
+        "k-QSA": dict(color="#0072B2", marker="o", linestyle="-"),
+        "k-CSA": dict(color="#D55E00", marker="s", linestyle="--"),
+        "nl-CSA": dict(color="#009E73", marker="D", linestyle="-."),
     }
 
     fig, ax = plt.subplots(figsize=(8, 5))

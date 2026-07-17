@@ -153,9 +153,12 @@ def run_loss_vs_k(
 
 
 def rbar_snapshot(T: int = 8, d: int = 8, k: int = 2, seed: int = 0) -> None:
-    """Quick classical rbar at random ortho W,V (no train) — poly vs monomial feel."""
+    """Quick classical rbar + monomial obar at random ortho W,V (no train)."""
+    from qsa_section2_circuit import classical_report as mono_report
+    from qsa_section2_circuit import haar_floor, advantage_threshold
+
     print("\n" + "=" * 60)
-    print("4) rbar snapshot (untrained random W,V)")
+    print("4) rbar / obar snapshot (untrained random W,V)")
     print("=" * 60)
     rng = np.random.default_rng(seed)
     X = rng.standard_normal((T, d))
@@ -168,12 +171,14 @@ def rbar_snapshot(T: int = 8, d: int = 8, k: int = 2, seed: int = 0) -> None:
         beta = softmax_beta(d)
         c = lcu_coeffs(kk, beta)
         rep = classical_report(X, Y, Wm, Vm, kk, beta)
+        mono = mono_report(X, Y, Wm, Vm, kk)
         pr_p = participation_ratio(X, Wm, c)
         pr_m = participation_ratio(X, Wm, np.eye(kk + 1)[kk])
         print(
-            f"  k={kk}: rbar={rep['rbar']:.4f} mu={rep['mu']:.3e} "
-            f"p_eff={rep['p_eff']} PR_poly={pr_p:.2f} PR_mono={pr_m:.2f} "
-            f"adv?={rep['advantage']}"
+            f"  k={kk}: obar={mono['obar']:.4f} rbar={rep['rbar']:.4f} "
+            f"d^(-(k+1)/2)={haar_floor(d, kk):.4f} adv={advantage_threshold(d, kk):.4f} "
+            f"mu={rep['mu']:.3e} p_eff={rep['p_eff']} "
+            f"PR_poly={pr_p:.2f} PR_mono={pr_m:.2f} adv?={rep['advantage']}"
         )
 
 

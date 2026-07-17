@@ -106,7 +106,10 @@ def mean_O_ij(X, Y, Wmat, Vmat, k):
 
 
 def haar_floor(d: int, k: int) -> float:
-    """Haar reference for obar: d^{-(k+1)/2}."""
+    """Primary bug-check / Haar-scale floor for obar: d^{-(k+1)/2}.
+
+    Trained obar should sit above this line; falling below strongly suggests a bug.
+    """
     return float(d ** (-(k + 1) / 2))
 
 

@@ -141,13 +141,15 @@ def classical_report(X, Y, Wmat, Vmat, k, beta=None):
             w.append(A[j, i] * g_poly(S[j, i], c)); sv.append(S[j, i])
     w = np.array(w); sv = np.array(sv); Ntri = T * (T + 1) // 2
     mu = (w.sum() / (lam * Ntri)) ** 2
+    # rbar = mean |a g(s)| / lam  (same lam normalisation as the quantum mu readout)
+    rbar = float(np.abs(w).sum() / (lam * Ntri)) if Ntri > 0 else 0.0
     # effective degree: which degrees actually carry g(s) on THIS overlap distribution
     contrib = np.array([np.abs(c[p] * sv ** p).mean() for p in range(k + 1)])
     frac = contrib / contrib.sum()
     p_eff = max([p for p in range(k + 1) if frac[p] > 0.05], default=0)
     mk = comb(d + k - 1, k)
     return dict(
-        mu=mu, rbar=np.abs(w).sum() / Ntri,
+        mu=mu, rbar=rbar,
         alignment=(abs(w.sum()) / np.abs(w).sum() if np.abs(w).sum() > 0 else 0.0),
         beta=beta, tau=reduced_temperature(beta, d), lam=lam, lam2=lam ** 2,
         degree_fracs=frac, p_eff=p_eff,
