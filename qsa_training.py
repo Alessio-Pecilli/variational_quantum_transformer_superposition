@@ -60,7 +60,7 @@ class QSATrainConfig:
     # early-stop alone is not enough for large d (can "converge" at loss >> 3).
     target_loss: Optional[float] = None
     # "monomial" = a * s^k (legacy); "poly" = a * sum_p c_p s^p with c_p=beta^p/p!, beta=sqrt(d)
-    kernel_mode: str = "poly"
+    kernel_mode: str = "monomial"
     local_max_qubits: int = 15
 
 
@@ -87,7 +87,7 @@ def qsa_config_from_dict(cfg: dict) -> QSATrainConfig:
         loss_rel_tol=float(cfg.get("loss_rel_tol", 1e-4)),
         convergence_patience=int(cfg.get("convergence_patience", 8)),
         target_loss=(None if raw_target is None else float(raw_target)),
-        kernel_mode=str(cfg.get("kernel_mode", "poly")),
+        kernel_mode=str(cfg.get("kernel_mode", "monomial")),
         local_max_qubits=int(cfg.get("local_max_qubits", 15)),
     )
 
@@ -154,16 +154,16 @@ def classical_mu_jax(
     W: jnp.ndarray,
     V: jnp.ndarray,
     k: int,
-    kernel_mode: str = "poly",
+    kernel_mode: str = "monomial",
     beta: Optional[float] = None,
 ) -> jnp.ndarray:
     """mu = |sum_{i<=j} a_ij * kernel(s_ij)|^2 / norm^2.
 
     kernel_mode:
-      - "monomial": kernel = s^k  (legacy sharpener)
+      - "monomial": kernel = s^k  (legacy sharpener; default)
       - "poly":     kernel = sum_{p=0..k} c_p s^p with c_p = beta^p/p!,
                     beta = sqrt(d) by default, divided by lam = sum c_p
-                    (matches LCU / softmax truncation in qsa_section2_circuit_polynomial)
+                    (LCU / softmax truncation; abandoned for Section-2 campaigns)
     """
     from math import factorial
 

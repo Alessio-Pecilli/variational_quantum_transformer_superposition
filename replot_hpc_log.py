@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""One-shot: rebuild complexity plots from the pasted HPC log numbers (no retraining)."""
+"""Rebuild Friday monomial complexity plots (ō vs T linear; ō vs d log + advantage)."""
 from __future__ import annotations
 
 from pathlib import Path
 
 from run_study import _plot_vs_T, _plot_vs_d, _plot_vs_T_by_d, _plot_vs_d_by_T
 
-# From Nuovo Documento di testo.txt / job 2026-07-16
+# From Nuovo Documento di testo.txt / job finished 2026-07-16 ~18:05
 ROWS = [
     # vs T, d=16
     {"label": "T2_d16_k2", "T": 2, "d": 16, "k": 2, "obar": 0.299136, "reference_haar": 0.015625, "reference_advantage": 0.125, "final_loss": 2.4237},
@@ -34,7 +34,7 @@ ROWS = [
 
 
 def main() -> None:
-    out = Path("results/study/replot_from_hpc_log")
+    out = Path("results_from_hpc/report_20260716_monomial")
     out.mkdir(parents=True, exist_ok=True)
 
     t_k2 = [r for r in ROWS if r["d"] == 16 and r["k"] == 2]
@@ -52,7 +52,6 @@ def main() -> None:
         T_fixed=32,
         out_path=out / "mean_O_vs_d.png",
     )
-    # Panels incomplete on this run (only d=16 vs T, only T=32 vs d) — still write what we can.
     _plot_vs_T_by_d(t_k2, k_fixed=2, out_path=out / "mean_O_vs_T_by_d.png")
     _plot_vs_d_by_T(d_k2, k_fixed=2, out_path=out / "mean_O_vs_d_by_T.png")
     print(f"wrote plots under {out}")

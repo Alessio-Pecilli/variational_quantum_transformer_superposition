@@ -4,8 +4,8 @@ Classical baselines for comparison with k-QSA (Section 2).
 Important (referee-facing):
 - Local k-QSA training optimizes the classical mu path (circuit is for readout).
   Therefore k-QSA and k-CSA MUST share data + init and produce matching curves.
-  Default kernel is the LCU polynomial g(s)=sum_p c_p s^p (softmax truncation);
-  legacy monomial s^k is available via kernel_mode='monomial'.
+  Default kernel is the legacy monomial s^k; poly LCU is available via kernel_mode='poly'
+  but abandoned for Section-2 campaigns.
 - nl-CSA: softmax + FFN, Renyi next-token loss, isometric embedding (unchanged).
 """
 from __future__ import annotations
@@ -70,8 +70,8 @@ class BaselineConfig:
     batch_size: Optional[int] = None
     checkpoint_every: int = 20
     resume: bool = True
-    # "poly" = LCU softmax truncation; "monomial" = legacy s^k
-    kernel_mode: str = "poly"
+    # "monomial" = legacy s^k (default); "poly" = LCU softmax truncation (abandoned)
+    kernel_mode: str = "monomial"
 
 
 def _load_sentences(cfg: BaselineConfig) -> List[str]:

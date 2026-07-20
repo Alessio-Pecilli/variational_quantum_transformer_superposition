@@ -22,8 +22,10 @@
 #SBATCH --time=24:00:00
 
 # Override examples:
-#   sbatch --export=ALL,T=16,D=16,EPOCHS=300,N_SEEDS=5 hpc_all_section2.sh
-#   sbatch --nodes=2 --ntasks-per-node=20 --export=ALL,SKIP_COMPLEXITY=1 hpc_all_section2.sh
+#   sbatch hpc_all_section2.sh
+#   # retrain high-d only (resume Friday dir; new baselines/ppl dirs):
+#   sbatch --export=ALL,TARGET_LOSS=2.5,MAX_EPOCHS=2000,N_SEEDS=8 hpc_all_section2.sh
+#   sbatch --export=ALL,SKIP_COMPLEXITY=1,N_SEEDS=8 hpc_all_section2.sh   # baselines redo only
 
 set -euo pipefail
 
@@ -33,7 +35,7 @@ K="${K:-2}"
 LAYERS="${LAYERS:-2}"
 EPOCHS="${EPOCHS:-300}"
 MAX_SENTENCES="${MAX_SENTENCES:-1000}"
-N_SEEDS="${N_SEEDS:-5}"
+N_SEEDS="${N_SEEDS:-8}"
 BATCH_SIZE="${BATCH_SIZE:-64}"
 SEED="${SEED:-42}"
 LR="${LR:-1e-3}"
@@ -50,19 +52,31 @@ SKIP_COMPLEXITY="${SKIP_COMPLEXITY:-0}"
 SKIP_BASELINES="${SKIP_BASELINES:-0}"
 SKIP_PPL_K="${SKIP_PPL_K:-0}"
 
-TARGET_LOSS="${TARGET_LOSS:-3}"
-MAX_EPOCHS="${MAX_EPOCHS:-800}"
+TARGET_LOSS="${TARGET_LOSS:-2.5}"
+MAX_EPOCHS="${MAX_EPOCHS:-2000}"
 PANEL_D_ON_T="${PANEL_D_ON_T:-4,8,16}"
 PANEL_T_ON_D="${PANEL_T_ON_D:-8,16,32}"
-KERNEL_MODE="${KERNEL_MODE:-poly}"
+# Poly LCU abandoned: default back to fixed-k monomial (Friday 16/17 Jul campaign).
+KERNEL_MODE="${KERNEL_MODE:-monomial}"
 
-COMPLEXITY_DIR="${COMPLEXITY_DIR:-results/study/definitive_complexity_${KERNEL_MODE}_T${T_FIXED}_mode${MODE}}"
-BASELINES_DIR="${BASELINES_DIR:-results/baselines_smoke/definitive_${KERNEL_MODE}_T${T}_d${D}_k${K}_ep${EPOCHS}_n${N_SEEDS}}"
-PPL_ROOT="${PPL_ROOT:-results/baselines_smoke/ppl_vs_k_${KERNEL_MODE}_T${T}_d${D}_ep${EPOCHS}_n${N_SEEDS}}"
+# Resume Friday monomial complexity dir by default (retrains points with loss > TARGET_LOSS).
+if [[ -z "${COMPLEXITY_DIR:-}" ]]; then
+  if [[ "$KERNEL_MODE" == "monomial" ]]; then
+    COMPLEXITY_DIR="results/study/definitive_complexity_T${T_FIXED}_mode${MODE}"
+  else
+    COMPLEXITY_DIR="results/study/definitive_complexity_${KERNEL_MODE}_T${T_FIXED}_mode${MODE}"
+  fi
+fi
+# Fresh baselines / ppl-vs-k dirs so k=3 fluctuation is re-measured (no resume of old seeds).
+BASELINES_DIR="${BASELINES_DIR:-results/baselines_smoke/definitive_${KERNEL_MODE}_T${T}_d${D}_k${K}_ep${EPOCHS}_n${N_SEEDS}_v2}"
+PPL_ROOT="${PPL_ROOT:-results/baselines_smoke/ppl_vs_k_${KERNEL_MODE}_T${T}_d${D}_ep${EPOCHS}_n${N_SEEDS}_v2}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
 echo "nodes=${SLURM_JOB_NUM_NODES:-?} tasks=${SLURM_NTASKS:-?} (MPI via srun)"
-echo "kernel_mode=${KERNEL_MODE}"
+echo "kernel_mode=${KERNEL_MODE} target_loss=${TARGET_LOSS} max_epochs=${MAX_EPOCHS}"
+echo "COMPLEXITY_DIR=${COMPLEXITY_DIR}"
+echo "BASELINES_DIR=${BASELINES_DIR}"
+echo "PPL_ROOT=${PPL_ROOT}"
 echo "phases: complexity=$([ "$SKIP_COMPLEXITY" = 1 ] && echo SKIP || echo RUN) |" \
      "baselines=$([ "$SKIP_BASELINES" = 1 ] && echo SKIP || echo RUN) |" \
      "ppl_vs_k=$([ "$SKIP_PPL_K" = 1 ] && echo SKIP || echo RUN)"

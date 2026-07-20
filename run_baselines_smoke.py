@@ -77,8 +77,8 @@ def main() -> int:
     p.add_argument(
         "--kernel-mode",
         choices=("poly", "monomial"),
-        default="poly",
-        help="attention kernel: poly = sum c_p s^p (LCU/softmax); monomial = s^k (legacy)",
+        default="monomial",
+        help="attention kernel: monomial = s^k (default); poly = LCU (abandoned)",
     )
     args = p.parse_args()
 

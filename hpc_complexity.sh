@@ -29,7 +29,7 @@ EXTRA_K3="${EXTRA_K3:-1}"     # 1 => also k=3 on T-sweep
 LOCAL_MAX_QUBITS="${LOCAL_MAX_QUBITS:-40}"
 EPOCHS="${EPOCHS:-}"          # empty => run_study --long defaults
 MAX_SENTENCES="${MAX_SENTENCES:-}"
-KERNEL_MODE="${KERNEL_MODE:-poly}"
+KERNEL_MODE="${KERNEL_MODE:-monomial}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
 echo "complexity: MODE=$MODE T_FIXED=$T_FIXED EXTRA_K=$EXTRA_K LOCAL_MAX_QUBITS=$LOCAL_MAX_QUBITS"
@@ -52,12 +52,20 @@ export XLA_PYTHON_CLIENT_PREALLOCATE=false
 export UCX_TLS=self,shm,rc,ud
 export UCX_MEMTYPE_CACHE=n
 
-OUTPUT_DIR="${OUTPUT_DIR:-results/study/definitive_complexity_${KERNEL_MODE}_T${T_FIXED}_mode${MODE}}"
+if [[ -z "${OUTPUT_DIR:-}" ]]; then
+  if [[ "$KERNEL_MODE" == "monomial" ]]; then
+    OUTPUT_DIR="results/study/definitive_complexity_T${T_FIXED}_mode${MODE}"
+  else
+    OUTPUT_DIR="results/study/definitive_complexity_${KERNEL_MODE}_T${T_FIXED}_mode${MODE}"
+  fi
+fi
 
 test -f run_study.py || { echo "ERROR: run_study.py not found in $(pwd)"; exit 1; }
 mkdir -p logs "$OUTPUT_DIR"
 
-ARGS=(--long --skip-self-check --mpi --local-max-qubits "$LOCAL_MAX_QUBITS" --output-dir "$OUTPUT_DIR" --kernel-mode "$KERNEL_MODE")
+TARGET_LOSS="${TARGET_LOSS:-2.5}"
+MAX_EPOCHS="${MAX_EPOCHS:-2000}"
+ARGS=(--long --skip-self-check --mpi --local-max-qubits "$LOCAL_MAX_QUBITS" --output-dir "$OUTPUT_DIR" --kernel-mode "$KERNEL_MODE" --target-loss "$TARGET_LOSS" --max-epochs "$MAX_EPOCHS")
 if [[ -n "$EPOCHS" ]]; then
   ARGS+=(--epochs "$EPOCHS")
 fi

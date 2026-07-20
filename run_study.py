@@ -46,7 +46,7 @@ PANEL_D_ON_T = (4, 8, 16)     # obar vs T curves at these d (fixed k)
 PANEL_T_ON_D = (8, 16, 32)    # obar vs d curves at these T (fixed k)
 T_LIM = 4
 LOCAL_MAX_QUBITS = 15
-DEFAULT_TARGET_LOSS = 3.0
+DEFAULT_TARGET_LOSS = 2.5
 
 # Previous-style palette: data curves vs theory refs must NOT share dash/color.
 # Data = solid + distinct markers; Haar floor = dashed squares; advantage = dotted triangles.
@@ -56,7 +56,7 @@ _REF_HAAR_COLOR = "#000000"
 _REF_ADV_COLOR = "#666666"
 
 
-def _qubit_budget(T: int, d: int, k: int, kernel_mode: str = "poly") -> int:
+def _qubit_budget(T: int, d: int, k: int, kernel_mode: str = "monomial") -> int:
     if kernel_mode == "poly":
         from qsa_section2_circuit_polynomial import qubit_budget as qb
     else:
@@ -87,7 +87,7 @@ def _main_hpc_equivalent(T: int, d: int, k: int, epochs: int, max_sentences: int
     )
 
 
-def _run_self_check(kernel_mode: str = "poly") -> bool:
+def _run_self_check(kernel_mode: str = "monomial") -> bool:
     print("\n" + "=" * 60)
     print(f"FASE 1/4 — Self-check circuito Section 2 (kernel={kernel_mode})")
     print("=" * 60)
@@ -133,7 +133,7 @@ def _train_point(
     train_opts: dict,
     local_max_qubits: int = LOCAL_MAX_QUBITS,
 ) -> dict:
-    kernel_mode = str(train_opts.get("kernel_mode", "poly"))
+    kernel_mode = str(train_opts.get("kernel_mode", "monomial"))
     n_q = _qubit_budget(T, d, k, kernel_mode=kernel_mode)
     if n_q > local_max_qubits:
         raise ValueError(
@@ -330,7 +330,7 @@ def _plot_vs_d(
     T_fixed: int,
     out_path: Path,
 ) -> None:
-    """Plot obar vs d; primary ref d^{-(k+1)/2}, plus advantage. Linear y."""
+    """Plot obar vs d; primary ref d^{-(k+1)/2}, plus advantage. Log y."""
     from qsa_section2_circuit import advantage_threshold, haar_floor
 
     fig, ax = plt.subplots(figsize=(8, 5))
@@ -388,8 +388,8 @@ def _plot_vs_d(
     ax.set_ylabel(_obar_ylabel())
     ax.set_title(f"obar vs d  (T={T_fixed})")
     ax.set_xticks(sorted(all_d) if all_d else [])
-    ax.set_yscale("linear")
-    ax.grid(True, alpha=0.3)
+    ax.set_yscale("log")
+    ax.grid(True, which="both", alpha=0.3)
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
@@ -457,8 +457,8 @@ def _plot_vs_d_by_T(
     k_fixed: int,
     out_path: Path,
 ) -> None:
-    """obar vs d: same k, one curve per T (+ d^{-(k+1)/2} refs). Linear y."""
-    from qsa_section2_circuit import haar_floor
+    """obar vs d: same k, one curve per T (+ Haar floor + advantage). Log y."""
+    from qsa_section2_circuit import advantage_threshold, haar_floor
 
     by_T: dict[int, list[dict]] = {}
     for r in rows:
@@ -472,6 +472,7 @@ def _plot_vs_d_by_T(
     all_d = sorted({int(r["d"]) for pts in by_T.values() for r in pts})
     if all_d:
         floor = [haar_floor(d, k_fixed) for d in all_d]
+        adv = [advantage_threshold(d, k_fixed) for d in all_d]
         ax.plot(
             all_d,
             floor,
@@ -481,6 +482,17 @@ def _plot_vs_d_by_T(
             marker="s",
             markersize=5,
             label=rf"$d^{{-(k+1)/2}}$ (k={k_fixed})",
+            zorder=1,
+        )
+        ax.plot(
+            all_d,
+            adv,
+            color=_REF_ADV_COLOR,
+            linestyle=":",
+            linewidth=1.8,
+            marker="^",
+            markersize=5,
+            label=rf"$\sqrt{{k\,k!/d^k}}$ adv (k={k_fixed})",
             zorder=1,
         )
 
@@ -504,8 +516,8 @@ def _plot_vs_d_by_T(
     ax.set_ylabel(_obar_ylabel())
     ax.set_title(f"obar vs d  (k={k_fixed}, curves = different T)")
     ax.set_xticks(all_d)
-    ax.set_yscale("linear")
-    ax.grid(True, alpha=0.3)
+    ax.set_yscale("log")
+    ax.grid(True, which="both", alpha=0.3)
     ax.legend(fontsize=8, loc="best")
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
@@ -747,8 +759,8 @@ def main() -> int:
     parser.add_argument(
         "--kernel-mode",
         choices=("poly", "monomial"),
-        default="poly",
-        help="attention kernel: poly = LCU softmax truncation; monomial = legacy s^k",
+        default="monomial",
+        help="attention kernel: monomial = legacy s^k (default); poly = LCU softmax truncation (abandoned)",
     )
     parser.add_argument(
         "--panel-d-on-T",
