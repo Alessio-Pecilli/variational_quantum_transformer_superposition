@@ -1,0 +1,61 @@
+{
+  "config": {
+    "T": 16,
+    "d": 16,
+    "k": 2,
+    "layers": 2,
+    "epochs": 300,
+    "max_sentences": 1000,
+    "batch_size": 64,
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49
+    ],
+    "n_seeds": 8,
+    "angle_budget": 16,
+    "resume": true,
+    "checkpoint_every": 20,
+    "output_dir": "results/baselines_smoke/definitive_monomial_T16_d16_k2_ep300_n8_v2",
+    "mpi_ranks": 64
+  },
+  "qsa_csa_max_epoch_gap_first_seed": 0.0,
+  "models": [
+    {
+      "model": "k-QSA",
+      "n_seeds": 8,
+      "final_loss_mean": 6.072321324167285,
+      "final_loss_std": 1.2453733028696217,
+      "n_params_angles": 16,
+      "n_params_model": null,
+      "nl_rank": null,
+      "batch_size": 64
+    },
+    {
+      "model": "k-CSA",
+      "n_seeds": 8,
+      "final_loss_mean": 6.072321324167285,
+      "final_loss_std": 1.2453733028696217,
+      "n_params_angles": 16,
+      "n_params_model": null,
+      "nl_rank": null,
+      "batch_size": 64
+    },
+    {
+      "model": "nl-CSA",
+      "n_seeds": 8,
+      "final_loss_mean": 6.676907552893909,
+      "final_loss_std": 0.045749068649787644,
+      "n_params_angles": null,
+      "n_params_model": 768,
+      "nl_rank": 4,
+      "batch_size": 64
+    }
+  ],
+  "plot_note": "Curves show mean over seeds; shaded band is \u00b11 std; faint lines are individual seeds. Logged metric is full-batch eval loss each epoch (updates use minibatch when batch_size is set)."
+}

@@ -1,0 +1,62 @@
+RIASSUNTO STUDIO SECTION 2
+==================================================
+Data:        2026-07-20T18:40:24
+Preset:      long
+k:           2
+Epoche:      40
+Frasi:       64
+Seed:        42
+Self-check:  PASS
+Tempo tot.:  23.0 s
+Output:      results/study/definitive_complexity_T32_modeboth
+
+METRICA: obar = mean_{i<=j} |a_ij s_ij^k|  (= absS/Ntri, NO potenza 1/k)
+         obar_k_root = obar^{1/k}  (solo diagnostica, non usata nei plot)
+         s_ij = <x_j|W|x_i>, a_ij = <x_{j+1}|V|x_i>
+Refs: PRIMARY bug-check = d^{-(k+1)/2} ; secondary advantage = sqrt(k * k! / d^k)
+      (obar always monomial mean|a s^k| even when training uses poly kernel)
+      (Haar floor in code == d^{-(k+1)/2}; use that as the main theory line)
+
+SWEEP vs T  (d=4, k=2)
+----------------------------------------
+   T          obar          Haar           adv  n_qubits
+   2      0.299136  1.562500e-02  1.250000e-01        14
+   4      0.050805  1.562500e-02  1.250000e-01        16
+   8      0.286869  1.562500e-02  1.250000e-01        18
+  16      0.193828  1.562500e-02  1.250000e-01        20
+  32      0.145414  1.562500e-02  1.250000e-01        22
+
+  T>=4: media obar=0.1692, spread=0.2361
+  Atteso: circa costante in T per T >= T_lim=4 (T=2 spesso outlier).
+
+SWEEP vs d  (T=32, k variabile)
+----------------------------------------
+   d          obar          Haar           adv     >Haar      >adv
+   2      0.397341  3.535534e-01  1.000000e+00        si        no
+   4      0.293566  1.250000e-01  5.000000e-01        si        no
+   8      0.269047  4.419417e-02  2.500000e-01        si        si
+  16      0.146333  1.562500e-02  1.250000e-01        si        si
+  32      0.163963  5.524272e-03  6.250000e-02        si        si
+
+  Atteso: obar sopra Haar e possibilmente sopra advantage threshold.
+
+FILE GENERATI
+----------------------------------------
+  summary_vs_T.csv, summary_vs_d.csv
+  mean_O_vs_T.png, mean_O_vs_d.png  (obar + d^{-(k+1)/2} + adv, y linear)
+  mean_O_vs_T_by_d.png, mean_O_vs_d_by_T.png  (panel curves)
+  manifest.json
+  RIASSUNTO.txt  (questo file)
+
+COMANDI EQUIVALENTI (main_hpc.py per un singolo punto)
+----------------------------------------
+  python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 2 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d2_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 4 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d4_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 8 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d8_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k2
+  python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 32 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d32_k2
