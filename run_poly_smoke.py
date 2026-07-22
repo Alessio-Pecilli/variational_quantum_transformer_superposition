@@ -110,7 +110,7 @@ def run_loss_vs_k(
             csa = train_kcsa(cfg, bundle, logger=log)
             nl = train_nlcsa(cfg, bundle, logger=log)
             gap = max(abs(a - b) for a, b in zip(qsa["loss_history"], csa["loss_history"]))
-            print(f"[CHECK] max |QSA-CSA| = {gap:.3e}")
+            print(f"[CHECK] max |QSA-CSA| train = {gap:.3e} (independent models)")
             runs_qsa.append(qsa)
             runs_csa.append(csa)
             runs_nl.append(nl)

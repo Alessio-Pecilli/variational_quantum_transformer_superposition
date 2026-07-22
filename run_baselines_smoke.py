@@ -14,9 +14,10 @@ from pathlib import Path
 from classical_baselines import (
     BaselineConfig,
     aggregate_seed_results,
-    prepare_shared_bundle,
+    prepare_data_bundle,
     plot_training_curves,
     qsa_angle_param_count,
+    kcsa_matrix_param_count,
     train_kcsa,
     train_kqsa,
     train_nlcsa,
@@ -35,57 +36,29 @@ def main() -> int:
     p.add_argument("--learning-rate", type=float, default=1e-3)
     p.add_argument("--nl-learning-rate", type=float, default=5e-3)
     p.add_argument("--nl-rank", type=int, default=None)
-    p.add_argument("--seed", type=int, default=42, help="base seed")
+    p.add_argument("--nl-embedding", choices=("general", "isometric"), default="isometric")
+    p.add_argument("--nl-loss", choices=("ce", "renyi"), default="renyi")
+    p.add_argument("--data-seed", type=int, default=42, help="dataset / encoding seed")
+    p.add_argument("--model-seed-base", type=int, default=1042, help="base model init seed")
+    p.add_argument("--seed", type=int, default=None, help="legacy alias for data-seed")
     p.add_argument("--n-seeds", type=int, default=3, help="number of seeds for mean±std")
-    p.add_argument(
-        "--batch-size",
-        type=int,
-        default=64,
-        help="minibatch size (0 = full batch, smoother curves)",
-    )
-    p.add_argument(
-        "--output-dir",
-        type=str,
-        default=None,
-        help="fixed output dir (required for resume across jobs; default: timestamped)",
-    )
-    p.add_argument(
-        "--checkpoint-every",
-        type=int,
-        default=20,
-        help="save checkpoint every N epochs (0 disables mid-run checkpoints)",
-    )
-    p.add_argument(
-        "--resume",
-        dest="resume",
-        action="store_true",
-        default=True,
-        help="skip completed runs / continue from checkpoint (default)",
-    )
-    p.add_argument(
-        "--no-resume",
-        dest="resume",
-        action="store_false",
-        help="ignore existing checkpoints and retrain",
-    )
-    p.add_argument(
-        "--mpi",
-        action="store_true",
-        help="shard seeds across MPI ranks (use with srun)",
-    )
+    p.add_argument("--batch-size", type=int, default=64, help="0 = full batch")
+    p.add_argument("--output-dir", type=str, default=None)
+    p.add_argument("--checkpoint-every", type=int, default=20)
+    p.add_argument("--resume", dest="resume", action="store_true", default=True)
+    p.add_argument("--no-resume", dest="resume", action="store_false")
+    p.add_argument("--mpi", action="store_true")
     p.add_argument("--quick", action="store_true")
-    p.add_argument(
-        "--kernel-mode",
-        choices=("poly", "monomial"),
-        default="monomial",
-        help="attention kernel: monomial = s^k (default); poly = LCU (abandoned)",
-    )
+    p.add_argument("--kernel-mode", choices=("poly", "monomial"), default="monomial")
+    p.add_argument("--skip-nl", action="store_true", help="skip nl-CSA (k-independent)")
     args = p.parse_args()
 
     if args.quick:
         args.T, args.d, args.epochs, args.max_sentences = 4, 4, 40, 64
-        args.n_seeds = 3
+        args.n_seeds = 1
         args.batch_size = 16
+
+    data_seed = args.data_seed if args.seed is None else args.seed
 
     comm, rank, size = init_mpi(enabled=args.mpi)
     logging.basicConfig(level=logging.INFO, format=f"[rank{rank}] %(message)s")
@@ -101,9 +74,8 @@ def main() -> int:
     barrier(comm)
 
     batch_size = None if args.batch_size <= 0 else args.batch_size
-    seeds = [args.seed + i for i in range(args.n_seeds)]
-    my_seeds = shard_items(seeds, rank, size) if args.mpi else seeds
-    budget = qsa_angle_param_count(args.d, args.layers)
+    model_seeds = [args.model_seed_base + i for i in range(args.n_seeds)]
+    my_seeds = shard_items(model_seeds, rank, size) if args.mpi else model_seeds
 
     if rank == 0:
         print("=" * 60)
@@ -112,17 +84,17 @@ def main() -> int:
             f"T={args.T} d={args.d} k={args.k} L={args.layers} "
             f"epochs={args.epochs} frasi={args.max_sentences}"
         )
-        print(f"seeds={seeds} batch_size={batch_size or 'full'} angle_budget={budget}")
+        print(f"data_seed={data_seed} model_seeds={model_seeds} batch_size={batch_size or 'full'}")
+        print(f"k-QSA angles={qsa_angle_param_count(args.d, args.layers)}")
+        print(f"k-CSA matrices={kcsa_matrix_param_count(args.d)}")
         print(f"kernel_mode={args.kernel_mode}")
-        print(f"resume={args.resume} checkpoint_every={args.checkpoint_every}")
-        print(f"MPI: enabled={args.mpi} ranks={size}")
         print(f"Output: {out}")
         print("=" * 60)
 
     runs_qsa, runs_csa, runs_nl = [], [], []
-    identity_gap = None
+    qsa_csa_gaps = []
 
-    for s in my_seeds:
+    for ms in my_seeds:
         cfg = BaselineConfig(
             T=args.T,
             d=args.d,
@@ -131,59 +103,56 @@ def main() -> int:
             epochs=args.epochs,
             learning_rate=args.learning_rate,
             max_sentences=args.max_sentences,
-            seed=s,
+            seed=data_seed,
+            data_seed=data_seed,
+            model_seed=ms,
             output_dir=str(out),
-            run_label=f"seed{s}",
+            run_label=f"model_seed{ms}",
             nl_rank=args.nl_rank,
             nl_learning_rate=args.nl_learning_rate,
+            nl_embedding_mode=args.nl_embedding,
+            nl_loss_mode=args.nl_loss,
             batch_size=batch_size,
             checkpoint_every=args.checkpoint_every,
             resume=args.resume,
             kernel_mode=args.kernel_mode,
         )
-        print(f"\n===== seed {s} (rank {rank}/{size}) =====")
-        bundle = prepare_shared_bundle(cfg)
+        print(f"\n===== model_seed {ms} (rank {rank}/{size}) =====")
+        bundle = prepare_data_bundle(cfg)
         print(f"vocab={bundle['encoding'].vocabSize} sentences={len(bundle['sentences'])}")
 
-        print("--- k-QSA ---")
         qsa = train_kqsa(cfg, bundle, logger=log)
         runs_qsa.append(qsa)
-
-        print("--- k-CSA ---")
         csa = train_kcsa(cfg, bundle, logger=log)
         runs_csa.append(csa)
 
         gap = max(abs(a - b) for a, b in zip(qsa["loss_history"], csa["loss_history"]))
-        print(f"[CHECK seed={s}] max |QSA-CSA| = {gap:.3e}")
-        if identity_gap is None:
-            identity_gap = gap
+        qsa_csa_gaps.append(gap)
+        print(f"[CHECK model_seed={ms}] max |QSA-CSA| train = {gap:.3e} (expect >0, models independent)")
 
-        print("--- nl-CSA ---")
-        runs_nl.append(train_nlcsa(cfg, bundle, logger=log))
+        if not args.skip_nl:
+            runs_nl.append(train_nlcsa(cfg, bundle, logger=log))
 
     barrier(comm)
     all_qsa = gather_list(comm, runs_qsa) if args.mpi else runs_qsa
     all_csa = gather_list(comm, runs_csa) if args.mpi else runs_csa
     all_nl = gather_list(comm, runs_nl) if args.mpi else runs_nl
-    gaps = gather_list(comm, [identity_gap] if identity_gap is not None else []) if args.mpi else (
-        [identity_gap] if identity_gap is not None else []
-    )
+    all_gaps = gather_list(comm, qsa_csa_gaps) if args.mpi else qsa_csa_gaps
 
     if rank != 0:
         barrier(comm)
         return 0
 
-    # restore seed order for stable plots
-    all_qsa = sorted(all_qsa or [], key=lambda r: int(r.get("seed", 0)))
-    all_csa = sorted(all_csa or [], key=lambda r: int(r.get("seed", 0)))
-    all_nl = sorted(all_nl or [], key=lambda r: int(r.get("seed", 0)))
-    identity_gap = next((g for g in (gaps or []) if g is not None), None)
+    all_qsa = sorted(all_qsa or [], key=lambda r: int(r.get("model_seed", 0)))
+    all_csa = sorted(all_csa or [], key=lambda r: int(r.get("model_seed", 0)))
+    all_nl = sorted(all_nl or [], key=lambda r: int(r.get("model_seed", 0)))
 
     agg = [
         aggregate_seed_results(all_qsa),
         aggregate_seed_results(all_csa),
-        aggregate_seed_results(all_nl),
     ]
+    if all_nl:
+        agg.append(aggregate_seed_results(all_nl))
     plot_training_curves(agg, out / "training_curves.png", show_seed_traces=True)
 
     summary = {
@@ -195,33 +164,35 @@ def main() -> int:
             "epochs": args.epochs,
             "max_sentences": args.max_sentences,
             "batch_size": batch_size,
-            "seeds": seeds,
+            "data_seed": data_seed,
+            "model_seeds": model_seeds,
             "n_seeds": args.n_seeds,
-            "angle_budget": budget,
-            "resume": args.resume,
-            "checkpoint_every": args.checkpoint_every,
             "output_dir": str(out),
-            "mpi_ranks": size,
         },
-        "qsa_csa_max_epoch_gap_first_seed": identity_gap,
+        "parametrization": BaselineConfig(T=args.T, d=args.d).parametrization,
+        "qsa_csa_independence": {
+            "max_train_gap_per_seed": all_gaps,
+            "note": "k-QSA and k-CSA are independent; non-zero gap expected.",
+        },
         "models": [
             {
                 "model": a["model"],
                 "n_seeds": a["n_seeds"],
                 "final_loss_mean": a["final_loss_mean"],
                 "final_loss_std": a["final_loss_std"],
+                "final_val_ppl_mean": a.get("final_val_ppl_mean"),
+                "final_val_ppl_std": a.get("final_val_ppl_std"),
                 "n_params_angles": a.get("n_params_angles"),
+                "n_params_matrices": a.get("n_params_matrices"),
                 "n_params_model": a.get("n_params_model"),
                 "nl_rank": a.get("nl_rank"),
-                "batch_size": a.get("batch_size"),
+                "ablation": a.get("ablation"),
             }
             for a in agg
         ],
         "plot_note": (
-            "Curves show mean over seeds; shaded band is ±1 std; "
-            "faint lines are individual seeds. "
-            "Logged metric is full-batch eval loss each epoch "
-            "(updates use minibatch when batch_size is set)."
+            "Train loss is model-specific; compare architectures via val_ppl (common metric). "
+            "nl-CSA is k-independent — run once per (T,d), not per k."
         ),
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
