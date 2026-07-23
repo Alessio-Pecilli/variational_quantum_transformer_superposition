@@ -441,6 +441,17 @@ def _try_load_checkpoint(out: Path, template_params):
 
 
 def _relative_improvement(losses: List[float], window: int = 5) -> float:
+    """Relative improvement of train loss over a trailing window.
+
+    Definition (positive = loss still decreasing):
+        old = mean(loss[t-window : t-1])   # previous `window` epochs
+        new = loss[t]                      # current epoch
+        rel = (old - new) / max(|old|, eps)
+
+    Used as a plateau indicator (together with early-stopping on
+    consecutive |Δloss|/|loss| < loss_rel_tol).  Not comparable across
+    different loss families (−log μ vs CE vs Rényi).
+    """
     if len(losses) < window + 1:
         return float("nan")
     old = float(np.mean(losses[-(window + 1) : -1]))
@@ -532,12 +543,14 @@ def _train_loop(
         params, loss, grads = step(params, batch)
         gn = _grad_norm(grads) if cfg.track_grad_norm else 0.0
         full_loss = float(loss_batch(params, train_batch))
-        val_ce = float(
+        # val_eval_fn is model-specific: −log μ for mu-models, true CE for nl-CSA.
+        # Do NOT treat exp(val) as a shared "perplexity" across architectures.
+        val_metric = float(
             jnp.mean(jax.vmap(lambda ids: val_eval_fn(params, ids, pe, cfg))(val_batch))
         )
         losses.append(full_loss)
-        val_ce_history.append(val_ce)
-        val_ppl_history.append(float(np.exp(val_ce)))
+        val_ce_history.append(val_metric)  # name kept for resume compat; see val_metric_kind
+        val_ppl_history.append(float(np.exp(val_metric)))
         if cfg.track_grad_norm:
             grad_norm_history.append(float(gn))
         rel_improve_history.append(_relative_improvement(losses, window=5))
@@ -546,7 +559,7 @@ def _train_loop(
         if ep == 1 or ep % max(1, max_ep // 10) == 0 or ep == max_ep:
             log.info(
                 f"[{name}] ep={ep:03d}/{max_ep} train_loss={full_loss:.6f} "
-                f"val_ce={val_ce:.6f} val_ppl={val_ppl_history[-1]:.4f} "
+                f"val_metric={val_metric:.6f} exp(val)={val_ppl_history[-1]:.4f} "
                 f"grad_norm={grad_norm_history[-1] if grad_norm_history else 0:.3e} "
                 f"rel_impr5={rel_improve_history[-1]:.3e} t={wall_times[-1]:.1f}s"
             )
@@ -619,7 +632,12 @@ def _finalize_mu_result(
         "final_val_ce": train_out["val_ce_history"][-1],
         "final_val_ppl": train_out["val_ppl_history"][-1],
         "train_metric": "neg_log_mu",
-        "val_metric_common": "neg_log_mu_on_val",
+        "val_metric_kind": "neg_log_mu",
+        "val_metric_common": None,
+        "metric_warning": (
+            "exp(val) = 1/μ is NOT language-model perplexity and must NOT be "
+            "compared to nl-CSA next-token CE perplexity."
+        ),
         "ppl_mu": float(np.exp(train_out["losses"][-1])),
         "n_params_angles": angle_n,
         "n_params_matrices": matrix_n,
@@ -765,7 +783,13 @@ def train_nlcsa(
         "final_val_ce": train_out["val_ce_history"][-1],
         "final_val_ppl": train_out["val_ppl_history"][-1],
         "train_metric": cfg.nl_loss_mode,
+        "val_metric_kind": "next_token_cross_entropy",
         "val_metric_common": "cross_entropy",
+        "metric_warning": (
+            "final_val_ppl = exp(CE) is true next-token LM perplexity "
+            f"(vocab≈{encoding.vocabSize}; uniform baseline ≈ vocab). "
+            "Not comparable to k-QSA/k-CSA exp(−log μ)=1/μ."
+        ),
         "n_params_model": n_model,
         "n_params_embedding": emb_n,
         "n_params_total": n_total,
@@ -974,14 +998,20 @@ def plot_convergence_diagnostics(results: List[dict], out_path: Path) -> None:
 def plot_final_loss_vs_k(
     points: List[dict],
     out_path: Path,
-    title: str = "Validation perplexity vs k",
-    ykey: str = "final_val_ppl_mean",
-    ylabel: str = "validation perplexity (mean ± std)",
+    title: str = "Train loss vs k",
+    ykey: str = "final_loss_mean",
+    ylabel: str = r"train loss ($-\log\mu$ for k-QSA/k-CSA)",
     nl_ref: Optional[dict] = None,
+    nl_ref_ykey: str = "final_loss",
+    nl_ref_label: str = "nl-CSA isometric+Rényi (k-indep.; different loss)",
+    annotate_params: bool = True,
 ) -> None:
     """
-    Line plot with error bars for baselines across k.
-    nl-CSA (k-independent) shown as horizontal reference if nl_ref provided.
+    Line plot with error bars for mu-baselines across k.
+
+    nl-CSA (k-independent) can be shown as a horizontal reference.  If that
+    reference is a Rényi/CE value, the caption must state it is NOT the same
+    metric as −log μ (different absolute scale; trends only if declared).
     """
     import matplotlib.pyplot as plt
 
@@ -995,23 +1025,32 @@ def plot_final_loss_vs_k(
         "nl-CSA": dict(color="#009E73", marker="D", linestyle="-."),
     }
 
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(8.5, 5.2))
     for model, rows in by_model.items():
         rows = sorted(rows, key=lambda r: int(r["k"]))
         ks = [int(r["k"]) for r in rows]
-        means = [float(r.get(ykey, r.get("final_loss_mean", 0))) for r in rows]
-        stds = [float(r.get(f"{ykey.replace('_mean', '_std')}", r.get("final_loss_std", 0))) for r in rows]
+        means = [float(r.get(ykey, r.get("final_loss", r.get("final_loss_mean", 0)))) for r in rows]
+        std_key = ykey.replace("_mean", "_std") if ykey.endswith("_mean") else "final_loss_std"
+        stds = [float(r.get(std_key, r.get("final_loss_std", 0.0))) for r in rows]
         st = styles.get(model, dict(color="0.3", marker="o", linestyle="-"))
+        n_params = rows[0].get("n_params_angles") or rows[0].get("n_params_matrices")
+        label = model
+        if annotate_params and n_params is not None:
+            kind = "angles" if rows[0].get("n_params_angles") else "matrices"
+            label = f"{model} ({kind}={int(n_params)})"
         ax.errorbar(
             ks, means, yerr=stds, color=st["color"], marker=st["marker"],
-            linestyle=st["linestyle"], linewidth=2.2, markersize=8, capsize=4, label=model,
+            linestyle=st["linestyle"], linewidth=2.2, markersize=8, capsize=4, label=label,
         )
 
     if nl_ref is not None:
-        mean = float(nl_ref.get("final_val_ppl_mean", nl_ref.get("final_val_ppl", 0)))
-        std = float(nl_ref.get("final_val_ppl_std", 0))
-        xmin, xmax = ax.get_xlim()
-        ax.axhline(mean, color="#009E73", linestyle="-.", linewidth=2, label="nl-CSA (k-indep.)")
+        mean = float(nl_ref.get(nl_ref_ykey, nl_ref.get("final_loss", 0)))
+        std = float(nl_ref.get("final_loss_std", nl_ref.get("final_val_ppl_std", 0)) or 0)
+        n_nl = nl_ref.get("n_params_model") or nl_ref.get("n_params_total")
+        lbl = nl_ref_label
+        if annotate_params and n_nl is not None:
+            lbl = f"{nl_ref_label} (params≈{int(n_nl)})"
+        ax.axhline(mean, color="#009E73", linestyle="-.", linewidth=2, label=lbl)
         if std > 0:
             ax.axhspan(mean - std, mean + std, color="#009E73", alpha=0.15)
 
@@ -1022,9 +1061,9 @@ def plot_final_loss_vs_k(
         ax.set_xticks(sorted({int(p["k"]) for p in points}))
     ax.set_yscale("linear")
     ax.grid(True, alpha=0.3)
-    ax.legend()
+    ax.legend(fontsize=8)
     fig.tight_layout()
-    fig.savefig(out_path, dpi=200)
+    fig.savefig(out_path, dpi=220)
     plt.close(fig)
 
 
