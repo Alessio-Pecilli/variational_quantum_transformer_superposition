@@ -20,3 +20,7 @@ T=16 > d=8, single seed, corrected metrics, paper-style loss vs k:
 
 [study/definitive_complexity_poly_T32_modeboth/](study/definitive_complexity_poly_T32_modeboth/) and
 [baselines_smoke/](baselines_smoke/) — kept for the record only.
+
+## K-study (24 Jul 2026) — Renyi/logT + μ/μ0 + more QSA layers + poly
+
+- [k_study_T16_d8_seed42/](k_study_T16_d8_seed42/)
