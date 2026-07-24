@@ -37,22 +37,23 @@ from jax_training_pipeline import run_training
 ROOT = Path(__file__).resolve().parent
 
 # Sweep fissi dello studio (limite locale: max 14 qubit)
-SWEEP_T = (2, 4, 8, 16, 32)   # HPC: include 32; local skips if > local_max_qubits
-SWEEP_D = (2, 4, 8, 16, 32)   # HPC: include 16/32 for advantage regime
-SWEEP_D_FIXED = 16            # default complexity d for vs-T on HPC
-SWEEP_T_FIXED = 16            # default T_lim-ish for vs-d on HPC
+SWEEP_T = (2, 4, 8, 16, 32, 64)  # FINAL includes T=64; local skips if > local_max_qubits
+SWEEP_D = (2, 4, 8, 16, 32)      # HPC: include 16/32 for advantage regime
+SWEEP_D_FIXED = 16               # default complexity d for vs-T on HPC
+SWEEP_T_FIXED = 16               # default T for vs-d on HPC
 # Extra panels: same k, vary the other axis
-PANEL_D_ON_T = (4, 8, 16)     # obar vs T curves at these d (fixed k)
-PANEL_T_ON_D = (8, 16, 32)    # obar vs d curves at these T (fixed k)
-T_LIM = 4
+PANEL_D_ON_T = (4, 8, 16)        # obar vs T curves at these d (fixed k)
+PANEL_T_ON_D = (8, 16, 32, 64)   # obar vs d curves at these T (fixed k)
+T_LIM = 4  # kept for docs only; NOT drawn on FINAL plots
 LOCAL_MAX_QUBITS = 15
 DEFAULT_TARGET_LOSS = 2.5
+FINAL_TARGET_LOSS = 3.8  # professor: ~3.8 is acceptable for FINAL obar
 
-# Previous-style palette: data curves vs theory refs must NOT share dash/color.
-# Data = solid + distinct markers; Haar floor = dashed squares; advantage = dotted triangles.
+# Data = solid + markers; Haar/advantage refs use SAME color as the matching
+# data curve, with different dash (Haar=dashed, advantage=dotted).
 _DATA_MARKERS = ("o", "s", "D", "^", "v")
 _DATA_COLORS = ("#0072B2", "#E69F00", "#009E73", "#CC79A7", "#56B4E9")
-_REF_HAAR_COLOR = "#000000"
+_REF_HAAR_COLOR = "#000000"  # fallback when a single global Haar is drawn
 _REF_ADV_COLOR = "#666666"
 
 
@@ -252,20 +253,18 @@ def _plot_vs_T(
     series: list[tuple[str, list[dict]]],
     d_fixed: int,
     out_path: Path,
-    t_lim: int = T_LIM,
+    t_lim: int | None = None,
 ) -> None:
-    """Plot obar vs T with primary d^{-(k+1)/2} and secondary advantage refs.
+    """Plot obar vs T with Haar / advantage refs matching each curve's color.
 
-    Style: data = solid+markers (distinct colors); Haar floor = black dashed;
-    advantage = grey dotted. Linear y.
+    Data = solid+markers; Haar = same color dashed; advantage = same color dotted.
+    No T_lim vertical (t_lim ignored; kept for API compat). Linear y.
     """
     from qsa_section2_circuit import advantage_threshold, haar_floor
 
     fig, ax = plt.subplots(figsize=(8, 5))
     all_T: set[int] = set()
     drawn_refs: set[tuple[int, int]] = set()
-    haar_colors = ("#000000", "#4D4D4D", "#7F7F7F")
-    adv_colors = ("#666666", "#999999", "#BBBBBB")
     for si, (label, rows) in enumerate(series):
         if not rows:
             continue
@@ -290,28 +289,28 @@ def _plot_vs_T(
         d_val = int(rows[0].get("d", d_fixed))
         key = (d_val, k_val)
         if key not in drawn_refs:
-            ri = len(drawn_refs)
             drawn_refs.add(key)
             floor = haar_floor(d_val, k_val)
             adv = advantage_threshold(d_val, k_val)
             ax.axhline(
                 floor,
-                color=haar_colors[ri % len(haar_colors)],
+                color=color,
                 linestyle="--",
-                linewidth=1.8,
+                linewidth=1.6,
+                alpha=0.9,
                 label=rf"$d^{{-(k+1)/2}}$ (k={k_val}, d={d_val})",
                 zorder=1,
             )
             ax.axhline(
                 adv,
-                color=adv_colors[ri % len(adv_colors)],
+                color=color,
                 linestyle=":",
-                linewidth=1.8,
+                linewidth=1.6,
+                alpha=0.9,
                 label=rf"$\sqrt{{k\,k!/d^k}}$ adv (k={k_val}, d={d_val})",
                 zorder=1,
             )
 
-    ax.axvline(t_lim, color="0.45", linestyle="-.", linewidth=1.2, label=rf"$T_{{\mathrm{{lim}}}}$={t_lim}")
     ax.set_xlabel("T (lunghezza sequenza)")
     ax.set_ylabel(_obar_ylabel())
     k_labels = ", ".join(lbl for lbl, _ in series)
@@ -330,7 +329,7 @@ def _plot_vs_d(
     T_fixed: int,
     out_path: Path,
 ) -> None:
-    """Plot obar vs d; primary ref d^{-(k+1)/2}, plus advantage. Log y."""
+    """Plot obar vs d; Haar/advantage refs match each curve's color. Log y."""
     from qsa_section2_circuit import advantage_threshold, haar_floor
 
     fig, ax = plt.subplots(figsize=(8, 5))
@@ -364,22 +363,24 @@ def _plot_vs_d(
             ax.plot(
                 d_vals,
                 floor,
-                color=_REF_HAAR_COLOR,
+                color=color,
                 linestyle="--",
-                linewidth=1.8,
+                linewidth=1.6,
                 marker="s",
                 markersize=5,
+                alpha=0.9,
                 label=rf"$d^{{-(k+1)/2}}$ (k={k_val})",
                 zorder=1,
             )
             ax.plot(
                 d_vals,
                 adv,
-                color=_REF_ADV_COLOR,
+                color=color,
                 linestyle=":",
-                linewidth=1.8,
+                linewidth=1.6,
                 marker="^",
                 markersize=5,
+                alpha=0.9,
                 label=rf"$\sqrt{{k\,k!/d^k}}$ adv (k={k_val})",
                 zorder=1,
             )
@@ -400,10 +401,10 @@ def _plot_vs_T_by_d(
     rows: list[dict],
     k_fixed: int,
     out_path: Path,
-    t_lim: int = T_LIM,
+    t_lim: int | None = None,
 ) -> None:
-    """obar vs T: same k, one curve per d (+ d^{-(k+1)/2} refs)."""
-    from qsa_section2_circuit import haar_floor
+    """obar vs T: same k, one curve per d; Haar/adv match curve color. No T_lim."""
+    from qsa_section2_circuit import advantage_threshold, haar_floor
 
     by_d: dict[int, list[dict]] = {}
     for r in rows:
@@ -430,6 +431,7 @@ def _plot_vs_T_by_d(
             zorder=3,
         )
         floor = haar_floor(d_val, k_fixed)
+        adv = advantage_threshold(d_val, k_fixed)
         ax.axhline(
             floor,
             color=color,
@@ -439,8 +441,16 @@ def _plot_vs_T_by_d(
             label=rf"$d^{{-(k+1)/2}}$ ($d={d_val}$)",
             zorder=1,
         )
+        ax.axhline(
+            adv,
+            color=color,
+            linestyle=":",
+            linewidth=1.4,
+            alpha=0.85,
+            label=rf"adv ($d={d_val}$)",
+            zorder=1,
+        )
 
-    ax.axvline(t_lim, color="0.45", linestyle="-.", linewidth=1.2, label=rf"$T_{{\mathrm{{lim}}}}$={t_lim}")
     ax.set_xlabel("T (lunghezza sequenza)")
     ax.set_ylabel(_obar_ylabel())
     ax.set_title(f"obar vs T  (k={k_fixed}, curves = different d)")
@@ -457,7 +467,7 @@ def _plot_vs_d_by_T(
     k_fixed: int,
     out_path: Path,
 ) -> None:
-    """obar vs d: same k, one curve per T (+ Haar floor + advantage). Log y."""
+    """obar vs d: same k, one curve per T; Haar/adv in black (d-only refs). Log y."""
     from qsa_section2_circuit import advantage_threshold, haar_floor
 
     by_T: dict[int, list[dict]] = {}
@@ -625,12 +635,187 @@ def _parse_int_list(raw: str | None) -> list[int]:
     return [int(x.strip()) for x in text.split(",") if x.strip()]
 
 
+def _count_ptb_sentences(T: int) -> int:
+    path = Path("ptb_sentences.txt")
+    if not path.exists():
+        return 0
+    n = 0
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            if len(line.split()) == T:
+                n += 1
+    return n
+
+
+def _build_final_obar_jobs(
+    local_max_qubits: int,
+    kernel_mode: str,
+    max_T: int = 64,
+    obar_ks: tuple[int, ...] | list[int] = (1, 2, 3, 5, 6),
+    also_poly: bool = False,
+) -> list[dict]:
+    """Union of FINAL obar panels (deduped by T,d,k,kernel)."""
+    Ts = [t for t in SWEEP_T if t <= max_T]
+    if max_T not in Ts and max_T > 0:
+        Ts = sorted(set(Ts) | {max_T})
+    # Data-availability guard (PTB exact-length sentences).
+    for T in Ts:
+        n_avail = _count_ptb_sentences(T)
+        if n_avail < 16:
+            print(
+                f"  [WARN] PTB has only {n_avail} unique sentences with T={T}. "
+                f"Training will duplicate them — prefer MAX_T<=32."
+            )
+    panel_Ts = [t for t in PANEL_T_ON_D if t <= max_T]
+    if max_T >= 64 and 64 not in panel_Ts:
+        panel_Ts = sorted(set(panel_Ts) | {64})
+    kernels = [kernel_mode]
+    if also_poly and "poly" not in kernels:
+        kernels.append("poly")
+    jobs: list[dict] = []
+    seen: set[tuple[int, int, int, str]] = set()
+
+    def _add(T: int, d: int, k: int, series: str, km: str) -> None:
+        key = (T, d, k, km)
+        if key in seen:
+            return
+        n_q = _qubit_budget(T, d, k, kernel_mode=km)
+        if n_q > local_max_qubits:
+            print(f"  [skip final] T={T} d={d} k={k} {km}: n_qubits={n_q} > {local_max_qubits}")
+            return
+        seen.add(key)
+        tag = "poly" if km == "poly" else "mono"
+        jobs.append(
+            {
+                "series": series,
+                "T": T,
+                "d": d,
+                "k": k,
+                "kernel_mode": km,
+                "label": f"T{T}_d{d}_k{k}_{tag}",
+            }
+        )
+
+    for km in kernels:
+        for k in obar_ks:
+            for T in Ts:
+                _add(T, 16, k, f"T_k{k}", km)
+        for d in PANEL_D_ON_T:
+            for T in Ts:
+                _add(T, d, 3, "T_by_d", km)
+        for k in (2, 3):
+            for d in SWEEP_D:
+                _add(max_T, d, k, f"d_k{k}", km)
+        for T in panel_Ts:
+            for d in SWEEP_D:
+                _add(T, d, 3, "d_by_T", km)
+    return jobs
+
+
+def _plot_final_obar_panels(
+    all_rows: list[dict],
+    out_root: Path,
+    max_T: int = 64,
+    obar_ks: tuple[int, ...] | list[int] = (1, 2, 3, 5, 6),
+) -> None:
+    """Emit the four FINAL figure panels from a flat list of trained points.
+
+    If both mono and poly rows exist for the same (T,d,k), they appear on the
+    same vs-T plot as separate series (poly labeled explicitly).
+    """
+    import math
+
+    ok = [
+        r
+        for r in all_rows
+        if r.get("error") is None
+        and not (
+            isinstance(r.get("obar"), float)
+            and math.isnan(float(r.get("obar", float("nan"))))
+        )
+    ]
+    for r in ok:
+        r.setdefault("kernel_mode", "monomial")
+
+    t_series: list[tuple[str, list[dict]]] = []
+    for k in obar_ks:
+        for km, tag in (("monomial", "mono"), ("poly", "poly")):
+            rows = [
+                r
+                for r in ok
+                if int(r["d"]) == 16
+                and int(r["k"]) == k
+                and str(r.get("kernel_mode", "monomial")) == km
+            ]
+            if rows:
+                label = f"k={k} {tag}" if any(str(x.get("kernel_mode")) == "poly" for x in ok) else f"k={k} (trained)"
+                if km == "monomial" and not any(str(x.get("kernel_mode")) == "poly" for x in ok):
+                    label = f"k={k} (trained)"
+                elif km == "poly":
+                    label = f"k={k} poly"
+                else:
+                    label = f"k={k} mono"
+                t_series.append((label, rows))
+    if t_series:
+        _write_csv(out_root / "summary_vs_T.csv", [r for _, rows in t_series for r in rows])
+        _plot_vs_T(t_series, d_fixed=16, out_path=out_root / "mean_O_vs_T.png")
+
+    # by-d / by-T panels: prefer monomial; if only poly present use that
+    def _prefer_mono(rows: list[dict]) -> list[dict]:
+        mono = [r for r in rows if str(r.get("kernel_mode", "monomial")) == "monomial"]
+        return mono if mono else rows
+
+    t_by_d = _prefer_mono([r for r in ok if int(r["k"]) == 3 and int(r["d"]) in PANEL_D_ON_T])
+    if t_by_d:
+        _write_csv(out_root / "summary_vs_T_by_d.csv", t_by_d)
+        _plot_vs_T_by_d(t_by_d, k_fixed=3, out_path=out_root / "mean_O_vs_T_by_d.png")
+
+    d_series: list[tuple[str, list[dict]]] = []
+    for k in (2, 3):
+        for km, tag in (("monomial", "mono"), ("poly", "poly")):
+            rows = [
+                r
+                for r in ok
+                if int(r["T"]) == max_T
+                and int(r["k"]) == k
+                and str(r.get("kernel_mode", "monomial")) == km
+            ]
+            if rows:
+                has_poly = any(str(x.get("kernel_mode")) == "poly" for x in ok if int(x["T"]) == max_T)
+                label = f"k={k} {tag}" if has_poly else f"k={k} (trained)"
+                d_series.append((label, rows))
+    if d_series:
+        _write_csv(out_root / "summary_vs_d.csv", [r for _, rows in d_series for r in rows])
+        _plot_vs_d(d_series, T_fixed=max_T, out_path=out_root / "mean_O_vs_d.png")
+
+    panel_Ts = {t for t in PANEL_T_ON_D if t <= max_T}
+    if max_T >= 64:
+        panel_Ts.add(64)
+    d_by_T = _prefer_mono([r for r in ok if int(r["k"]) == 3 and int(r["T"]) in panel_Ts])
+    if d_by_T:
+        _write_csv(out_root / "summary_vs_d_by_T.csv", d_by_T)
+        _plot_vs_d_by_T(d_by_T, k_fixed=3, out_path=out_root / "mean_O_vs_d_by_T.png")
+
+
 def _replot_study_dir(out_root: Path, args) -> int:
     """Regenerate PNGs from manifest.json / CSVs without retraining."""
     manifest_path = out_root / "manifest.json"
     if not manifest_path.exists():
         raise FileNotFoundError(f"missing {manifest_path}")
     man = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if man.get("final_obar_grid"):
+        all_rows = list(man.get("all_rows") or [])
+        for key in ("T_sweep", "T_sweep_k3", "T_by_d", "d_sweep", "d_sweep_extra", "d_by_T"):
+            all_rows.extend(man.get(key) or [])
+        by_label = {r["label"]: r for r in all_rows if "label" in r}
+        max_T = int(man.get("max_T", 64))
+        obar_ks = man.get("obar_ks") or [1, 2, 3, 5, 6]
+        _plot_final_obar_panels(
+            list(by_label.values()), out_root, max_T=max_T, obar_ks=obar_ks
+        )
+        print(f"replot FINAL panels in {out_root}")
+        return 0
+
     t_rows = man.get("T_sweep") or []
     t_rows_k3 = man.get("T_sweep_k3") or []
     d_rows = man.get("d_sweep") or []
@@ -638,14 +823,21 @@ def _replot_study_dir(out_root: Path, args) -> int:
     t_by_d = man.get("T_by_d") or []
     d_by_T = man.get("d_by_T") or []
     k = int(man.get("k", args.k))
-    d_fixed = SWEEP_D_FIXED
+    d_fixed = int(man.get("d_fixed", SWEEP_D_FIXED))
     T_fixed = int(man.get("d_sweep_T", SWEEP_T_FIXED))
     ek = man.get("extra_k_on_d")
 
-    if t_rows or t_rows_k3:
-        t_series = [(f"k={k} (trained)", t_rows)]
-        if t_rows_k3:
-            t_series.append(("k=3 (trained)", t_rows_k3))
+    t_by_k = man.get("T_sweep_by_k") or {}
+    if t_rows or t_rows_k3 or t_by_k:
+        if t_by_k:
+            t_series = [
+                (f"k={kk} (trained)", t_by_k[str(kk)])
+                for kk in sorted(int(x) for x in t_by_k.keys())
+            ]
+        else:
+            t_series = [(f"k={k} (trained)", t_rows)]
+            if t_rows_k3:
+                t_series.append(("k=3 (trained)", t_rows_k3))
         _plot_vs_T(t_series, d_fixed=d_fixed, out_path=out_root / "mean_O_vs_T.png")
         print(f"wrote {out_root / 'mean_O_vs_T.png'}")
     if d_rows or d_rows_extra:
@@ -791,11 +983,60 @@ def main() -> int:
         action="store_true",
         help="shard sweep points across MPI ranks (use with srun)",
     )
+    parser.add_argument(
+        "--sweep-T",
+        type=str,
+        default=None,
+        help="comma-separated T values for vs-T / panels (default: module SWEEP_T)",
+    )
+    parser.add_argument(
+        "--sweep-D",
+        type=str,
+        default=None,
+        help="comma-separated d values for vs-d / panels (default: module SWEEP_D)",
+    )
+    parser.add_argument(
+        "--d-fixed",
+        type=int,
+        default=SWEEP_D_FIXED,
+        help=f"fixed d for vs-T sweep (default {SWEEP_D_FIXED})",
+    )
+    parser.add_argument(
+        "--extra-ks",
+        type=str,
+        default=None,
+        help="comma-separated extra k values on vs-T (replaces --extra-k3 when set)",
+    )
+    parser.add_argument(
+        "--final-obar-grid",
+        action="store_true",
+        help="run the FINAL obar campaign grid (all 4 panels; ignores --only)",
+    )
+    parser.add_argument(
+        "--max-T",
+        type=int,
+        default=64,
+        help="cap T for --final-obar-grid (use 32 if T=64 is too heavy)",
+    )
+    parser.add_argument(
+        "--final-obar-ks",
+        type=str,
+        default="1,2,3,5,6",
+        help="k values for FINAL obar vs-T panel (default 1,2,3,5,6)",
+    )
+    parser.add_argument(
+        "--also-poly",
+        action="store_true",
+        help="with --final-obar-grid, also train poly kernel and overlay on same plots",
+    )
     args = parser.parse_args()
 
     if args.long:
         args.train_until_converged = True
     if args.target_loss is not None:
+        args.train_until_converged = True
+    if args.final_obar_grid and args.target_loss is None:
+        args.target_loss = FINAL_TARGET_LOSS
         args.train_until_converged = True
 
     if args.replot_only:
@@ -874,107 +1115,129 @@ def main() -> int:
 
     d_sweep_T = args.d_sweep_T
     point_kw = dict(local_max_qubits=args.local_max_qubits)
+    sweep_T = _parse_int_list(args.sweep_T) or list(SWEEP_T)
+    sweep_D = _parse_int_list(args.sweep_D) or list(SWEEP_D)
+    d_fixed = int(args.d_fixed)
+    extra_ks = _parse_int_list(args.extra_ks)
+    if not extra_ks and args.extra_k3:
+        extra_ks = [3]
 
     # Build independent sweep jobs, then shard across MPI ranks.
     jobs: list[dict] = []
-    if args.only in (None, "T"):
-        for T in SWEEP_T:
-            jobs.append(
-                {
-                    "series": "T",
-                    "T": T,
-                    "d": SWEEP_D_FIXED,
-                    "k": args.k,
-                    "label": f"T{T}_d{SWEEP_D_FIXED}_k{args.k}",
-                }
+    final_obar_ks: list[int] = _parse_int_list(getattr(args, "final_obar_ks", None)) or [1, 2, 3, 5, 6]
+    if args.final_obar_grid:
+        if rank == 0:
+            print(
+                f"FINAL obar grid (max_T={args.max_T}, ks={final_obar_ks}, "
+                f"also_poly={args.also_poly}, target_loss={args.target_loss})"
             )
-        if args.extra_k3:
-            for T in SWEEP_T:
-                n_q = _qubit_budget(T, SWEEP_D_FIXED, 3, kernel_mode=args.kernel_mode)
-                if n_q > args.local_max_qubits:
-                    if rank == 0:
-                        print(f"  [skip] T={T} k=3: n_qubits={n_q} > {args.local_max_qubits}")
-                    continue
+        jobs = _build_final_obar_jobs(
+            local_max_qubits=args.local_max_qubits,
+            kernel_mode=args.kernel_mode,
+            max_T=int(args.max_T),
+            obar_ks=final_obar_ks,
+            also_poly=bool(args.also_poly),
+        )
+    else:
+        if args.only in (None, "T"):
+            for T in sweep_T:
                 jobs.append(
                     {
-                        "series": "T_k3",
+                        "series": "T",
                         "T": T,
-                        "d": SWEEP_D_FIXED,
-                        "k": 3,
-                        "label": f"T{T}_d{SWEEP_D_FIXED}_k3",
+                        "d": d_fixed,
+                        "k": args.k,
+                        "label": f"T{T}_d{d_fixed}_k{args.k}",
                     }
                 )
-    if args.only in (None, "d"):
-        for d in SWEEP_D:
-            jobs.append(
-                {
-                    "series": "d",
-                    "T": d_sweep_T,
-                    "d": d,
-                    "k": args.k,
-                    "label": f"T{d_sweep_T}_d{d}_k{args.k}",
-                }
-            )
-        if args.extra_k_on_d is not None:
-            ek = args.extra_k_on_d
-            for d in SWEEP_D:
-                n_q = _qubit_budget(d_sweep_T, d, ek, kernel_mode=args.kernel_mode)
-                if n_q > args.local_max_qubits:
-                    if rank == 0:
-                        print(f"  [skip] d={d} k={ek}: n_qubits={n_q} > {args.local_max_qubits}")
+            for ek in extra_ks:
+                if ek == args.k:
                     continue
+                for T in sweep_T:
+                    n_q = _qubit_budget(T, d_fixed, ek, kernel_mode=args.kernel_mode)
+                    if n_q > args.local_max_qubits:
+                        if rank == 0:
+                            print(f"  [skip] T={T} k={ek}: n_qubits={n_q} > {args.local_max_qubits}")
+                        continue
+                    jobs.append(
+                        {
+                            "series": f"T_k{ek}",
+                            "T": T,
+                            "d": d_fixed,
+                            "k": ek,
+                            "label": f"T{T}_d{d_fixed}_k{ek}",
+                        }
+                    )
+        if args.only in (None, "d"):
+            for d in sweep_D:
                 jobs.append(
                     {
-                        "series": "d_extra",
+                        "series": "d",
                         "T": d_sweep_T,
                         "d": d,
-                        "k": ek,
-                        "label": f"T{d_sweep_T}_d{d}_k{ek}",
+                        "k": args.k,
+                        "label": f"T{d_sweep_T}_d{d}_k{args.k}",
                     }
                 )
+            if args.extra_k_on_d is not None:
+                ek = args.extra_k_on_d
+                for d in sweep_D:
+                    n_q = _qubit_budget(d_sweep_T, d, ek, kernel_mode=args.kernel_mode)
+                    if n_q > args.local_max_qubits:
+                        if rank == 0:
+                            print(f"  [skip] d={d} k={ek}: n_qubits={n_q} > {args.local_max_qubits}")
+                        continue
+                    jobs.append(
+                        {
+                            "series": "d_extra",
+                            "T": d_sweep_T,
+                            "d": d,
+                            "k": ek,
+                            "label": f"T{d_sweep_T}_d{d}_k{ek}",
+                        }
+                    )
 
-    # Extra panels: same k, vary the other axis (skip duplicates already scheduled).
-    scheduled = {(j["T"], j["d"], j["k"]) for j in jobs}
-    panel_ds = _parse_int_list(args.panel_d_on_T)
-    panel_Ts = _parse_int_list(args.panel_T_on_d)
-    if args.only in (None, "T") and panel_ds:
-        for d_panel in panel_ds:
-            for T in SWEEP_T:
-                key = (T, d_panel, args.k)
-                if key in scheduled:
-                    continue
-                n_q = _qubit_budget(T, d_panel, args.k, kernel_mode=args.kernel_mode)
-                if n_q > args.local_max_qubits:
-                    continue
-                jobs.append(
-                    {
-                        "series": "T_by_d",
-                        "T": T,
-                        "d": d_panel,
-                        "k": args.k,
-                        "label": f"T{T}_d{d_panel}_k{args.k}",
-                    }
-                )
-                scheduled.add(key)
-    if args.only in (None, "d") and panel_Ts:
-        for T_panel in panel_Ts:
-            for d in SWEEP_D:
-                key = (T_panel, d, args.k)
-                if key in scheduled:
-                    continue
-                n_q = _qubit_budget(T_panel, d, args.k, kernel_mode=args.kernel_mode)
-                if n_q > args.local_max_qubits:
-                    continue
-                jobs.append(
-                    {
-                        "series": "d_by_T",
-                        "T": T_panel,
-                        "d": d,
-                        "k": args.k,
-                        "label": f"T{T_panel}_d{d}_k{args.k}",
-                    }
-                )
-                scheduled.add(key)
+        scheduled = {(j["T"], j["d"], j["k"]) for j in jobs}
+        panel_ds = _parse_int_list(args.panel_d_on_T)
+        panel_Ts = _parse_int_list(args.panel_T_on_d)
+        if args.only in (None, "T") and panel_ds:
+            for d_panel in panel_ds:
+                for T in sweep_T:
+                    key = (T, d_panel, args.k)
+                    if key in scheduled:
+                        continue
+                    n_q = _qubit_budget(T, d_panel, args.k, kernel_mode=args.kernel_mode)
+                    if n_q > args.local_max_qubits:
+                        continue
+                    jobs.append(
+                        {
+                            "series": "T_by_d",
+                            "T": T,
+                            "d": d_panel,
+                            "k": args.k,
+                            "label": f"T{T}_d{d_panel}_k{args.k}",
+                        }
+                    )
+                    scheduled.add(key)
+        if args.only in (None, "d") and panel_Ts:
+            for T_panel in panel_Ts:
+                for d in sweep_D:
+                    key = (T_panel, d, args.k)
+                    if key in scheduled:
+                        continue
+                    n_q = _qubit_budget(T_panel, d, args.k, kernel_mode=args.kernel_mode)
+                    if n_q > args.local_max_qubits:
+                        continue
+                    jobs.append(
+                        {
+                            "series": "d_by_T",
+                            "T": T_panel,
+                            "d": d,
+                            "k": args.k,
+                            "label": f"T{T_panel}_d{d}_k{args.k}",
+                        }
+                    )
+                    scheduled.add(key)
 
     my_jobs = shard_items(jobs, rank, size) if args.mpi else jobs
     if rank == 0:
@@ -983,7 +1246,9 @@ def main() -> int:
 
     local_rows: list[dict] = []
     for job in my_jobs:
-        kw = {**train_kw, "k": job["k"]}
+        opts = dict(train_opts)
+        opts["kernel_mode"] = job.get("kernel_mode", args.kernel_mode)
+        kw = {**train_kw, "k": job["k"], "train_opts": opts}
         try:
             row = _train_point(
                 T=job["T"],
@@ -993,6 +1258,7 @@ def main() -> int:
                 **kw,
             )
             row["series"] = job["series"]
+            row["kernel_mode"] = opts["kernel_mode"]
             local_rows.append(row)
         except Exception as exc:
             print(f"[WARN] sweep point failed {job['label']}: {exc}")
@@ -1003,11 +1269,16 @@ def main() -> int:
                     "T": job["T"],
                     "d": job["d"],
                     "k": job["k"],
+                    "kernel_mode": opts["kernel_mode"],
                     "error": str(exc),
                     "mean_O_ij": float("nan"),
                     "obar": float("nan"),
                     "final_loss": float("nan"),
-                    "n_qubits": int(_qubit_budget(job["T"], job["d"], job["k"], kernel_mode=args.kernel_mode)),
+                    "n_qubits": int(
+                        _qubit_budget(
+                            job["T"], job["d"], job["k"], kernel_mode=opts["kernel_mode"]
+                        )
+                    ),
                 }
             )
 
@@ -1017,24 +1288,84 @@ def main() -> int:
         barrier(comm)
         return 0
 
+    print("\n" + "=" * 60)
+    print("FASE 4/4 — Plot e riassunto")
+    print("=" * 60)
+
+    if args.final_obar_grid:
+        _plot_final_obar_panels(
+            all_rows, out_root, max_T=int(args.max_T), obar_ks=final_obar_ks
+        )
+        if args.target_loss is not None:
+            bad = [
+                r for r in all_rows
+                if r.get("final_loss") is not None
+                and float(r["final_loss"]) > float(args.target_loss)
+            ]
+            if bad:
+                print("\n[WARN] Punti con loss > target_loss (da ritrenare):")
+                for r in sorted(bad, key=lambda x: (int(x["T"]), int(x["d"]), int(x["k"]))):
+                    print(
+                        f"  {r['label']}: loss={float(r['final_loss']):.4f} "
+                        f"> {args.target_loss}  (obar={float(r.get('obar', float('nan'))):.4f})"
+                    )
+        total_wall = time.perf_counter() - t_start
+        manifest = {
+            "timestamp": stamp,
+            "preset": preset_name,
+            "final_obar_grid": True,
+            "max_T": int(args.max_T),
+            "obar_ks": final_obar_ks,
+            "also_poly": bool(args.also_poly),
+            "circuit_mode": "section2",
+            "epochs": args.epochs,
+            "max_sentences": args.max_sentences,
+            "seed": args.seed,
+            "self_check_ok": self_check_ok,
+            "train_opts": train_opts,
+            "total_wall_seconds": total_wall,
+            "local_max_qubits": args.local_max_qubits,
+            "mpi_ranks": size,
+            "all_rows": all_rows,
+        }
+        (out_root / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        _write_summary(
+            out_root, preset_name, args.k, args.epochs, args.max_sentences, args.seed,
+            all_rows, [], self_check_ok, total_wall,
+        )
+        print(f"\n[FATTO] Tutto in: {out_root}")
+        barrier(comm)
+        return 0
+
     t_rows = [r for r in all_rows if r.get("series") == "T"]
     t_rows_k3 = [r for r in all_rows if r.get("series") == "T_k3"]
+    t_sweep_by_k: dict[str, list[dict]] = {}
+    if t_rows:
+        t_sweep_by_k[str(args.k)] = t_rows
+    for r in all_rows:
+        s = str(r.get("series", ""))
+        if s.startswith("T_k"):
+            kk = s.split("T_k", 1)[1]
+            t_sweep_by_k.setdefault(kk, []).append(r)
     d_rows = [r for r in all_rows if r.get("series") == "d"]
     d_rows_extra = [r for r in all_rows if r.get("series") == "d_extra"]
     t_by_d_rows = [r for r in all_rows if r.get("series") == "T_by_d"]
     d_by_T_rows = [r for r in all_rows if r.get("series") == "d_by_T"]
 
-    print("\n" + "=" * 60)
-    print("FASE 4/4 — Plot e riassunto")
-    print("=" * 60)
-
-    if t_rows or t_rows_k3:
-        all_t = t_rows + t_rows_k3
-        _write_csv(out_root / "summary_vs_T.csv", all_t)
-        t_series: list[tuple[str, list[dict]]] = [(f"k={args.k} (trained)", t_rows)]
-        if t_rows_k3:
-            t_series.append(("k=3 (trained)", t_rows_k3))
-        _plot_vs_T(t_series, d_fixed=SWEEP_D_FIXED, out_path=out_root / "mean_O_vs_T.png")
+    if t_rows or t_rows_k3 or len(t_sweep_by_k) > 1:
+        all_t = t_rows + [r for rows in t_sweep_by_k.values() for r in rows]
+        by_lab = {r["label"]: r for r in all_t}
+        _write_csv(out_root / "summary_vs_T.csv", list(by_lab.values()))
+        if len(t_sweep_by_k) > 1:
+            t_series = [
+                (f"k={kk} (trained)", t_sweep_by_k[kk])
+                for kk in sorted(t_sweep_by_k.keys(), key=int)
+            ]
+        else:
+            t_series = [(f"k={args.k} (trained)", t_rows)]
+            if t_rows_k3:
+                t_series.append(("k=3 (trained)", t_rows_k3))
+        _plot_vs_T(t_series, d_fixed=d_fixed, out_path=out_root / "mean_O_vs_T.png")
     if d_rows or d_rows_extra:
         all_d = d_rows + d_rows_extra
         _write_csv(out_root / "summary_vs_d.csv", all_d)
@@ -1043,7 +1374,6 @@ def main() -> int:
             d_series.append((f"k={args.extra_k_on_d} (trained)", d_rows_extra))
         _plot_vs_d(d_series, T_fixed=d_sweep_T, out_path=out_root / "mean_O_vs_d.png")
 
-    # Extra panels (same k, vary other axis). Merge with primary series points.
     panel_T_src = t_rows + t_by_d_rows
     if panel_T_src:
         _write_csv(out_root / "summary_vs_T_by_d.csv", panel_T_src)
@@ -1053,10 +1383,9 @@ def main() -> int:
         _write_csv(out_root / "summary_vs_d_by_T.csv", panel_d_src)
         _plot_vs_d_by_T(panel_d_src, k_fixed=args.k, out_path=out_root / "mean_O_vs_d_by_T.png")
 
-    # Flag under-trained d points (loss above target).
     if args.target_loss is not None:
         bad = [
-            r for r in (d_rows + d_rows_extra + d_by_T_rows)
+            r for r in (d_rows + d_rows_extra + d_by_T_rows + t_rows + t_rows_k3 + t_by_d_rows)
             if r.get("final_loss") is not None
             and float(r["final_loss"]) > float(args.target_loss)
         ]
@@ -1081,12 +1410,15 @@ def main() -> int:
         "train_opts": train_opts,
         "total_wall_seconds": total_wall,
         "d_sweep_T": d_sweep_T,
+        "d_fixed": d_fixed,
         "extra_k3": args.extra_k3,
+        "extra_ks": extra_ks,
         "extra_k_on_d": args.extra_k_on_d,
         "local_max_qubits": args.local_max_qubits,
         "mpi_ranks": size,
         "T_sweep": t_rows,
         "T_sweep_k3": t_rows_k3,
+        "T_sweep_by_k": t_sweep_by_k,
         "d_sweep": d_rows,
         "d_sweep_extra": d_rows_extra,
         "T_by_d": t_by_d_rows,

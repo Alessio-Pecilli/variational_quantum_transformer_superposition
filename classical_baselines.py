@@ -252,6 +252,17 @@ def _default_nl_rank(d: int, layers: int) -> int:
     return int(min(d, max(2, int(round(d ** 0.5)))))
 
 
+def nl_model_param_count(d: int, layers: int, rank: int) -> int:
+    """Model params excluding embedding: 6 matrices per layer of shape (d, r)."""
+    return int(6 * layers * d * rank)
+
+
+def nl_rank_for_budget(d: int, layers: int, target_params: int) -> int:
+    """Choose integer rank so that 6*L*d*r ≈ target_params (at least 1)."""
+    denom = max(6 * layers * d, 1)
+    return max(1, int(round(target_params / denom)))
+
+
 def _apply_nl_embedding(emb_raw, cfg: BaselineConfig):
     if not cfg.train_embedding:
         emb_raw = jax.lax.stop_gradient(emb_raw)
@@ -663,7 +674,7 @@ def train_kqsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
     log = logger or logging.getLogger("baselines")
     key = jax.random.PRNGKey(cfg.model_seed)
     params = init_qsa_params(bundle["encoding"].vocabSize, bundle["qcfg"], key)
-    run_name = f"kqsa_seed{cfg.model_seed}"
+    run_name = cfg.run_label or f"kqsa_seed{cfg.model_seed}"
     angle_n = qsa_angle_param_count(cfg.d, cfg.layers)
     train_out = _train_loop(
         "k-QSA",
@@ -696,7 +707,7 @@ def train_kcsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
     log = logger or logging.getLogger("baselines")
     key = jax.random.PRNGKey(cfg.model_seed + 31)
     params = init_kcsa_params(bundle["encoding"].vocabSize, cfg, key)
-    run_name = f"kcsa_seed{cfg.model_seed}"
+    run_name = cfg.run_label or f"kcsa_seed{cfg.model_seed}"
     matrix_n = kcsa_matrix_param_count(cfg.d)
     train_out = _train_loop(
         "k-CSA",
@@ -732,7 +743,7 @@ def train_nlcsa(
 ) -> dict:
     log = logger or logging.getLogger("baselines")
     ablation_tag = f"{cfg.nl_embedding_mode}_{cfg.nl_loss_mode}"
-    run_name = f"nlcsa_{ablation_tag}_seed{cfg.model_seed}"
+    run_name = cfg.run_label or f"nlcsa_{ablation_tag}_seed{cfg.model_seed}"
     out = _run_dir(cfg, run_name)
     max_ep = int(cfg.max_epochs or cfg.epochs)
 
