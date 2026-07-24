@@ -1,0 +1,20 @@
+{
+  "created": "2026-07-24T16:07:05+02:00",
+  "orchestrator_job": "50173852",
+  "campaign": "definitive",
+  "n_seeds": 8,
+  "ks_loss": "1,2,3,5,6",
+  "obar_max_T": 32,
+  "obar_ks": "1,2,3,5,6",
+  "target_loss": 3.8,
+  "include_poly_obar": 1,
+  "try_T64": 0,
+  "paths": {
+    "loss": "results/final_loss/definitive_T16_d8_ks1-2-3-5-6_L16_n8",
+    "obar": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8",
+    "obar_T64": "results/study/final_obar_T64_ks1-2-3-5-6_tl3.8",
+    "campaign": "results/final_campaign/definitive",
+    "status": "results/final_campaign/definitive/STATUS.txt",
+    "jobs": "results/final_campaign/definitive/JOBS.txt"
+  }
+}

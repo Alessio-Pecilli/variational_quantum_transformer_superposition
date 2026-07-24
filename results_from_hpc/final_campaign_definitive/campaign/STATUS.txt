@@ -1,0 +1,63 @@
+============================================================
+FINAL CAMPAIGN CHAIN  (2026-07-24T16:05:57+02:00)  orchestrator_job=50173852
+repo=/leonardo_work/IscrC_QuSALa/variational_quantum_transformer_sovrapposition
+LOSS_DIR=results/final_loss/definitive_T16_d8_ks1-2-3-5-6_L16_n8
+OBAR_DIR=results/study/final_obar_T32_ks1-2-3-5-6_tl3.8
+MAX_T=32 ks=1,2,3,5,6 target_loss=3.8 n_seeds=8
+INCLUDE_POLY_OBAR=1 TRY_T64=0 DRY_RUN=0
+============================================================
+[preflight] using /leonardo_work/IscrC_QuSALa/venv_py311/bin/python3 ...
+  [WARN] PTB has only 3 unique sentences with T=64. Training will duplicate them — prefer MAX_T<=32.
+  [WARN] PTB has only 3 unique sentences with T=64. Training will duplicate them — prefer MAX_T<=32.
+============================================================
+PREFLIGHT FINAL CAMPAIGNS
+============================================================
+  [OK]   file run_final_loss.py
+  [OK]   file run_study.py
+  [OK]   file classical_baselines.py
+  [OK]   file hpc_final_loss.sh
+  [OK]   file hpc_final_obar.sh
+  [OK]   file hpc_env.sh
+  [OK]   file mpi_runtime.py
+  [OK]   file ptb_sentences.txt
+  [OK]   file qsa_training.py
+  [OK]   file qsa_section2_circuit.py
+  [OK]   file qsa_section2_circuit_polynomial.py
+  [OK]   python imports
+  [OK]   QSA L=16 -> 96 angles
+  [OK]   CSA -> 128 matrices
+  [OK]   nl ~128 -> 144 params (L=1,r=3)
+  [OK]   nl ~288 -> 288 params
+  [OK]   obar target_loss=3.8
+  [OK]   no T_lim vertical on vs-T
+  [OK]   no T_lim vertical on vs-T-by-d
+  [OK]   obar vs-T ks=[1, 2, 3, 5, 6]
+  [OK]   obar jobs MAX_T=32: mono=45, +poly=90; MAX_T=64 mono=54
+  [OK]   qubit budget OK (mono max=40, poly max=46 <= 48)
+  [OK]   7 final-loss models (mono+poly+3 nl)
+  [OK]   final_loss jobs @8 seeds / ks=[1, 2, 3, 5, 6]: 184
+  [OK]   PTB T=4: 521 sentences
+  [OK]   PTB T=8: 1086 sentences
+  [OK]   PTB T=16: 1905 sentences
+  [OK]   PTB T=32: 895 sentences
+  [OK]   FINAL loss styles complete
+  [WARN] PTB T=64: ONLY 3 unique sentences — prefer MAX_T=32 for FINAL obar.
+------------------------------------------------------------
+RESULT: GO WITH WARNINGS — read WARNs carefully
+[plan] results/final_campaign/definitive/PLAN.json
+[submit] loss :: --export=ALL,T=16,D=8,KS=1,2,3,5,6,N_SEEDS=8,QSA_LAYERS=16,OUTPUT_DIR=results/final_loss/definitive_T16_d8_ks1-2-3-5-6_L16_n8 /leonardo_work/IscrC_QuSALa/variational_quantum_transformer_sovrapposition/hpc_final_loss.sh
+[submit] obar_mono :: --dependency=afterok:50173880 --export=ALL,MAX_T=32,FINAL_KS=1,2,3,5,6,TARGET_LOSS=3.8,ALSO_POLY=0,OUTPUT_DIR=results/study/final_obar_T32_ks1-2-3-5-6_tl3.8 /leonardo_work/IscrC_QuSALa/variational_quantum_transformer_sovrapposition/hpc_final_obar.sh
+[submit] obar_poly :: --dependency=afterok:50173881 --export=ALL,MAX_T=32,FINAL_KS=1,2,3,5,6,TARGET_LOSS=3.8,ALSO_POLY=1,OUTPUT_DIR=results/study/final_obar_T32_ks1-2-3-5-6_tl3.8 /leonardo_work/IscrC_QuSALa/variational_quantum_transformer_sovrapposition/hpc_final_obar.sh
+[submit] wrapup :: --dependency=afterok:50173884 --export=ALL,CAMPAIGN_DIR=results/final_campaign/definitive,LOSS_DIR=results/final_loss/definitive_T16_d8_ks1-2-3-5-6_L16_n8,OBAR_DIR=results/study/final_obar_T32_ks1-2-3-5-6_tl3.8,OBAR64_DIR=results/study/final_obar_T64_ks1-2-3-5-6_tl3.8 results/final_campaign/definitive/wrapup_job.sh
+
+CHAIN QUEUED 2026-07-24T16:07:10+02:00
+  orchestrator = 50173852
+  1 loss      = 50173880
+  2 obar_mono = 50173881
+  3 obar_poly = 50173884
+  4 obar_T64  = (skipped)
+  5 wrapup    = 50173886
+
+Monitor: squeue -u $USER
+Status:  tail -f results/final_campaign/definitive/STATUS.txt
+Jobs:    cat results/final_campaign/definitive/JOBS.txt
