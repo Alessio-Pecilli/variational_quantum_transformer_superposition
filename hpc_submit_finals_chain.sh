@@ -1,33 +1,34 @@
 #!/bin/bash
+#SBATCH --job-name=final_chain
+#SBATCH --output=logs/final_chain_%j.out
+#SBATCH --error=logs/final_chain_%j.err
+#
+#SBATCH --partition=lrd_all_serial
+#SBATCH --account=iscrc_qusala
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+#SBATCH --time=00:30:00
+#
 # =============================================================================
-# hpc_submit_finals_chain.sh  —  UNICO COMANDO (nodo di login)
-# =============================================================================
-# Lancia TUTTA la campagna FINAL in sequenza (SLURM dependencies), salva tutto
-# su OUTPUT_DIR fissi (resume-safe se un job scade / si ri-sbatcha).
+# Orchestratore FINAL (da lanciare con sbatch).
+# Non fa training: mette in coda la catena loss → obar → wrapup con
+# --dependency=afterok, poi esce. Puoi uscire subito dopo lo sbatch.
 #
-#   bash hpc_submit_finals_chain.sh
+#   sbatch hpc_submit_finals_chain.sh
 #
-# Catena:
-#   1) LOSS   multi-seed × ks=1,2,3,5,6 × 7 modelli (mono+poly QSA/CSA + 3 nl)
-#   2) OBAR   mono, griglia FINAL, MAX_T=32 (default), target_loss=3.8
-#   3) OBAR   +poly sullo STESSO dir (mono skippato da resume)
-#   4) WRAPUP replot + LOSS_CHECK + INDEX
-#   5) opz.   OBAR MAX_T=64 se TRY_T64=1  (PTB ha ~3 frasi a T=64!)
-#
-# Override:
-#   N_SEEDS=8 TRY_T64=0 INCLUDE_POLY_OBAR=1 bash hpc_submit_finals_chain.sh
-#   DRY_RUN=1 bash hpc_submit_finals_chain.sh
-#   SKIP_PREFLIGHT=1 bash hpc_submit_finals_chain.sh
-#
-# Monitor (mentre sei via):
-#   squeue -u $USER
-#   tail -f results/final_campaign/definitive/STATUS.txt
+# Override (esempi):
+#   sbatch --export=ALL,TRY_T64=1,N_SEEDS=8 hpc_submit_finals_chain.sh
+#   sbatch --export=ALL,INCLUDE_POLY_OBAR=0 hpc_submit_finals_chain.sh
+#   sbatch --export=ALL,SKIP_PREFLIGHT=1 hpc_submit_finals_chain.sh
 # =============================================================================
 
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 cd "$ROOT"
+mkdir -p logs
 
 N_SEEDS="${N_SEEDS:-8}"
 KS="${KS:-1,2,3,5,6}"
@@ -51,7 +52,7 @@ OBAR_DIR="${OBAR_DIR:-results/study/final_obar_T${MAX_T}_ks${FINAL_KS_TAG}_tl${T
 OBAR64_DIR="${OBAR64_DIR:-results/study/final_obar_T64_ks${FINAL_KS_TAG}_tl${TARGET_LOSS}}"
 CAMPAIGN_DIR="${CAMPAIGN_DIR:-results/final_campaign/${CAMPAIGN_NAME}}"
 
-mkdir -p logs "$CAMPAIGN_DIR" "$LOSS_DIR" "$OBAR_DIR"
+mkdir -p "$CAMPAIGN_DIR" "$LOSS_DIR" "$OBAR_DIR"
 [[ "$TRY_T64" == "1" ]] && mkdir -p "$OBAR64_DIR"
 
 STATUS="$CAMPAIGN_DIR/STATUS.txt"
@@ -63,7 +64,7 @@ _ts() { date -Iseconds 2>/dev/null || date; }
 
 {
   echo "============================================================"
-  echo "FINAL CAMPAIGN CHAIN  ($(_ts))"
+  echo "FINAL CAMPAIGN CHAIN  ($(_ts))  orchestrator_job=${SLURM_JOB_ID:-local}"
   echo "repo=$ROOT"
   echo "LOSS_DIR=$LOSS_DIR"
   echo "OBAR_DIR=$OBAR_DIR"
@@ -72,14 +73,15 @@ _ts() { date -Iseconds 2>/dev/null || date; }
   echo "============================================================"
 } | tee "$STATUS"
 
+# ---- env for preflight (venv py3.11, not login default py) -----------------
+module purge
+module load python/3.11.7
+# shellcheck source=hpc_env.sh
+source "$ROOT/hpc_env.sh"
+
 if [[ "$SKIP_PREFLIGHT" != "1" && -f preflight_finals.py ]]; then
-  echo "[preflight] ..." | tee -a "$STATUS"
-  if command -v python3 >/dev/null 2>&1; then
-    PY=python3
-  else
-    PY=python
-  fi
-  if ! "$PY" preflight_finals.py | tee -a "$STATUS"; then
+  echo "[preflight] using $VENV_PY ..." | tee -a "$STATUS"
+  if ! "$VENV_PY" preflight_finals.py | tee -a "$STATUS"; then
     echo "[FATAL] preflight failed" | tee -a "$STATUS"
     exit 2
   fi
@@ -88,6 +90,7 @@ fi
 cat > "$PLAN" <<EOF
 {
   "created": "$(_ts)",
+  "orchestrator_job": "${SLURM_JOB_ID:-local}",
   "campaign": "$CAMPAIGN_NAME",
   "n_seeds": $N_SEEDS,
   "ks_loss": "$KS",
@@ -103,28 +106,12 @@ cat > "$PLAN" <<EOF
     "campaign": "$CAMPAIGN_DIR",
     "status": "$STATUS",
     "jobs": "$JOBS"
-  },
-  "models_loss": [
-    "k-QSA L=16 (blue solid)",
-    "k-CSA 128 (orange solid)",
-    "poly-k-QSA L=16 (blue dashed)",
-    "poly-k-CSA (orange dashed)",
-    "nl-CSA iso ~288 (black dashed)",
-    "nl-CSA iso ~128 (black solid)",
-    "nl-CSA gen ~128 (black dotted)"
-  ],
-  "notes": [
-    "Multi-seed mean±std error bars on all loss plots",
-    "Aligned loss: -log mu + log T vs Renyi for nl",
-    "Obar Haar/advantage: same color as curve, different dash; no T_lim",
-    "PTB T=64 has only ~3 unique sentences — default MAX_T=32",
-    "All metrics/histories/params saved under paths above for aesthetic replot"
-  ]
+  }
 }
 EOF
 echo "[plan] $PLAN" | tee -a "$STATUS"
 
-# ---- wrapup job (replot + loss check + index) -------------------------------
+# ---- wrapup child job ------------------------------------------------------
 cat > "$WRAPUP_SCRIPT" <<EOF
 #!/bin/bash
 #SBATCH --job-name=final_wrap
@@ -149,6 +136,7 @@ export OBAR64_DIR="$OBAR64_DIR"
 STATUS="$STATUS"
 REPORT="\$CAMPAIGN_DIR/LOSS_CHECK.txt"
 INDEX="\$CAMPAIGN_DIR/INDEX.md"
+JOBS_FILE="$JOBS"
 
 module purge
 module load python/3.11.7
@@ -186,31 +174,25 @@ obar_dir = Path(os.environ["OBAR_DIR"])
 lines = ["LOSS COMPARABILITY / CONVERGENCE REPORT", "=" * 60]
 sp = loss_dir / "summary.json"
 if not sp.exists():
-    lines.append(f"MISSING {sp}")
+    lines.append("MISSING " + str(sp))
     print("\\n".join(lines))
     raise SystemExit(0)
 s = json.loads(sp.read_text(encoding="utf-8"))
 cfg = s.get("config", {})
-lines.append(f"T={cfg.get('T')} d={cfg.get('d')} ks={cfg.get('ks')} n_seeds={cfg.get('n_seeds')}")
+lines.append("T=%s d=%s ks=%s n_seeds=%s" % (cfg.get("T"), cfg.get("d"), cfg.get("ks"), cfg.get("n_seeds")))
 lines.append(str(s.get("alignment_note", "")))
 lines.append("")
 lines.append("Mu-models (aligned = -log mu + log T):")
 for p in sorted(s.get("mu_points_vs_k") or [], key=lambda x: (x["model"], int(x["k"]))):
-    lines.append(
-        f"  {p['model']:22s} k={p['k']}: "
-        f"{p['aligned_loss_mean']:.4f} ± {p['aligned_loss_std']:.4f}"
-    )
+    lines.append("  %-22s k=%s: %.4f +/- %.4f" % (p["model"], p["k"], p["aligned_loss_mean"], p["aligned_loss_std"]))
 lines.append("")
 lines.append("nl-CSA (Renyi, k-independent):")
 for a in s.get("nl_refs") or []:
-    lines.append(
-        f"  {a['model']:22s}: "
-        f"{a['aligned_loss_mean']:.4f} ± {a.get('aligned_loss_std', 0):.4f}"
-    )
+    lines.append("  %-22s: %.4f +/- %.4f" % (a["model"], a["aligned_loss_mean"], a.get("aligned_loss_std", 0)))
 lines.append("")
 lines.append("Trend notes:")
 for t in s.get("trend_notes") or []:
-    lines.append(f"  {t}")
+    lines.append("  " + str(t))
 lines.append("")
 lines.append("Convergence warnings:")
 warns = s.get("convergence_warnings") or []
@@ -218,7 +200,7 @@ if not warns:
     lines.append("  (none)")
 else:
     for w in warns:
-        lines.append(f"  - {w}")
+        lines.append("  - " + str(w))
 mp = obar_dir / "manifest.json"
 lines.append("")
 lines.append("OBAR loss check:")
@@ -226,20 +208,12 @@ if mp.exists():
     m = json.loads(mp.read_text(encoding="utf-8"))
     rows = m.get("all_rows") or []
     target = float((m.get("train_opts") or {}).get("target_loss") or 3.8)
-    bad = [
-        r for r in rows
-        if r.get("final_loss") is not None
-        and float(r["final_loss"]) > target
-        and r.get("error") is None
-    ]
-    lines.append(f"  points={len(rows)}  above_target({target})={len(bad)}")
+    bad = [r for r in rows if r.get("final_loss") is not None and float(r["final_loss"]) > target and r.get("error") is None]
+    lines.append("  points=%d  above_target(%.1f)=%d" % (len(rows), target, len(bad)))
     for r in sorted(bad, key=lambda x: float(x["final_loss"]), reverse=True)[:25]:
-        lines.append(
-            f"  {r.get('label')}: loss={float(r['final_loss']):.4f} "
-            f"obar={float(r.get('obar', float('nan'))):.4f}"
-        )
+        lines.append("  %s: loss=%.4f obar=%.4f" % (r.get("label"), float(r["final_loss"]), float(r.get("obar", float("nan")))))
 else:
-    lines.append(f"  MISSING {mp}")
+    lines.append("  MISSING " + str(mp))
 print("\\n".join(lines))
 PY
 
@@ -251,25 +225,18 @@ PY
   echo "- Obar data: \`\$OBAR_DIR\`"
   echo "- Loss check: \`\$REPORT\`"
   echo "- Status: \`\$STATUS\`"
-  echo "- Jobs: \`$JOBS\`"
+  echo "- Jobs: \`\$JOBS_FILE\`"
   echo
   echo "## Loss plots"
-  echo "- \`\$LOSS_DIR/plots/final_aligned_loss_vs_k.png\`  (mono+poly, error bars)"
-  echo "- \`\$LOSS_DIR/plots/final_aligned_curves_k*.png\`"
-  echo "- \`\$LOSS_DIR/summary.json\` + \`aggregates/\` + per-seed dirs"
+  echo "- \`\$LOSS_DIR/plots/final_aligned_loss_vs_k.png\`"
+  echo "- \`\$LOSS_DIR/summary.json\`"
   echo
   echo "## Obar plots"
   echo "- \`\$OBAR_DIR/mean_O_vs_T.png\`"
   echo "- \`\$OBAR_DIR/mean_O_vs_T_by_d.png\`"
   echo "- \`\$OBAR_DIR/mean_O_vs_d.png\`"
   echo "- \`\$OBAR_DIR/mean_O_vs_d_by_T.png\`"
-  echo "- \`\$OBAR_DIR/manifest.json\` + summary CSV"
-  echo
-  echo "Aesthetic replot anytime:"
-  echo "\`\`\`"
-  echo "\$VENV_PY run_final_loss.py --replot-only \$LOSS_DIR"
-  echo "\$VENV_PY run_study.py --replot-only \$OBAR_DIR"
-  echo "\`\`\`"
+  echo "- \`\$OBAR_DIR/manifest.json\`"
 } > "\$INDEX"
 
 echo "[wrapup] DONE \$(_ts)" | tee -a "\$STATUS"
@@ -277,7 +244,6 @@ echo "CAMPAIGN_COMPLETE \$(_ts)" >> "\$STATUS"
 EOF
 chmod +x "$WRAPUP_SCRIPT"
 
-# ---- submit helper (only jobid on stdout) ----------------------------------
 _submit() {
   local label="$1"; shift
   echo "[submit] $label :: $*" | tee -a "$STATUS" >&2
@@ -298,11 +264,7 @@ J_LOSS="$(_submit loss \
   --export=ALL,T="${LOSS_T}",D="${LOSS_D}",KS="${KS}",N_SEEDS="${N_SEEDS}",QSA_LAYERS="${QSA_LAYERS}",OUTPUT_DIR="${LOSS_DIR}" \
   "$ROOT/hpc_final_loss.sh")"
 
-if [[ "$DRY_RUN" == "1" ]]; then
-  DEP_LOSS=()
-else
-  DEP_LOSS=(--dependency="afterok:${J_LOSS}")
-fi
+if [[ "$DRY_RUN" == "1" ]]; then DEP_LOSS=(); else DEP_LOSS=(--dependency="afterok:${J_LOSS}"); fi
 
 J_OBAR="$(_submit obar_mono \
   "${DEP_LOSS[@]}" \
@@ -312,11 +274,7 @@ J_OBAR="$(_submit obar_mono \
 PREV="$J_OBAR"
 J_POLY="(skipped)"
 if [[ "$INCLUDE_POLY_OBAR" == "1" ]]; then
-  if [[ "$DRY_RUN" == "1" ]]; then
-    DEP_POLY=()
-  else
-    DEP_POLY=(--dependency="afterok:${J_OBAR}")
-  fi
+  if [[ "$DRY_RUN" == "1" ]]; then DEP_POLY=(); else DEP_POLY=(--dependency="afterok:${J_OBAR}"); fi
   J_POLY="$(_submit obar_poly \
     "${DEP_POLY[@]}" \
     --export=ALL,MAX_T="${MAX_T}",FINAL_KS="${FINAL_KS}",TARGET_LOSS="${TARGET_LOSS}",ALSO_POLY=1,OUTPUT_DIR="${OBAR_DIR}" \
@@ -326,13 +284,8 @@ fi
 
 J_T64="(skipped)"
 if [[ "$TRY_T64" == "1" ]]; then
-  if [[ "$DRY_RUN" == "1" ]]; then
-    DEP_T64=()
-  else
-    DEP_T64=(--dependency="afterok:${PREV}")
-  fi
-  POLY64=0
-  [[ "$INCLUDE_POLY_OBAR" == "1" ]] && POLY64=1
+  if [[ "$DRY_RUN" == "1" ]]; then DEP_T64=(); else DEP_T64=(--dependency="afterok:${PREV}"); fi
+  POLY64=0; [[ "$INCLUDE_POLY_OBAR" == "1" ]] && POLY64=1
   J_T64="$(_submit obar_T64 \
     "${DEP_T64[@]}" \
     --export=ALL,MAX_T=64,FINAL_KS="${FINAL_KS}",TARGET_LOSS="${TARGET_LOSS}",ALSO_POLY="${POLY64}",OUTPUT_DIR="${OBAR64_DIR}" \
@@ -340,11 +293,7 @@ if [[ "$TRY_T64" == "1" ]]; then
   PREV="$J_T64"
 fi
 
-if [[ "$DRY_RUN" == "1" ]]; then
-  DEP_WRAP=()
-else
-  DEP_WRAP=(--dependency="afterok:${PREV}")
-fi
+if [[ "$DRY_RUN" == "1" ]]; then DEP_WRAP=(); else DEP_WRAP=(--dependency="afterok:${PREV}"); fi
 J_WRAP="$(_submit wrapup \
   "${DEP_WRAP[@]}" \
   --export=ALL,CAMPAIGN_DIR="${CAMPAIGN_DIR}",LOSS_DIR="${LOSS_DIR}",OBAR_DIR="${OBAR_DIR}",OBAR64_DIR="${OBAR64_DIR}" \
@@ -352,20 +301,17 @@ J_WRAP="$(_submit wrapup \
 
 {
   echo
-  echo "CHAIN SUBMITTED $(_ts)"
+  echo "CHAIN QUEUED $(_ts)"
+  echo "  orchestrator = ${SLURM_JOB_ID:-local}"
   echo "  1 loss      = $J_LOSS"
   echo "  2 obar_mono = $J_OBAR"
   echo "  3 obar_poly = $J_POLY"
   echo "  4 obar_T64  = $J_T64"
   echo "  5 wrapup    = $J_WRAP"
   echo
-  echo "Monitor:   squeue -u \$USER"
-  echo "Status:    tail -f $STATUS"
-  echo "Job ids:   cat $JOBS"
-  echo "When done: cat $CAMPAIGN_DIR/INDEX.md && cat $CAMPAIGN_DIR/LOSS_CHECK.txt"
-  echo
-  echo "Se un job fallisce/scade: ri-sbatch dello STESSO script con STESSO OUTPUT_DIR (resume)."
+  echo "Monitor: squeue -u \$USER"
+  echo "Status:  tail -f $STATUS"
+  echo "Jobs:    cat $JOBS"
 } | tee -a "$STATUS"
 
-echo
-echo "OK — catena in coda. Puoi uscire."
+echo "OK — catena in coda. Orchestratore termina qui."
