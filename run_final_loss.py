@@ -198,6 +198,14 @@ def _train_one(spec: dict, cfg: BaselineConfig, bundle: dict, log: logging.Logge
     result["aligned_loss"] = _aligned_loss(result, cfg.T)
     result["log_T"] = math.log(cfg.T)
     result["model"] = spec["display"]
+    # Memory-safety: clear JAX caches after each job to reduce OOM risk
+    try:
+        import jax
+        jax.clear_caches()
+    except Exception:
+        pass
+    import gc
+    gc.collect()
     return result
 
 
