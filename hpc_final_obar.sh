@@ -8,9 +8,10 @@
 #SBATCH --account=iscrc_qusala
 #
 # FINAL obar (transformer / run_study) campaign — classical mu path.
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=16
-#SBATCH --cpus-per-task=1
+# Memory-safe: fewer MPI ranks + srun --mem=0 (step default was ~4G → instant OOM).
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --cpus-per-task=4
 #SBATCH --mem=0
 #SBATCH --time=48:00:00
 
@@ -67,13 +68,15 @@ module load python/3.11.7
 # shellcheck source=hpc_env.sh
 source "${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/hpc_env.sh"
 
-export OMP_NUM_THREADS=1
+export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-4}"
 export OPENBLAS_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 export PYTHONUTF8=1
 export JAX_ENABLE_X64=True
 export JAX_PLATFORMS=cpu
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
+export XLA_PYTHON_CLIENT_ALLOCATOR=platform
+export MALLOC_ARENA_MAX=2
 export UCX_TLS=self,shm,rc,ud
 export UCX_MEMTYPE_CACHE=n
 
@@ -103,7 +106,8 @@ if [[ -n "$MAX_SENTENCES" ]]; then
   ARGS+=(--max-sentences "$MAX_SENTENCES")
 fi
 
-srun --mpi=pmix_v3 --export=ALL "$VENV_PY" run_study.py "${ARGS[@]}"
+# --mem=0: inherit full node RAM for the step (without this Leonardo gave ~4G → OOM)
+srun --mpi=pmix_v3 --mem=0 --export=ALL --cpu-bind=cores "$VENV_PY" run_study.py "${ARGS[@]}"
 
 echo "=== JOB FINISHED at $(date) ==="
 echo "Replot aesthetics:  $VENV_PY run_study.py --replot-only $OUTPUT_DIR"
