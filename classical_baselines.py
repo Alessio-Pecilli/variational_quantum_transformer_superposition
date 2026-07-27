@@ -686,6 +686,9 @@ def train_kqsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
         run_name,
         log,
     )
+    # Already-complete resume returns metrics.json (no "params" key).
+    if "params" not in train_out:
+        return train_out
     return _finalize_mu_result(
         "k-QSA",
         cfg,
@@ -719,6 +722,9 @@ def train_kcsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
         run_name,
         log,
     )
+    # Already-complete resume returns metrics.json (no "params" key).
+    if "params" not in train_out:
+        return train_out
     return _finalize_mu_result(
         "k-CSA",
         cfg,
