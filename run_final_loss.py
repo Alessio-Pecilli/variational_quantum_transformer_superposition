@@ -21,6 +21,9 @@ import argparse
 import json
 import logging
 import math
+import os
+import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -190,6 +193,10 @@ def _train_one(spec: dict, cfg: BaselineConfig, bundle: dict, log: logging.Logge
         result = train_kcsa(cfg, bundle, logger=log)
     else:
         result = train_nlcsa(cfg, bundle, logger=log)
+    return _enrich_result(result, spec, cfg)
+
+
+def _enrich_result(result: dict, spec: dict, cfg: BaselineConfig) -> dict:
     # Enrich for FINAL reporting / replot
     result["display"] = spec["display"]
     result["spec_key"] = spec["key"]
@@ -198,14 +205,103 @@ def _train_one(spec: dict, cfg: BaselineConfig, bundle: dict, log: logging.Logge
     result["aligned_loss"] = _aligned_loss(result, cfg.T)
     result["log_T"] = math.log(cfg.T)
     result["model"] = spec["display"]
-    # Memory-safety: clear JAX caches after each job to reduce OOM risk
+    return result
+
+
+def _clear_jax_memory() -> None:
     try:
         import jax
+
         jax.clear_caches()
     except Exception:
         pass
     import gc
+
     gc.collect()
+
+
+def _run_dir_for(cfg: BaselineConfig) -> Path:
+    return Path(cfg.output_dir) / str(cfg.run_label)
+
+
+def _load_enriched_from_disk(spec: dict, cfg: BaselineConfig) -> dict | None:
+    metrics = _run_dir_for(cfg) / "metrics.json"
+    if not metrics.exists():
+        return None
+    result = json.loads(metrics.read_text(encoding="utf-8"))
+    return _enrich_result(result, spec, cfg)
+
+
+def _isolate_train_one(spec: dict, cfg: BaselineConfig, args: argparse.Namespace, log: logging.Logger) -> dict:
+    """Train one job in a fresh Python subprocess so JAX/XLA memory is fully released."""
+    existing = _load_enriched_from_disk(spec, cfg)
+    if args.resume and existing is not None:
+        log.info(f"[isolate] skip complete -> {_run_dir_for(cfg)}")
+        return existing
+
+    script = str(Path(__file__).resolve())
+    cmd = [
+        sys.executable,
+        script,
+        "--train-only",
+        "--T",
+        str(args.T),
+        "--d",
+        str(args.d),
+        "--ks",
+        str(cfg.k),
+        "--k",
+        str(cfg.k),
+        "--qsa-layers",
+        str(args.qsa_layers),
+        "--epochs",
+        str(args.epochs),
+        "--poly-epochs",
+        str(args.poly_epochs),
+        "--nl-epochs",
+        str(args.nl_epochs),
+        "--nl-epochs-general",
+        str(args.nl_epochs_general),
+        "--max-sentences",
+        str(args.max_sentences),
+        "--n-seeds",
+        "1",
+        "--batch-size",
+        str(args.batch_size),
+        "--data-seed",
+        str(args.data_seed),
+        "--model-seed-base",
+        str(cfg.model_seed),
+        "--learning-rate",
+        str(args.learning_rate),
+        "--nl-learning-rate",
+        str(args.nl_learning_rate),
+        "--nl-learning-rate-general",
+        str(args.nl_learning_rate_general),
+        "--nl-param-budget-small",
+        str(args.nl_param_budget_small),
+        "--checkpoint-every",
+        str(args.checkpoint_every),
+        "--output-dir",
+        str(cfg.output_dir),
+        "--resume",
+        "--models",
+        spec["key"],
+    ]
+    env = os.environ.copy()
+    env["JAX_PLATFORMS"] = "cpu"
+    env["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
+    env["XLA_PYTHON_CLIENT_ALLOCATOR"] = "platform"
+    env["MALLOC_ARENA_MAX"] = "2"
+    log.info(f"[isolate] subprocess: {spec['key']} k={cfg.k} seed={cfg.model_seed}")
+    proc = subprocess.run(cmd, env=env)
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"isolated job failed rc={proc.returncode}: {spec['key']} k={cfg.k} seed={cfg.model_seed}"
+        )
+    result = _load_enriched_from_disk(spec, cfg)
+    if result is None:
+        raise RuntimeError(f"isolated job produced no metrics.json under {_run_dir_for(cfg)}")
     return result
 
 
@@ -455,6 +551,16 @@ def main() -> int:
         action="store_true",
         help="skip poly-k-QSA / poly-k-CSA (default: include on same plots)",
     )
+    p.add_argument(
+        "--isolate-jobs",
+        action="store_true",
+        help="run each (model,k,seed) in a fresh subprocess to avoid JAX CPU OOM",
+    )
+    p.add_argument(
+        "--train-only",
+        action="store_true",
+        help="train assigned jobs and exit (no aggregate/plots); used by --isolate-jobs children",
+    )
     args = p.parse_args()
 
     if args.replot_only:
@@ -546,8 +652,13 @@ def main() -> int:
         k = int(job["k"])
         cfg = _make_cfg(args, spec, ms, out, k=k)
         print(f"\n===== {spec['display']} k={k} model_seed={ms} (rank {rank}/{size}) =====")
-        bundle = prepare_data_bundle(cfg)
-        result = _train_one(spec, cfg, bundle, log)
+        if args.isolate_jobs:
+            result = _isolate_train_one(spec, cfg, args, log)
+        else:
+            bundle = prepare_data_bundle(cfg)
+            result = _train_one(spec, cfg, bundle, log)
+            del bundle
+            _clear_jax_memory()
         result["k"] = k
         print(
             f"[{spec['display']} k={k} seed={ms}] raw={result['final_loss']:.4f} "
@@ -555,11 +666,33 @@ def main() -> int:
         )
         local_runs.append(result)
 
+    if args.train_only:
+        barrier(comm)
+        return 0
+
     barrier(comm)
     all_runs = gather_list(comm, local_runs) if args.mpi else local_runs
     if rank != 0:
         barrier(comm)
         return 0
+
+    # Prefer on-disk metrics for aggregation so a resumed/partial MPI run still
+    # includes every completed (model,k,seed) even if another rank died earlier.
+    disk_runs: list[dict] = []
+    for job in jobs:
+        spec = job["spec"]
+        ms = int(job["seed"])
+        k = int(job["k"])
+        cfg = _make_cfg(args, spec, ms, out, k=k)
+        loaded = _load_enriched_from_disk(spec, cfg)
+        if loaded is None:
+            print(f"[WARN] missing metrics for {cfg.run_label}")
+            continue
+        loaded["k"] = k
+        disk_runs.append(loaded)
+    if disk_runs:
+        all_runs = disk_runs
+        print(f"[aggregate] loaded {len(all_runs)}/{len(jobs)} runs from disk")
 
     # Group: nl by display; mu by (display, k)
     by_nl: dict[str, list[dict]] = {}

@@ -672,9 +672,15 @@ def _finalize_mu_result(
 
 def train_kqsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logger] = None) -> dict:
     log = logger or logging.getLogger("baselines")
+    run_name = cfg.run_label or f"kqsa_seed{cfg.model_seed}"
+    out = _run_dir(cfg, run_name)
+    max_ep = int(cfg.max_epochs or cfg.epochs)
+    if cfg.resume and _is_run_complete(out, max_ep):
+        result = _load_completed_result(out)
+        log.info(f"[k-QSA] resume: already complete -> {out}")
+        return result
     key = jax.random.PRNGKey(cfg.model_seed)
     params = init_qsa_params(bundle["encoding"].vocabSize, bundle["qcfg"], key)
-    run_name = cfg.run_label or f"kqsa_seed{cfg.model_seed}"
     angle_n = qsa_angle_param_count(cfg.d, cfg.layers)
     train_out = _train_loop(
         "k-QSA",
@@ -708,9 +714,15 @@ def train_kqsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
 
 def train_kcsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logger] = None) -> dict:
     log = logger or logging.getLogger("baselines")
+    run_name = cfg.run_label or f"kcsa_seed{cfg.model_seed}"
+    out = _run_dir(cfg, run_name)
+    max_ep = int(cfg.max_epochs or cfg.epochs)
+    if cfg.resume and _is_run_complete(out, max_ep):
+        result = _load_completed_result(out)
+        log.info(f"[k-CSA] resume: already complete -> {out}")
+        return result
     key = jax.random.PRNGKey(cfg.model_seed + 31)
     params = init_kcsa_params(bundle["encoding"].vocabSize, cfg, key)
-    run_name = cfg.run_label or f"kcsa_seed{cfg.model_seed}"
     matrix_n = kcsa_matrix_param_count(cfg.d)
     train_out = _train_loop(
         "k-CSA",

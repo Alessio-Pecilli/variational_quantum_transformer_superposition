@@ -8,11 +8,11 @@
 #SBATCH --account=iscrc_qusala
 #
 # FINAL loss campaign (multi-seed, multi-k, mono+poly on same plot).
-# Memory-safe: few MPI ranks, NO GPU (JAX is CPU-only here), full node RAM.
-# Previous OOM with 8 tasks + gpu:1 on L=16 / poly / 1000 sentences.
+# Memory-safe: 1 MPI rank + per-job subprocess isolation (JAX CPU leaks / OOM).
+# Previous OOMs: 8 tasks+GPU; then 2 tasks after ~157/184 runs.
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=2
-#SBATCH --cpus-per-task=16
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=32
 #SBATCH --mem=0
 #SBATCH --time=48:00:00
 
@@ -45,11 +45,12 @@ NL_LR_GENERAL="${NL_LR_GENERAL:-8e-3}"
 CHECKPOINT_EVERY="${CHECKPOINT_EVERY:-20}"
 NL_PARAM_BUDGET_SMALL="${NL_PARAM_BUDGET_SMALL:-128}"
 NO_POLY="${NO_POLY:-0}"
+ISOLATE_JOBS="${ISOLATE_JOBS:-1}"
 KS_TAG="${KS//,/-}"
 OUTPUT_DIR="${OUTPUT_DIR:-results/final_loss/definitive_T${T}_d${D}_ks${KS_TAG}_L${QSA_LAYERS}_n${N_SEEDS}}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
-echo "FINAL loss: T=$T d=$D ks=$KS QSA_L=$QSA_LAYERS n_seeds=$N_SEEDS no_poly=$NO_POLY"
+echo "FINAL loss: T=$T d=$D ks=$KS QSA_L=$QSA_LAYERS n_seeds=$N_SEEDS no_poly=$NO_POLY isolate=$ISOLATE_JOBS"
 echo "epochs mono=$EPOCHS poly=$POLY_EPOCHS nl=$NL_EPOCHS nl_gen=$NL_EPOCHS_GENERAL batch=$BATCH_SIZE"
 echo "OUTPUT_DIR=$OUTPUT_DIR (re-sbatch same dir to resume)"
 echo "MPI tasks=${SLURM_NTASKS:-1} cpus/task=${SLURM_CPUS_PER_TASK:-}"
@@ -78,6 +79,9 @@ mkdir -p logs "$OUTPUT_DIR"
 EXTRA=()
 if [[ "$NO_POLY" == "1" ]]; then
   EXTRA+=(--no-poly)
+fi
+if [[ "$ISOLATE_JOBS" == "1" ]]; then
+  EXTRA+=(--isolate-jobs)
 fi
 
 srun --mpi=pmix_v3 --export=ALL --cpu-bind=cores "$VENV_PY" run_final_loss.py \
