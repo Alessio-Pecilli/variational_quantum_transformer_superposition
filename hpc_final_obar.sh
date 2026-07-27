@@ -34,7 +34,9 @@
 set -euo pipefail
 
 MAX_T="${MAX_T:-32}"
+# Slurm --export splits on commas: parents pass FINAL_KS as 1:2:3:5:6
 FINAL_KS="${FINAL_KS:-1,2,3,5,6}"
+FINAL_KS="${FINAL_KS//:/,}"
 ALSO_POLY="${ALSO_POLY:-0}"
 LOCAL_MAX_QUBITS="${LOCAL_MAX_QUBITS:-48}"
 TARGET_LOSS="${TARGET_LOSS:-3.8}"

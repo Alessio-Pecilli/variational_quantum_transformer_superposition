@@ -28,7 +28,9 @@ set -euo pipefail
 
 T="${T:-16}"
 D="${D:-8}"
+# Slurm --export splits on commas: parents may pass KS as 1:2:3:5:6
 KS="${KS:-1,2,3,5,6}"
+KS="${KS//:/,}"
 QSA_LAYERS="${QSA_LAYERS:-16}"
 EPOCHS="${EPOCHS:-400}"
 POLY_EPOCHS="${POLY_EPOCHS:-600}"

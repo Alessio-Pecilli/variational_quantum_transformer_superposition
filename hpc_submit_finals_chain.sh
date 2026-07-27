@@ -260,15 +260,19 @@ _submit() {
 
 : > "$JOBS"
 
+# Slurm --export splits on commas → colon-safe encoding (scripts convert back)
+KS_SAFE="${KS//,/:}"
+FINAL_KS_SAFE="${FINAL_KS//,/:}"
+
 J_LOSS="$(_submit loss \
-  --export=ALL,T="${LOSS_T}",D="${LOSS_D}",KS="${KS}",N_SEEDS="${N_SEEDS}",QSA_LAYERS="${QSA_LAYERS}",OUTPUT_DIR="${LOSS_DIR}" \
+  --export=ALL,T="${LOSS_T}",D="${LOSS_D}",KS="${KS_SAFE}",N_SEEDS="${N_SEEDS}",QSA_LAYERS="${QSA_LAYERS}",OUTPUT_DIR="${LOSS_DIR}" \
   "$ROOT/hpc_final_loss.sh")"
 
 if [[ "$DRY_RUN" == "1" ]]; then DEP_LOSS=(); else DEP_LOSS=(--dependency="afterok:${J_LOSS}"); fi
 
 J_OBAR="$(_submit obar_mono \
   "${DEP_LOSS[@]}" \
-  --export=ALL,MAX_T="${MAX_T}",FINAL_KS="${FINAL_KS}",TARGET_LOSS="${TARGET_LOSS}",ALSO_POLY=0,OUTPUT_DIR="${OBAR_DIR}" \
+  --export=ALL,MAX_T="${MAX_T}",FINAL_KS="${FINAL_KS_SAFE}",TARGET_LOSS="${TARGET_LOSS}",ALSO_POLY=0,OUTPUT_DIR="${OBAR_DIR}" \
   "$ROOT/hpc_final_obar.sh")"
 
 PREV="$J_OBAR"
@@ -277,7 +281,7 @@ if [[ "$INCLUDE_POLY_OBAR" == "1" ]]; then
   if [[ "$DRY_RUN" == "1" ]]; then DEP_POLY=(); else DEP_POLY=(--dependency="afterok:${J_OBAR}"); fi
   J_POLY="$(_submit obar_poly \
     "${DEP_POLY[@]}" \
-    --export=ALL,MAX_T="${MAX_T}",FINAL_KS="${FINAL_KS}",TARGET_LOSS="${TARGET_LOSS}",ALSO_POLY=1,OUTPUT_DIR="${OBAR_DIR}" \
+    --export=ALL,MAX_T="${MAX_T}",FINAL_KS="${FINAL_KS_SAFE}",TARGET_LOSS="${TARGET_LOSS}",ALSO_POLY=1,OUTPUT_DIR="${OBAR_DIR}" \
     "$ROOT/hpc_final_obar.sh")"
   PREV="$J_POLY"
 fi
@@ -288,7 +292,7 @@ if [[ "$TRY_T64" == "1" ]]; then
   POLY64=0; [[ "$INCLUDE_POLY_OBAR" == "1" ]] && POLY64=1
   J_T64="$(_submit obar_T64 \
     "${DEP_T64[@]}" \
-    --export=ALL,MAX_T=64,FINAL_KS="${FINAL_KS}",TARGET_LOSS="${TARGET_LOSS}",ALSO_POLY="${POLY64}",OUTPUT_DIR="${OBAR64_DIR}" \
+    --export=ALL,MAX_T=64,FINAL_KS="${FINAL_KS_SAFE}",TARGET_LOSS="${TARGET_LOSS}",ALSO_POLY="${POLY64}",OUTPUT_DIR="${OBAR64_DIR}" \
     "$ROOT/hpc_final_obar.sh")"
   PREV="$J_T64"
 fi

@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=final_rechain
-#SBATCH --output=logs/final_rechain_%j.out
-#SBATCH --error=logs/final_rechain_%j.err
+#SBATCH --job-name=final_obar_rechain
+#SBATCH --output=logs/final_obar_rechain_%j.out
+#SBATCH --error=logs/final_obar_rechain_%j.err
 #SBATCH --partition=lrd_all_serial
 #SBATCH --account=iscrc_qusala
 #SBATCH --nodes=1
@@ -10,10 +10,13 @@
 #SBATCH --mem=2G
 #SBATCH --time=00:15:00
 #
-# Re-queue FINAL chain AFTER a loss OOM / failed dependency.
-# Same OUTPUT_DIR → loss resumes; then obar → wrapup.
+# Re-queue FINAL obar (+ wrapup) after Slurm node failure / bad KS export.
+# Does NOT re-run loss (assumes LOSS_DIR already complete).
 #
-#   sbatch hpc_rechain_after_loss_oom.sh
+#   sbatch hpc_rechain_obar.sh
+#
+# NOTE: Slurm --export splits on commas, so we pass FINAL_KS as 1:2:3:5:6
+# and hpc_final_obar.sh converts ':' back to ','.
 
 set -euo pipefail
 ROOT="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
@@ -27,22 +30,21 @@ FINAL_KS="${FINAL_KS:-1,2,3,5,6}"
 TARGET_LOSS="${TARGET_LOSS:-3.8}"
 MAX_T="${MAX_T:-32}"
 INCLUDE_POLY_OBAR="${INCLUDE_POLY_OBAR:-1}"
-# Slurm --export splits on commas → pass colon-separated; hpc_final_obar.sh converts back
+STATUS="$CAMPAIGN_DIR/STATUS_obar_rechain.txt"
+JOBS="$CAMPAIGN_DIR/JOBS_obar_rechain.txt"
+
+# Slurm-safe: commas → colons for --export
 FINAL_KS_SAFE="${FINAL_KS//,/:}"
-STATUS="$CAMPAIGN_DIR/STATUS_rechain.txt"
-JOBS="$CAMPAIGN_DIR/JOBS_rechain.txt"
 
 _ts() { date -Iseconds 2>/dev/null || date; }
 {
-  echo "RECHAIN $(_ts)"
-  echo "LOSS_DIR=$LOSS_DIR OBAR_DIR=$OBAR_DIR FINAL_KS=$FINAL_KS (export=$FINAL_KS_SAFE)"
+  echo "OBAR RECHAIN $(_ts)"
+  echo "LOSS_DIR=$LOSS_DIR (not re-run)"
+  echo "OBAR_DIR=$OBAR_DIR FINAL_KS=$FINAL_KS (export=$FINAL_KS_SAFE)"
 } | tee "$STATUS"
 : > "$JOBS"
 
-J1=$(sbatch --parsable --export=ALL,OUTPUT_DIR="$LOSS_DIR" "$ROOT/hpc_final_loss.sh")
-echo "loss $J1" | tee -a "$JOBS" "$STATUS"
-
-J2=$(sbatch --parsable --dependency="afterok:${J1}" \
+J2=$(sbatch --parsable \
   --export=ALL,MAX_T="$MAX_T",FINAL_KS="$FINAL_KS_SAFE",TARGET_LOSS="$TARGET_LOSS",ALSO_POLY=0,OUTPUT_DIR="$OBAR_DIR" \
   "$ROOT/hpc_final_obar.sh")
 echo "obar_mono $J2" | tee -a "$JOBS" "$STATUS"
@@ -56,7 +58,6 @@ if [[ "$INCLUDE_POLY_OBAR" == "1" ]]; then
   PREV=$J3
 fi
 
-# wrapup script must exist from previous chain; recreate minimal if missing
 WRAP="$CAMPAIGN_DIR/wrapup_job.sh"
 if [[ ! -f "$WRAP" ]]; then
   echo "[WARN] missing wrapup_job.sh — skip wrapup submit" | tee -a "$STATUS"
@@ -67,5 +68,5 @@ else
   echo "wrapup $J4" | tee -a "$JOBS" "$STATUS"
 fi
 
-echo "RECHAIN QUEUED $(_ts)" | tee -a "$STATUS"
+echo "OBAR RECHAIN QUEUED $(_ts)" | tee -a "$STATUS"
 cat "$JOBS" | tee -a "$STATUS"
