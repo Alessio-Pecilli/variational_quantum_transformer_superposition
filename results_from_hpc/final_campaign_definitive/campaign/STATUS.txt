@@ -61,3 +61,8 @@ CHAIN QUEUED 2026-07-24T16:07:10+02:00
 Monitor: squeue -u $USER
 Status:  tail -f results/final_campaign/definitive/STATUS.txt
 Jobs:    cat results/final_campaign/definitive/JOBS.txt
+[wrapup] start 2026-07-27T17:53:57+02:00
+[wrapup] replotted loss
+[wrapup] replotted obar
+[wrapup] DONE 2026-07-27T17:54:10+02:00
+CAMPAIGN_COMPLETE 2026-07-27T17:54:10+02:00

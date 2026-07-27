@@ -1,0 +1,72 @@
+LOSS COMPARABILITY / CONVERGENCE REPORT
+============================================================
+T=16 d=8 ks=[1, 2, 3, 5, 6] n_seeds=8
+Mu-models plotted as −logμ + log T; nl-CSA Renyi plotted as-is. poly-k-QSA/CSA use kernel_mode=poly (classical poly / LCU-truncated kernel) on the SAME vs-k plot as monomial — hoped to flatten growth of loss with k.
+
+Mu-models (aligned = -log mu + log T):
+  k-CSA                  k=1: 4.7431 +/- 0.3828
+  k-CSA                  k=2: 5.3984 +/- 0.6021
+  k-CSA                  k=3: 5.7343 +/- 0.3350
+  k-CSA                  k=5: 6.9519 +/- 1.3013
+  k-CSA                  k=6: 7.3418 +/- 0.9830
+  k-QSA L=16             k=1: 4.2473 +/- 0.0905
+  k-QSA L=16             k=2: 4.8160 +/- 0.1237
+  k-QSA L=16             k=3: 5.3248 +/- 0.1323
+  k-QSA L=16             k=5: 6.2010 +/- 0.2127
+  k-QSA L=16             k=6: 6.5956 +/- 0.2391
+  poly-k-CSA             k=1: 4.8330 +/- 0.9051
+  poly-k-CSA             k=2: 5.9427 +/- 1.5264
+  poly-k-CSA             k=3: 5.8220 +/- 1.7269
+  poly-k-CSA             k=5: 5.2757 +/- 0.3568
+  poly-k-CSA             k=6: 5.3805 +/- 0.3881
+  poly-k-QSA L=16        k=1: 4.2424 +/- 0.6475
+  poly-k-QSA L=16        k=2: 4.3354 +/- 0.0850
+  poly-k-QSA L=16        k=3: 4.5496 +/- 0.0546
+  poly-k-QSA L=16        k=5: 4.8165 +/- 0.0551
+  poly-k-QSA L=16        k=6: 4.8673 +/- 0.0555
+
+nl-CSA (Renyi, k-independent):
+  nl-CSA iso ~288       : 6.5092 +/- 0.0175
+  nl-CSA iso ~128       : 6.5807 +/- 0.0351
+  nl-CSA gen ~128       : 6.7330 +/- 0.7529
+
+Trend notes:
+  k-QSA L=16: aligned(k=1)=4.247 -> aligned(k=6)=6.596  Δ=+2.348
+  k-CSA: aligned(k=1)=4.743 -> aligned(k=6)=7.342  Δ=+2.599
+  poly-k-QSA L=16: aligned(k=1)=4.242 -> aligned(k=6)=4.867  Δ=+0.625
+  poly-k-CSA: aligned(k=1)=4.833 -> aligned(k=6)=5.381  Δ=+0.547
+
+Convergence warnings:
+  - k-QSA L=16 k=5: aligned=6.201 vs best=4.242 (Δ=1.959) — check convergence / epochs
+  - k-QSA L=16 k=6: aligned=6.596 vs best=4.242 (Δ=2.353) — check convergence / epochs
+  - k-CSA k=3: aligned=5.734 vs best=4.242 (Δ=1.492) — check convergence / epochs
+  - k-CSA k=5: aligned=6.952 vs best=4.242 (Δ=2.710) — check convergence / epochs
+  - k-CSA k=6: aligned=7.342 vs best=4.242 (Δ=3.099) — check convergence / epochs
+  - poly-k-CSA k=2: aligned=5.943 vs best=4.242 (Δ=1.700) — check convergence / epochs
+  - poly-k-CSA k=3: aligned=5.822 vs best=4.242 (Δ=1.580) — check convergence / epochs
+  - nl-CSA iso ~288: aligned=6.509 vs best=4.242 (Δ=2.267) — check convergence / epochs
+  - nl-CSA iso ~128: aligned=6.581 vs best=4.242 (Δ=2.338) — check convergence / epochs
+  - nl-CSA gen ~128: aligned=6.733 vs best=4.242 (Δ=2.491) — check convergence / epochs
+
+OBAR loss check:
+  points=90  above_target(3.8)=20
+  T8_d16_k6_mono: loss=10.7180 obar=0.0108
+  T4_d16_k6_mono: loss=7.6769 obar=0.0442
+  T4_d16_k5_mono: loss=7.3939 obar=0.0401
+  T4_d16_k5_poly: loss=6.5898 obar=0.0280
+  T32_d2_k2_mono: loss=6.3400 obar=0.3976
+  T32_d16_k6_mono: loss=5.6679 obar=0.0588
+  T16_d16_k6_mono: loss=5.2201 obar=0.0736
+  T32_d16_k5_mono: loss=5.2157 obar=0.0738
+  T16_d16_k6_poly: loss=4.8157 obar=0.0219
+  T16_d16_k5_mono: loss=4.7803 obar=0.0917
+  T32_d16_k6_poly: loss=4.6881 obar=0.0213
+  T16_d16_k5_poly: loss=4.6643 obar=0.0317
+  T4_d16_k3_poly: loss=4.6550 obar=0.0785
+  T32_d16_k5_poly: loss=4.4839 obar=0.0335
+  T32_d32_k3_mono: loss=4.4530 obar=0.1080
+  T4_d16_k1_poly: loss=4.4146 obar=0.1180
+  T32_d16_k3_mono: loss=4.3702 obar=0.1126
+  T16_d16_k3_poly: loss=4.0671 obar=0.0683
+  T32_d16_k2_mono: loss=3.8453 obar=0.1463
+  T16_d16_k3_mono: loss=3.8166 obar=0.1484

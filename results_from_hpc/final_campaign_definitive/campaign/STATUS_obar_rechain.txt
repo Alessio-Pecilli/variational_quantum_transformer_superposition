@@ -1,0 +1,10 @@
+OBAR RECHAIN 2026-07-27T17:48:23+02:00
+LOSS_DIR=results/final_loss/definitive_T16_d8_ks1-2-3-5-6_L16_n8 (not re-run)
+OBAR_DIR=results/study/final_obar_T32_ks1-2-3-5-6_tl3.8 FINAL_KS=1,2,3,5,6 (export=1:2:3:5:6)
+obar_mono 50436209
+obar_poly 50436210
+wrapup 50436211
+OBAR RECHAIN QUEUED 2026-07-27T17:48:24+02:00
+obar_mono 50436209
+obar_poly 50436210
+wrapup 50436211

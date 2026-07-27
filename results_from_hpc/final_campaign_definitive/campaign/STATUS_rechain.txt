@@ -1,0 +1,11 @@
+RECHAIN 2026-07-27T14:47:38+02:00
+LOSS_DIR=results/final_loss/definitive_T16_d8_ks1-2-3-5-6_L16_n8 OBAR_DIR=results/study/final_obar_T32_ks1-2-3-5-6_tl3.8
+loss 50423948
+obar_mono 50423949
+obar_poly 50423950
+wrapup 50423951
+RECHAIN QUEUED 2026-07-27T14:47:40+02:00
+loss 50423948
+obar_mono 50423949
+obar_poly 50423950
+wrapup 50423951

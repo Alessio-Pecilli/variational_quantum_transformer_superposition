@@ -293,6 +293,25 @@ def _isolate_train_one(spec: dict, cfg: BaselineConfig, args: argparse.Namespace
     env["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
     env["XLA_PYTHON_CLIENT_ALLOCATOR"] = "platform"
     env["MALLOC_ARENA_MAX"] = "2"
+    # Parent may be under srun/PMIx: scrub MPI launcher vars so the child does not hang.
+    for key in list(env):
+        ku = key.upper()
+        if ku.startswith(
+            (
+                "PMI_",
+                "PMIX_",
+                "OMPI_",
+                "MPI_",
+                "SLURM_MPI",
+                "SLURM_STEP_",
+                "SLURM_PROCID",
+                "SLURM_LOCALID",
+                "SLURM_GTIDS",
+                "SLURM_NODEID",
+            )
+        ) or ku in {"SLURM_NTASKS", "SLURM_NPROCS", "SLURM_TASKS_PER_NODE"}:
+            env.pop(key, None)
+    env["PYTHONUNBUFFERED"] = "1"
     log.info(f"[isolate] subprocess: {spec['key']} k={cfg.k} seed={cfg.model_seed}")
     proc = subprocess.run(cmd, env=env)
     if proc.returncode != 0:

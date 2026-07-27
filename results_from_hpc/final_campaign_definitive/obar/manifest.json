@@ -1,0 +1,2586 @@
+{
+  "timestamp": "final_obar_T32_ks1-2-3-5-6_tl3.8",
+  "preset": "long",
+  "final_obar_grid": true,
+  "max_T": 32,
+  "obar_ks": [
+    1,
+    2,
+    3,
+    5,
+    6
+  ],
+  "also_poly": true,
+  "circuit_mode": "section2",
+  "epochs": 40,
+  "max_sentences": 64,
+  "seed": 42,
+  "self_check_ok": true,
+  "train_opts": {
+    "warm_start_w_identity": false,
+    "curriculum_k": false,
+    "train_until_converged": true,
+    "max_epochs": 2000,
+    "loss_rel_tol": 0.0001,
+    "convergence_patience": 8,
+    "target_loss": 3.8,
+    "kernel_mode": "monomial"
+  },
+  "total_wall_seconds": 53.03141335200053,
+  "local_max_qubits": 48,
+  "mpi_ranks": 8,
+  "all_rows": [
+    {
+      "label": "T2_d16_k1_mono",
+      "T": 2,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.15169577417893543,
+      "obar": 0.15169577417893543,
+      "obar_k_root": 0.15169577417893543,
+      "final_loss": 3.797985355374423,
+      "n_qubits": 10,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 127,
+          "final_loss": 3.797985355374423,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.2153492951765656,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k1_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k1_mono",
+      "resumed": true,
+      "series": "T_k1",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T16_d16_k2_mono",
+      "T": 16,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.14978041642451262,
+      "obar": 0.14978041642451262,
+      "obar_k_root": 0.3869717034923207,
+      "final_loss": 3.7994461522106913,
+      "n_qubits": 20,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 1499,
+          "final_loss": 3.7994461522106913,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 2.8470283122733235,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k2_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k2_mono",
+      "resumed": true,
+      "series": "T_k2",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T4_d16_k5_mono",
+      "T": 4,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.040114064352951534,
+      "obar": 0.040114064352951534,
+      "obar_k_root": 0.5237266627653758,
+      "final_loss": 7.393896091697266,
+      "n_qubits": 28,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 2000,
+          "final_loss": 7.393896091697266,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 2.536461732001044,
+      "wall_seconds": 12.764928876014892,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k5_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k5_mono",
+      "series": "T_k5",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d16_k6_mono",
+      "T": 32,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.05881961911804626,
+      "obar": 0.05881961911804626,
+      "obar_k_root": 0.6236054523091267,
+      "final_loss": 5.6678863695573085,
+      "n_qubits": 38,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 2000,
+          "final_loss": 5.6678863695573085,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 5.783541152020916,
+      "wall_seconds": 6.915384181018453,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k6_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k6_mono",
+      "series": "T_k6",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T8_d8_k3_mono",
+      "T": 8,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.15023065636325195,
+      "obar": 0.15023065636325195,
+      "obar_k_root": 0.5313683556797966,
+      "final_loss": 3.7982497271603766,
+      "n_qubits": 18,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 580,
+          "final_loss": 3.7982497271603766,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.8689416004344821,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d8_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d8_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d32_k3_mono",
+      "T": 32,
+      "d": 32,
+      "k": 3,
+      "mean_O_ij": 0.10795457908529843,
+      "obar": 0.10795457908529843,
+      "obar_k_root": 0.47613569637473957,
+      "final_loss": 4.452996442200094,
+      "n_qubits": 30,
+      "reference_haar": 0.0009765625,
+      "reference_advantage": 0.0234375,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 2000,
+          "final_loss": 4.452996442200094,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 12.734830930014141,
+      "wall_seconds": 14.256360594998114,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d32_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 32 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d32_k3_mono",
+      "series": "d_k3",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T16_d16_k1_poly",
+      "T": 16,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.09904316445942257,
+      "obar": 0.09904316445942257,
+      "obar_k_root": 0.09904316445942257,
+      "final_loss": 3.799850942549479,
+      "n_qubits": 17,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 666,
+          "final_loss": 3.799850942549479,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.6195002309978008,
+      "wall_seconds": 2.769993747002445,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k1_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k1_poly",
+      "series": "T_k1",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T4_d16_k3_poly",
+      "T": 4,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.07853053818700474,
+      "obar": 0.07853053818700474,
+      "obar_k_root": 0.4238497973878336,
+      "final_loss": 4.654984904809384,
+      "n_qubits": 23,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 2000,
+          "final_loss": 4.654984904809384,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 1.9893400549772196,
+      "wall_seconds": 2.5507520139799453,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k3_poly",
+      "series": "T_k3",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d16_k5_poly",
+      "T": 32,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.03351179143992217,
+      "obar": 0.03351179143992217,
+      "obar_k_root": 0.5068302257133965,
+      "final_loss": 4.483897217164314,
+      "n_qubits": 39,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 2000,
+          "final_loss": 4.483897217164314,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 5.420386902987957,
+      "wall_seconds": 6.1734409219934605,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k5_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k5_poly",
+      "series": "T_k5",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T8_d4_k3_poly",
+      "T": 8,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.08919556235072158,
+      "obar": 0.08919556235072158,
+      "obar_k_root": 0.4467600504093727,
+      "final_loss": 3.719338722736275,
+      "n_qubits": 17,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 3.719338722736275,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.6709325509727933,
+      "wall_seconds": 2.2012384440167807,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d4_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d4_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d2_k2_poly",
+      "T": 32,
+      "d": 2,
+      "k": 2,
+      "mean_O_ij": 0.34614904191403184,
+      "obar": 0.34614904191403184,
+      "obar_k_root": 0.5883442110659076,
+      "final_loss": 3.7904871392686683,
+      "n_qubits": 15,
+      "reference_haar": 0.3535533905932738,
+      "reference_advantage": 1.0,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 1,
+          "final_loss": 3.7904871392686683,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.4590241099940613,
+      "wall_seconds": 1.8587512979866005,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d2_k2_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 2 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d2_k2_poly",
+      "series": "d_k2",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T16_d2_k3_poly",
+      "T": 16,
+      "d": 2,
+      "k": 3,
+      "mean_O_ij": 0.3021608667775791,
+      "obar": 0.3021608667775791,
+      "obar_k_root": 0.6710348300904958,
+      "final_loss": 3.608156045833757,
+      "n_qubits": 15,
+      "reference_haar": 0.25,
+      "reference_advantage": 1.5,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 3.608156045833757,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.4372394530219026,
+      "wall_seconds": 1.3109593340195715,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d2_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 2 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d2_k3_poly",
+      "series": "d_by_T",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T4_d16_k1_mono",
+      "T": 4,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.15054450309638656,
+      "obar": 0.15054450309638656,
+      "obar_k_root": 0.15054450309638656,
+      "final_loss": 3.7977188634739987,
+      "n_qubits": 12,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 278,
+          "final_loss": 3.7977188634739987,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.3007551860064268,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k1_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k1_mono",
+      "resumed": true,
+      "series": "T_k1",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d16_k2_mono",
+      "T": 32,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.1463373758657777,
+      "obar": 0.1463373758657777,
+      "obar_k_root": 0.38251409884385035,
+      "final_loss": 3.84532579396736,
+      "n_qubits": 22,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 2000,
+          "final_loss": 3.84532579396736,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 5.916184503003024,
+      "wall_seconds": 16.14781218400458,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k2_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k2_mono",
+      "series": "T_k2",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T8_d16_k5_mono",
+      "T": 8,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.15040074285298163,
+      "obar": 0.15040074285298163,
+      "obar_k_root": 0.6842345634746518,
+      "final_loss": 3.798145522419805,
+      "n_qubits": 30,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 1523,
+          "final_loss": 3.798145522419805,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.8795060822740197,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k5_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k5_mono",
+      "resumed": true,
+      "series": "T_k5",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T2_d4_k3_mono",
+      "T": 2,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.22001615339987096,
+      "obar": 0.22001615339987096,
+      "obar_k_root": 0.6023721456553695,
+      "final_loss": 3.060320900211593,
+      "n_qubits": 10,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 3.060320900211593,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.5783188119530678,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d4_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d4_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T16_d8_k3_mono",
+      "T": 16,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.14985081260379257,
+      "obar": 0.14985081260379257,
+      "obar_k_root": 0.5310005172148612,
+      "final_loss": 3.7999438527817126,
+      "n_qubits": 20,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 898,
+          "final_loss": 3.7999438527817126,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.15014988463372,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d8_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d8_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T8_d2_k3_mono",
+      "T": 8,
+      "d": 2,
+      "k": 3,
+      "mean_O_ij": 0.3101936092505282,
+      "obar": 0.3101936092505282,
+      "obar_k_root": 0.6769143541561253,
+      "final_loss": 2.366319429062931,
+      "n_qubits": 10,
+      "reference_haar": 0.25,
+      "reference_advantage": 1.5,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 2.366319429062931,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.42839213367551565,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d2_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 2 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d2_k3_mono",
+      "resumed": true,
+      "series": "d_by_T",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d16_k1_poly",
+      "T": 32,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.09578490068506525,
+      "obar": 0.09578490068506525,
+      "obar_k_root": 0.09578490068506525,
+      "final_loss": 3.7999001538058153,
+      "n_qubits": 19,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 699,
+          "final_loss": 3.7999001538058153,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 2.644815778010525,
+      "wall_seconds": 3.3726976530160755,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k1_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k1_poly",
+      "series": "T_k1",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T8_d16_k3_poly",
+      "T": 8,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.07593203701409741,
+      "obar": 0.07593203701409741,
+      "obar_k_root": 0.4232630420996961,
+      "final_loss": 3.7990769174164445,
+      "n_qubits": 25,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 847,
+          "final_loss": 3.7990769174164445,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.4399765220005065,
+      "wall_seconds": 2.6224045249982737,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k3_poly",
+      "series": "T_k3",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T2_d16_k6_poly",
+      "T": 2,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.04696253206652126,
+      "obar": 0.04696253206652126,
+      "obar_k_root": 0.5969737690247207,
+      "final_loss": 3.798694870852174,
+      "n_qubits": 36,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 442,
+          "final_loss": 3.798694870852174,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.2100721280439757,
+      "wall_seconds": 2.3247346049756743,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k6_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k6_poly",
+      "series": "T_k6",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T16_d4_k3_poly",
+      "T": 16,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.10032251482498418,
+      "obar": 0.10032251482498418,
+      "obar_k_root": 0.46463980789082554,
+      "final_loss": 3.797270861017238,
+      "n_qubits": 19,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 53,
+          "final_loss": 3.797270861017238,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.6405657209688798,
+      "wall_seconds": 2.5420556819881313,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d4_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d4_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d4_k2_poly",
+      "T": 32,
+      "d": 4,
+      "k": 2,
+      "mean_O_ij": 0.14361555041474355,
+      "obar": 0.14361555041474355,
+      "obar_k_root": 0.37896168137046227,
+      "final_loss": 3.362468788531925,
+      "n_qubits": 18,
+      "reference_haar": 0.125,
+      "reference_advantage": 0.5,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 1,
+          "final_loss": 3.362468788531925,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.5838856360060163,
+      "wall_seconds": 1.800801848003175,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d4_k2_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 4 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d4_k2_poly",
+      "series": "d_k2",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T16_d32_k3_poly",
+      "T": 16,
+      "d": 32,
+      "k": 3,
+      "mean_O_ij": 0.09867535038749359,
+      "obar": 0.09867535038749359,
+      "obar_k_root": 0.4620477206470256,
+      "final_loss": 3.799645611892103,
+      "n_qubits": 31,
+      "reference_haar": 0.0009765625,
+      "reference_advantage": 0.0234375,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1338,
+          "final_loss": 3.799645611892103,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 5.671023745031562,
+      "wall_seconds": 7.283552014967427,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d32_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 32 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d32_k3_poly",
+      "series": "d_by_T",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T8_d16_k1_mono",
+      "T": 8,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.15022989115755098,
+      "obar": 0.15022989115755098,
+      "obar_k_root": 0.15022989115755098,
+      "final_loss": 3.7983287554516845,
+      "n_qubits": 14,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 326,
+          "final_loss": 3.7983287554516845,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.4031112287193537,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k1_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k1_mono",
+      "resumed": true,
+      "series": "T_k1",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T2_d16_k3_mono",
+      "T": 2,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.15313867537601372,
+      "obar": 0.15313867537601372,
+      "obar_k_root": 0.5326424735754318,
+      "final_loss": 3.7978125069023694,
+      "n_qubits": 18,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 330,
+          "final_loss": 3.7978125069023694,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.9626653026789427,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k3_mono",
+      "resumed": true,
+      "series": "T_k3",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T16_d16_k5_mono",
+      "T": 16,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.09172791392706889,
+      "obar": 0.09172791392706889,
+      "obar_k_root": 0.6200622255222392,
+      "final_loss": 4.780299705225784,
+      "n_qubits": 32,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 2000,
+          "final_loss": 4.780299705225784,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 4.01279137597885,
+      "wall_seconds": 14.267520227003843,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k5_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k5_mono",
+      "series": "T_k5",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T4_d4_k3_mono",
+      "T": 4,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.16591897483285428,
+      "obar": 0.16591897483285428,
+      "obar_k_root": 0.549102175155174,
+      "final_loss": 3.7991690409841237,
+      "n_qubits": 12,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 90,
+          "final_loss": 3.7991690409841237,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.6024818811565638,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d4_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d4_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d8_k3_mono",
+      "T": 32,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.14982218487450158,
+      "obar": 0.14982218487450158,
+      "obar_k_root": 0.5310760452532367,
+      "final_loss": 3.7988242200891014,
+      "n_qubits": 22,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 712,
+          "final_loss": 3.7988242200891014,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.8328161118552089,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d8_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d8_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T8_d32_k3_mono",
+      "T": 8,
+      "d": 32,
+      "k": 3,
+      "mean_O_ij": 0.1497500944457092,
+      "obar": 0.1497500944457092,
+      "obar_k_root": 0.530981327026699,
+      "final_loss": 3.799684860958422,
+      "n_qubits": 26,
+      "reference_haar": 0.0009765625,
+      "reference_advantage": 0.0234375,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1224,
+          "final_loss": 3.799684860958422,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 4.823803354986012,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d32_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 32 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d32_k3_mono",
+      "resumed": true,
+      "series": "d_by_T",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T2_d16_k2_poly",
+      "T": 2,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.09191623400660112,
+      "obar": 0.09191623400660112,
+      "obar_k_root": 0.3020291006737991,
+      "final_loss": 3.7953753630954195,
+      "n_qubits": 16,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 208,
+          "final_loss": 3.7953753630954195,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.9323194039752707,
+      "wall_seconds": 2.0789777890313417,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k2_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k2_poly",
+      "series": "T_k2",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T16_d16_k3_poly",
+      "T": 16,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.06830214480765116,
+      "obar": 0.06830214480765116,
+      "obar_k_root": 0.408690875614657,
+      "final_loss": 4.067061705721649,
+      "n_qubits": 27,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 2000,
+          "final_loss": 4.067061705721649,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 3.6595260379835963,
+      "wall_seconds": 4.356262366985902,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k3_poly",
+      "series": "T_k3",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T4_d16_k6_poly",
+      "T": 4,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.04547883239479435,
+      "obar": 0.04547883239479435,
+      "obar_k_root": 0.5964203794183182,
+      "final_loss": 3.798509959008904,
+      "n_qubits": 38,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 733,
+          "final_loss": 3.798509959008904,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.428911397990305,
+      "wall_seconds": 2.6528565720072947,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k6_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k6_poly",
+      "series": "T_k6",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d4_k3_poly",
+      "T": 32,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.100580892572,
+      "obar": 0.100580892572,
+      "obar_k_root": 0.46504976106728113,
+      "final_loss": 3.6407087208036755,
+      "n_qubits": 21,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 3.6407087208036755,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.6493706630426459,
+      "wall_seconds": 2.6466548700118437,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d4_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d4_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d8_k2_poly",
+      "T": 32,
+      "d": 8,
+      "k": 2,
+      "mean_O_ij": 0.06761374955790085,
+      "obar": 0.06761374955790085,
+      "obar_k_root": 0.26001634349080444,
+      "final_loss": 3.7985658608990365,
+      "n_qubits": 21,
+      "reference_haar": 0.04419417382415922,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 40,
+          "final_loss": 3.7985658608990365,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.8043979069916531,
+      "wall_seconds": 2.342947244993411,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d8_k2_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 8 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d8_k2_poly",
+      "series": "d_k2",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T16_d16_k1_mono",
+      "T": 16,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.14992717378242615,
+      "obar": 0.14992717378242615,
+      "obar_k_root": 0.14992717378242615,
+      "final_loss": 3.798496654230296,
+      "n_qubits": 16,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 921,
+          "final_loss": 3.798496654230296,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 2.276705192402005,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k1_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k1_mono",
+      "resumed": true,
+      "series": "T_k1",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T4_d16_k3_mono",
+      "T": 4,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.1589531321754245,
+      "obar": 0.1589531321754245,
+      "obar_k_root": 0.5398456770210823,
+      "final_loss": 3.799763698172032,
+      "n_qubits": 20,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1500,
+          "final_loss": 3.799763698172032,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.544719680212438,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k3_mono",
+      "resumed": true,
+      "series": "T_k3",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d16_k5_mono",
+      "T": 32,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.07375336003507357,
+      "obar": 0.07375336003507357,
+      "obar_k_root": 0.5936588578706548,
+      "final_loss": 5.215695142515715,
+      "n_qubits": 34,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 2000,
+          "final_loss": 5.215695142515715,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 6.012133590003941,
+      "wall_seconds": 16.244459904031828,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k5_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k5_mono",
+      "series": "T_k5",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T8_d4_k3_mono",
+      "T": 8,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.15789255059496018,
+      "obar": 0.15789255059496018,
+      "obar_k_root": 0.5404368015070624,
+      "final_loss": 3.7972605351967443,
+      "n_qubits": 14,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 207,
+          "final_loss": 3.7972605351967443,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.6348533667623997,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d4_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d4_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d2_k2_mono",
+      "T": 32,
+      "d": 2,
+      "k": 2,
+      "mean_O_ij": 0.39758039037979154,
+      "obar": 0.39758039037979154,
+      "obar_k_root": 0.6305392905052545,
+      "final_loss": 6.339956528127044,
+      "n_qubits": 13,
+      "reference_haar": 0.3535533905932738,
+      "reference_advantage": 1.0,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 2000,
+          "final_loss": 6.339956528127044,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 2.4982642880058847,
+      "wall_seconds": 3.8644672490190715,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d2_k2_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 2 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d2_k2_mono",
+      "series": "d_k2",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T16_d2_k3_mono",
+      "T": 16,
+      "d": 2,
+      "k": 3,
+      "mean_O_ij": 0.3020504840679156,
+      "obar": 0.3020504840679156,
+      "obar_k_root": 0.6709534607668396,
+      "final_loss": 2.433292731118519,
+      "n_qubits": 12,
+      "reference_haar": 0.25,
+      "reference_advantage": 1.5,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 2.433292731118519,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.44753248896449804,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d2_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 2 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d2_k3_mono",
+      "resumed": true,
+      "series": "d_by_T",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T4_d16_k2_poly",
+      "T": 4,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.09623419963180108,
+      "obar": 0.09623419963180108,
+      "obar_k_root": 0.3099136828952228,
+      "final_loss": 3.798764245958088,
+      "n_qubits": 18,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 339,
+          "final_loss": 3.798764245958088,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.0191907729604281,
+      "wall_seconds": 2.203055744001176,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k2_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k2_poly",
+      "series": "T_k2",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d16_k3_poly",
+      "T": 32,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.081841592355939,
+      "obar": 0.081841592355939,
+      "obar_k_root": 0.43406627712104556,
+      "final_loss": 3.7997507871604217,
+      "n_qubits": 29,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1966,
+          "final_loss": 3.7997507871604217,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 5.65377510903636,
+      "wall_seconds": 6.511439402005635,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k3_poly",
+      "series": "T_k3",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T8_d16_k6_poly",
+      "T": 8,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.04121514511345032,
+      "obar": 0.04121514511345032,
+      "obar_k_root": 0.5873627549890648,
+      "final_loss": 3.799619099992288,
+      "n_qubits": 40,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 1555,
+          "final_loss": 3.799619099992288,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 2.0336476570228115,
+      "wall_seconds": 3.1487995520001277,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k6_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k6_poly",
+      "series": "T_k6",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T2_d8_k3_poly",
+      "T": 2,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.04764548001372249,
+      "obar": 0.04764548001372249,
+      "obar_k_root": 0.3575890012659773,
+      "final_loss": 3.7935201118608877,
+      "n_qubits": 17,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 166,
+          "final_loss": 3.7935201118608877,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.7475473820231855,
+      "wall_seconds": 2.3265870709437877,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d8_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d8_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d32_k2_poly",
+      "T": 32,
+      "d": 32,
+      "k": 2,
+      "mean_O_ij": 0.1080361297404573,
+      "obar": 0.1080361297404573,
+      "obar_k_root": 0.32867865984902445,
+      "final_loss": 3.7994807268938073,
+      "n_qubits": 27,
+      "reference_haar": 0.005524271728019903,
+      "reference_advantage": 0.0625,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 1477,
+          "final_loss": 3.7994807268938073,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 9.11960088199703,
+      "wall_seconds": 10.80831988499267,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d32_k2_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 32 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d32_k2_poly",
+      "series": "d_k2",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d16_k1_mono",
+      "T": 32,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.14992973395188977,
+      "obar": 0.14992973395188977,
+      "obar_k_root": 0.14992973395188977,
+      "final_loss": 3.799596328160782,
+      "n_qubits": 18,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 1134,
+          "final_loss": 3.799596328160782,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 3.7626416832208633,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k1_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k1_mono",
+      "resumed": true,
+      "series": "T_k1",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T8_d16_k3_mono",
+      "T": 8,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.15003376813427025,
+      "obar": 0.15003376813427025,
+      "obar_k_root": 0.5311267072229255,
+      "final_loss": 3.7995178204842452,
+      "n_qubits": 22,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1122,
+          "final_loss": 3.7995178204842452,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.6654272535815835,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k3_mono",
+      "resumed": true,
+      "series": "T_k3",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T2_d16_k6_mono",
+      "T": 2,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.1650148581404795,
+      "obar": 0.1650148581404795,
+      "obar_k_root": 0.730652349727082,
+      "final_loss": 3.7979230907890766,
+      "n_qubits": 30,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 679,
+          "final_loss": 3.7979230907890766,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.1844120286405087,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k6_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k6_mono",
+      "resumed": true,
+      "series": "T_k6",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T16_d4_k3_mono",
+      "T": 16,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.15704627360021478,
+      "obar": 0.15704627360021478,
+      "obar_k_root": 0.5394994283751811,
+      "final_loss": 3.798867571641245,
+      "n_qubits": 16,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 321,
+          "final_loss": 3.798867571641245,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.7078798403963447,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d4_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d4_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d4_k2_mono",
+      "T": 32,
+      "d": 4,
+      "k": 2,
+      "mean_O_ij": 0.1603087508065704,
+      "obar": 0.1603087508065704,
+      "obar_k_root": 0.40038035152577744,
+      "final_loss": 3.7996637368973674,
+      "n_qubits": 16,
+      "reference_haar": 0.125,
+      "reference_advantage": 0.5,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 282,
+          "final_loss": 3.7996637368973674,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.8680692594498396,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d4_k2_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 4 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d4_k2_mono",
+      "resumed": true,
+      "series": "d_k2",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T16_d32_k3_mono",
+      "T": 16,
+      "d": 32,
+      "k": 3,
+      "mean_O_ij": 0.1496382098257319,
+      "obar": 0.1496382098257319,
+      "obar_k_root": 0.5308834508222564,
+      "final_loss": 3.799822375441936,
+      "n_qubits": 28,
+      "reference_haar": 0.0009765625,
+      "reference_advantage": 0.0234375,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1929,
+          "final_loss": 3.799822375441936,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 7.930884939618409,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d32_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 32 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d32_k3_mono",
+      "resumed": true,
+      "series": "d_by_T",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T8_d16_k2_poly",
+      "T": 8,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.08550583664895031,
+      "obar": 0.08550583664895031,
+      "obar_k_root": 0.2922774430888171,
+      "final_loss": 3.798603909215256,
+      "n_qubits": 20,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 573,
+          "final_loss": 3.798603909215256,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.6127333939657547,
+      "wall_seconds": 11.805291402968578,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k2_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k2_poly",
+      "series": "T_k2",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T2_d16_k5_poly",
+      "T": 2,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.05911251322661577,
+      "obar": 0.05911251322661577,
+      "obar_k_root": 0.5637530495804767,
+      "final_loss": 3.7964151406204723,
+      "n_qubits": 31,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 400,
+          "final_loss": 3.7964151406204723,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.0559866619878449,
+      "wall_seconds": 2.1068967719911598,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k5_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k5_poly",
+      "series": "T_k5",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T16_d16_k6_poly",
+      "T": 16,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.021880856512951807,
+      "obar": 0.021880856512951807,
+      "obar_k_root": 0.5285487163576278,
+      "final_loss": 4.815665881097711,
+      "n_qubits": 42,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 2000,
+          "final_loss": 4.815665881097711,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 4.1948180589824915,
+      "wall_seconds": 5.334496208000928,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k6_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k6_poly",
+      "series": "T_k6",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T4_d8_k3_poly",
+      "T": 4,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.05584865328686738,
+      "obar": 0.05584865328686738,
+      "obar_k_root": 0.3809886533668929,
+      "final_loss": 3.7986325198483897,
+      "n_qubits": 19,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 207,
+          "final_loss": 3.7986325198483897,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.7592317439848557,
+      "wall_seconds": 2.4304266120307148,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d8_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d8_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d2_k3_poly",
+      "T": 32,
+      "d": 2,
+      "k": 3,
+      "mean_O_ij": 0.3003614319042855,
+      "obar": 0.3003614319042855,
+      "obar_k_root": 0.6697015058026459,
+      "final_loss": 3.5678090539370864,
+      "n_qubits": 17,
+      "reference_haar": 0.25,
+      "reference_advantage": 1.5,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 3.5678090539370864,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.5163913500146009,
+      "wall_seconds": 2.1835017249686643,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d2_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 2 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d2_k3_poly",
+      "series": "d_k3",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T2_d16_k2_mono",
+      "T": 2,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.15140937759999845,
+      "obar": 0.15140937759999845,
+      "obar_k_root": 0.3883000121799409,
+      "final_loss": 3.798761176043433,
+      "n_qubits": 14,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 259,
+          "final_loss": 3.798761176043433,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.283410674892366,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k2_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k2_mono",
+      "resumed": true,
+      "series": "T_k2",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T16_d16_k3_mono",
+      "T": 16,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.1484410519655939,
+      "obar": 0.1484410519655939,
+      "obar_k_root": 0.5294378695776034,
+      "final_loss": 3.8165694467147513,
+      "n_qubits": 24,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 2000,
+          "final_loss": 3.8165694467147513,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 3.8176030599861406,
+      "wall_seconds": 14.039820051984861,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k3_mono",
+      "series": "T_k3",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T4_d16_k6_mono",
+      "T": 4,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.04423976597435296,
+      "obar": 0.04423976597435296,
+      "obar_k_root": 0.5933863686643526,
+      "final_loss": 7.676855613259345,
+      "n_qubits": 32,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 2000,
+          "final_loss": 7.676855613259345,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 1.8642580889863893,
+      "wall_seconds": 3.0002402529935353,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k6_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k6_mono",
+      "series": "T_k6",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d4_k3_mono",
+      "T": 32,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.15390268597514858,
+      "obar": 0.15390268597514858,
+      "obar_k_root": 0.5358864285775995,
+      "final_loss": 3.799969534210232,
+      "n_qubits": 18,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 477,
+          "final_loss": 3.799969534210232,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.109924596734345,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d4_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d4_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d8_k2_mono",
+      "T": 32,
+      "d": 8,
+      "k": 2,
+      "mean_O_ij": 0.14986399482273233,
+      "obar": 0.14986399482273233,
+      "obar_k_root": 0.38710650436505945,
+      "final_loss": 3.798825178873708,
+      "n_qubits": 19,
+      "reference_haar": 0.04419417382415922,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 436,
+          "final_loss": 3.798825178873708,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.409652577713132,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d8_k2_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 8 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d8_k2_mono",
+      "resumed": true,
+      "series": "d_k2",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T2_d16_k1_poly",
+      "T": 2,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.10501051924565036,
+      "obar": 0.10501051924565036,
+      "obar_k_root": 0.10501051924565036,
+      "final_loss": 3.794348252083656,
+      "n_qubits": 11,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 65,
+          "final_loss": 3.794348252083656,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.8325444849906489,
+      "wall_seconds": 1.9237735529895872,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k1_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k1_poly",
+      "series": "T_k1",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T16_d16_k2_poly",
+      "T": 16,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.09029634126570053,
+      "obar": 0.09029634126570053,
+      "obar_k_root": 0.3004415845695193,
+      "final_loss": 3.7993731272905387,
+      "n_qubits": 22,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 1460,
+          "final_loss": 3.7993731272905387,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 2.812102716008667,
+      "wall_seconds": 3.4266090739984065,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k2_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k2_poly",
+      "series": "T_k2",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T4_d16_k5_poly",
+      "T": 4,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.027958874574758305,
+      "obar": 0.027958874574758305,
+      "obar_k_root": 0.48638272300866026,
+      "final_loss": 6.589798087985143,
+      "n_qubits": 33,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 2000,
+          "final_loss": 6.589798087985143,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 1.8252833530423231,
+      "wall_seconds": 2.448127667012159,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k5_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k5_poly",
+      "series": "T_k5",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d16_k6_poly",
+      "T": 32,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.021348886702639465,
+      "obar": 0.021348886702639465,
+      "obar_k_root": 0.5265248434536344,
+      "final_loss": 4.688060500240452,
+      "n_qubits": 44,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 2000,
+          "final_loss": 4.688060500240452,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 5.758199313015211,
+      "wall_seconds": 7.034397226991132,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k6_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k6_poly",
+      "series": "T_k6",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T8_d8_k3_poly",
+      "T": 8,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.06028776232155961,
+      "obar": 0.06028776232155961,
+      "obar_k_root": 0.39182572264967885,
+      "final_loss": 3.7994259242023873,
+      "n_qubits": 21,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 407,
+          "final_loss": 3.7994259242023873,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.9201476399903186,
+      "wall_seconds": 2.5295434099971317,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d8_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d8_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d32_k3_poly",
+      "T": 32,
+      "d": 32,
+      "k": 3,
+      "mean_O_ij": 0.10423034692592559,
+      "obar": 0.10423034692592559,
+      "obar_k_root": 0.47058431337349393,
+      "final_loss": 3.79887784054604,
+      "n_qubits": 33,
+      "reference_haar": 0.0009765625,
+      "reference_advantage": 0.0234375,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1759,
+          "final_loss": 3.79887784054604,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 10.431739647989161,
+      "wall_seconds": 12.022095340013038,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d32_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 32 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d32_k3_poly",
+      "series": "d_k3",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T4_d16_k2_mono",
+      "T": 4,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.17100219843262154,
+      "obar": 0.17100219843262154,
+      "obar_k_root": 0.4105395810887186,
+      "final_loss": 3.799753348899884,
+      "n_qubits": 16,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 1273,
+          "final_loss": 3.799753348899884,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.8976380790118128,
+      "wall_seconds": 12.106423916004132,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k2_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k2_mono",
+      "series": "T_k2",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d16_k3_mono",
+      "T": 32,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.11256280794240298,
+      "obar": 0.11256280794240298,
+      "obar_k_root": 0.4828106216812167,
+      "final_loss": 4.370216835467875,
+      "n_qubits": 26,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 2000,
+          "final_loss": 4.370216835467875,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 5.641260717995465,
+      "wall_seconds": 6.863062346994411,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k3_mono",
+      "series": "T_k3",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T8_d16_k6_mono",
+      "T": 8,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.010759689506342159,
+      "obar": 0.010759689506342159,
+      "obar_k_root": 0.4688684444810796,
+      "final_loss": 10.718045469436923,
+      "n_qubits": 34,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 2000,
+          "final_loss": 10.718045469436923,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 2.2068709559971467,
+      "wall_seconds": 3.325354670989327,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k6_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k6_mono",
+      "series": "T_k6",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T2_d8_k3_mono",
+      "T": 2,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.15564027222833093,
+      "obar": 0.15564027222833093,
+      "obar_k_root": 0.534406909893393,
+      "final_loss": 3.7922707675774068,
+      "n_qubits": 14,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 188,
+          "final_loss": 3.7922707675774068,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.7508380096405745,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d8_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d8_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d32_k2_mono",
+      "T": 32,
+      "d": 32,
+      "k": 2,
+      "mean_O_ij": 0.14966110512516614,
+      "obar": 0.14966110512516614,
+      "obar_k_root": 0.3868487069956037,
+      "final_loss": 3.7997704865415,
+      "n_qubits": 25,
+      "reference_haar": 0.005524271728019903,
+      "reference_advantage": 0.0625,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 1722,
+          "final_loss": 3.7997704865415,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 10.011329071596265,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d32_k2_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 32 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d32_k2_mono",
+      "resumed": true,
+      "series": "d_k2",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T4_d16_k1_poly",
+      "T": 4,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.11803927219951943,
+      "obar": 0.11803927219951943,
+      "obar_k_root": 0.11803927219951943,
+      "final_loss": 4.414578802417989,
+      "n_qubits": 13,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 2000,
+          "final_loss": 4.414578802417989,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 1.8817089080112055,
+      "wall_seconds": 2.5137007869780064,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d16_k1_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d16_k1_poly",
+      "series": "T_k1",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d16_k2_poly",
+      "T": 32,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.09030876940946284,
+      "obar": 0.09030876940946284,
+      "obar_k_root": 0.30047201301277915,
+      "final_loss": 3.79949198153349,
+      "n_qubits": 24,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 1406,
+          "final_loss": 3.79949198153349,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 4.237592956982553,
+      "wall_seconds": 4.872552953020204,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d16_k2_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d16_k2_poly",
+      "series": "T_k2",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T8_d16_k5_poly",
+      "T": 8,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.05284271738966306,
+      "obar": 0.05284271738966306,
+      "obar_k_root": 0.5550147549458183,
+      "final_loss": 3.799911773894511,
+      "n_qubits": 35,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 1357,
+          "final_loss": 3.799911773894511,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.814536495017819,
+      "wall_seconds": 2.445393043977674,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k5_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k5_poly",
+      "series": "T_k5",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T2_d4_k3_poly",
+      "T": 2,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.21256669009165158,
+      "obar": 0.21256669009165158,
+      "obar_k_root": 0.595711705654085,
+      "final_loss": 2.035849768422017,
+      "n_qubits": 13,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 2.035849768422017,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.6733256240258925,
+      "wall_seconds": 2.159738712012768,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d4_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d4_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T16_d8_k3_poly",
+      "T": 16,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.06061279082764521,
+      "obar": 0.06061279082764521,
+      "obar_k_root": 0.39269967927770827,
+      "final_loss": 3.7983414506328876,
+      "n_qubits": 23,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 329,
+          "final_loss": 3.7983414506328876,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.8842943219933659,
+      "wall_seconds": 2.5710841109976172,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d8_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d8_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T8_d2_k3_poly",
+      "T": 8,
+      "d": 2,
+      "k": 3,
+      "mean_O_ij": 0.30920101140869194,
+      "obar": 0.30920101140869194,
+      "obar_k_root": 0.6761863951213298,
+      "final_loss": 3.535685147086728,
+      "n_qubits": 13,
+      "reference_haar": 0.25,
+      "reference_advantage": 1.5,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 3.535685147086728,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.45816958002978936,
+      "wall_seconds": 1.8065797169692814,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d2_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 2 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d2_k3_poly",
+      "series": "d_by_T",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T8_d16_k2_mono",
+      "T": 8,
+      "d": 16,
+      "k": 2,
+      "mean_O_ij": 0.14997060266798937,
+      "obar": 0.14997060266798937,
+      "obar_k_root": 0.3871383505695859,
+      "final_loss": 3.7989991703111023,
+      "n_qubits": 18,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.125,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 2,
+          "epochs_run": 696,
+          "final_loss": 3.7989991703111023,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.7087433813139796,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k2_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 2 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k2_mono",
+      "resumed": true,
+      "series": "T_k2",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T2_d16_k5_mono",
+      "T": 2,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.1548778144732636,
+      "obar": 0.1548778144732636,
+      "obar_k_root": 0.6850612405751928,
+      "final_loss": 3.7983457045722977,
+      "n_qubits": 26,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 558,
+          "final_loss": 3.7983457045722977,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.1404418665915728,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k5_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k5_mono",
+      "resumed": true,
+      "series": "T_k5",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T16_d16_k6_mono",
+      "T": 16,
+      "d": 16,
+      "k": 6,
+      "mean_O_ij": 0.07361516006399413,
+      "obar": 0.07361516006399413,
+      "obar_k_root": 0.6473024949356292,
+      "final_loss": 5.220081856227281,
+      "n_qubits": 36,
+      "reference_haar": 6.103515625e-05,
+      "reference_advantage": 0.016046559301909163,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 6,
+          "epochs_run": 2000,
+          "final_loss": 5.220081856227281,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 4.001696790975984,
+      "wall_seconds": 14.23620831995504,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k6_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 6 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k6_mono",
+      "series": "T_k6",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T4_d8_k3_mono",
+      "T": 4,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.15057846359014698,
+      "obar": 0.15057846359014698,
+      "obar_k_root": 0.531383010108651,
+      "final_loss": 3.799193790092116,
+      "n_qubits": 16,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 593,
+          "final_loss": 3.799193790092116,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.8556827334687114,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d8_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d8_k3_mono",
+      "resumed": true,
+      "series": "T_by_d",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T32_d2_k3_mono",
+      "T": 32,
+      "d": 2,
+      "k": 3,
+      "mean_O_ij": 0.3002277043210744,
+      "obar": 0.3002277043210744,
+      "obar_k_root": 0.6696021138693226,
+      "final_loss": 2.438074573703377,
+      "n_qubits": 14,
+      "reference_haar": 0.25,
+      "reference_advantage": 1.5,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 1,
+          "final_loss": 2.438074573703377,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.5106091108173132,
+      "wall_seconds": 0.0,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d2_k3_mono",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 2 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d2_k3_mono",
+      "resumed": true,
+      "series": "d_k3",
+      "kernel_mode": "monomial"
+    },
+    {
+      "label": "T8_d16_k1_poly",
+      "T": 8,
+      "d": 16,
+      "k": 1,
+      "mean_O_ij": 0.09146198043056553,
+      "obar": 0.09146198043056553,
+      "obar_k_root": 0.09146198043056553,
+      "final_loss": 3.7971565648979113,
+      "n_qubits": 15,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.25,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 1,
+          "epochs_run": 280,
+          "final_loss": 3.7971565648979113,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.0809445459744893,
+      "wall_seconds": 2.2312163169845007,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d16_k1_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 16 --non-linear-order 1 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d16_k1_poly",
+      "series": "T_k1",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T2_d16_k3_poly",
+      "T": 2,
+      "d": 16,
+      "k": 3,
+      "mean_O_ij": 0.08138570850246216,
+      "obar": 0.08138570850246216,
+      "obar_k_root": 0.4317933647569415,
+      "final_loss": 3.7999607897770584,
+      "n_qubits": 21,
+      "reference_haar": 0.00390625,
+      "reference_advantage": 0.06629126073623882,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 306,
+          "final_loss": 3.7999607897770584,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.9565932299592532,
+      "wall_seconds": 2.067808330000844,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T2_d16_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 2 --embedding-dim 16 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T2_d16_k3_poly",
+      "series": "T_k3",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T16_d16_k5_poly",
+      "T": 16,
+      "d": 16,
+      "k": 5,
+      "mean_O_ij": 0.03167717385023686,
+      "obar": 0.03167717385023686,
+      "obar_k_root": 0.5010822462463677,
+      "final_loss": 4.664272700321437,
+      "n_qubits": 37,
+      "reference_haar": 0.000244140625,
+      "reference_advantage": 0.023920798269366973,
+      "converged": false,
+      "training_phases": [
+        {
+          "k": 5,
+          "epochs_run": 2000,
+          "final_loss": 4.664272700321437,
+          "converged": false
+        }
+      ],
+      "elapsed_seconds": 4.088978308951482,
+      "wall_seconds": 4.831898735021241,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T16_d16_k5_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 16 --embedding-dim 16 --non-linear-order 5 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T16_d16_k5_poly",
+      "series": "T_k5",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T4_d4_k3_poly",
+      "T": 4,
+      "d": 4,
+      "k": 3,
+      "mean_O_ij": 0.11578846654865613,
+      "obar": 0.11578846654865613,
+      "obar_k_root": 0.4872585967688066,
+      "final_loss": 3.7862437322962004,
+      "n_qubits": 15,
+      "reference_haar": 0.0625,
+      "reference_advantage": 0.5303300858899106,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 14,
+          "final_loss": 3.7862437322962004,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 0.5730441189953126,
+      "wall_seconds": 2.1236157920211554,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T4_d4_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 4 --embedding-dim 4 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T4_d4_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T32_d8_k3_poly",
+      "T": 32,
+      "d": 8,
+      "k": 3,
+      "mean_O_ij": 0.05498283724965172,
+      "obar": 0.05498283724965172,
+      "obar_k_root": 0.38023753339903177,
+      "final_loss": 3.7987538863635684,
+      "n_qubits": 25,
+      "reference_haar": 0.015625,
+      "reference_advantage": 0.1875,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 272,
+          "final_loss": 3.7987538863635684,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 1.1889872640022077,
+      "wall_seconds": 3.0655717119807377,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T32_d8_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 32 --embedding-dim 8 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T32_d8_k3_poly",
+      "series": "T_by_d",
+      "kernel_mode": "poly"
+    },
+    {
+      "label": "T8_d32_k3_poly",
+      "T": 8,
+      "d": 32,
+      "k": 3,
+      "mean_O_ij": 0.1000296550534891,
+      "obar": 0.1000296550534891,
+      "obar_k_root": 0.4641020023464323,
+      "final_loss": 3.7974473466121674,
+      "n_qubits": 29,
+      "reference_haar": 0.0009765625,
+      "reference_advantage": 0.0234375,
+      "converged": true,
+      "training_phases": [
+        {
+          "k": 3,
+          "epochs_run": 985,
+          "final_loss": 3.7974473466121674,
+          "converged": true
+        }
+      ],
+      "elapsed_seconds": 3.956931494991295,
+      "wall_seconds": 5.660892233019695,
+      "run_dir": "results/study/final_obar_T32_ks1-2-3-5-6_tl3.8/T8_d32_k3_poly",
+      "main_hpc_cmd": "python main_hpc.py --circuit-mode section2 --sentence-length 8 --embedding-dim 32 --non-linear-order 3 --epochs 40 --max-sentences 64 --learning-rate 0.001 --seed 42 --run-label T8_d32_k3_poly",
+      "series": "d_by_T",
+      "kernel_mode": "poly"
+    }
+  ]
+}
