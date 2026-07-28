@@ -82,6 +82,8 @@ class BaselineConfig:
     resume: bool = True
     kernel_mode: str = "monomial"
     val_fraction: float = 0.2
+    test_data_seed: Optional[int] = None
+    test_max_sentences: int = 200
     # Early stopping / plateau (diagnostic; avoids mega-runs)
     early_stop: bool = False
     max_epochs: Optional[int] = None
@@ -119,22 +121,29 @@ class BaselineConfig:
         }
 
 
-def _load_sentences(cfg: BaselineConfig) -> List[str]:
-    """Seeded sentence sample; all models see the exact same data."""
-    rng = random.Random(cfg.data_seed)
+def _load_sentences_with_seed(
+    T: int, max_sentences: int, data_seed: int
+) -> List[str]:
+    """Seeded sentence sample from local PTB (fixed T words per line)."""
+    rng = random.Random(data_seed)
     local = "ptb_sentences.txt"
     with open(local, "r", encoding="utf-8") as f:
-        valid = [line.strip() for line in f if line.strip() and len(line.split()) == cfg.T]
-    if len(valid) <= cfg.max_sentences:
+        valid = [line.strip() for line in f if line.strip() and len(line.split()) == T]
+    if len(valid) <= max_sentences:
         sentences = valid
     else:
-        sentences = rng.sample(valid, cfg.max_sentences)
-    if len(sentences) < cfg.max_sentences:
+        sentences = rng.sample(valid, max_sentences)
+    if len(sentences) < max_sentences:
         expanded = list(sentences)
-        while len(expanded) < cfg.max_sentences:
+        while len(expanded) < max_sentences:
             expanded.extend(sentences)
-        sentences = expanded[: cfg.max_sentences]
+        sentences = expanded[:max_sentences]
     return sentences
+
+
+def _load_sentences(cfg: BaselineConfig) -> List[str]:
+    """Seeded sentence sample; all models see the exact same data."""
+    return _load_sentences_with_seed(cfg.T, cfg.max_sentences, int(cfg.data_seed))
 
 
 def _split_train_val(n: int, val_fraction: float, seed: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -182,6 +191,26 @@ def prepare_data_bundle(cfg: BaselineConfig) -> dict:
         "pe": pe,
         "qcfg": qcfg,
     }
+
+
+def attach_test_bundle(bundle: dict, cfg: BaselineConfig) -> dict:
+    """Hold-out PTB sample (different seed) encoded with the train vocabulary."""
+    if cfg.test_data_seed is None:
+        return bundle
+    encoding = bundle["encoding"]
+    test_sentences = _load_sentences_with_seed(
+        cfg.T, int(cfg.test_max_sentences), int(cfg.test_data_seed)
+    )
+    test_token_batch = jnp.stack([encoding.encode_tokens(s) for s in test_sentences])
+    bundle = dict(bundle)
+    bundle["test_sentences"] = test_sentences
+    bundle["test_token_batch"] = test_token_batch
+    bundle["num_test"] = int(test_token_batch.shape[0])
+    return bundle
+
+
+def eval_batch_mean_loss(params, batch, pe, cfg: BaselineConfig, loss_fn) -> float:
+    return float(jnp.mean(jax.vmap(lambda ids: loss_fn(params, ids, pe, cfg))(batch)))
 
 
 def prepare_shared_bundle(cfg: BaselineConfig) -> dict:
@@ -625,6 +654,7 @@ def _finalize_mu_result(
     matrix_n: int,
     note: str,
     run_name: str,
+    loss_fn,
 ) -> dict:
     emb_n = int(np.asarray(params["embedding"]).size)
     result = {
@@ -666,6 +696,13 @@ def _finalize_mu_result(
         "vocab_size": int(bundle["encoding"].vocabSize),
         "note": note,
     }
+    if "test_token_batch" in bundle:
+        test_batch = bundle["test_token_batch"]
+        result["final_test_loss"] = eval_batch_mean_loss(
+            params, test_batch, bundle["pe"], cfg, loss_fn
+        )
+        result["num_test"] = int(bundle.get("num_test", test_batch.shape[0]))
+        result["test_data_seed"] = int(cfg.test_data_seed) if cfg.test_data_seed is not None else None
     _save_run(result, params, bundle["sentences"], cfg, run_name)
     return result
 
@@ -709,10 +746,8 @@ def train_kqsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
             "Local training does not execute the quantum circuit."
         ),
         run_name=run_name,
+        loss_fn=mu_loss_sentence,
     )
-
-
-def train_kcsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logger] = None) -> dict:
     log = logger or logging.getLogger("baselines")
     run_name = cfg.run_label or f"kcsa_seed{cfg.model_seed}"
     out = _run_dir(cfg, run_name)
@@ -751,6 +786,7 @@ def train_kcsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
             "separate model_seed. Train loss = -log(mu); val_ce = -log(mu) on val split."
         ),
         run_name=run_name,
+        loss_fn=kcsa_mu_loss_sentence,
     )
 
 
@@ -842,6 +878,13 @@ def train_nlcsa(
             "Architecture does not depend on k."
         ),
     }
+    if "test_token_batch" in bundle:
+        test_batch = bundle["test_token_batch"]
+        result["final_test_loss"] = eval_batch_mean_loss(
+            params, test_batch, bundle["pe"], cfg, nlcsa_loss_sentence
+        )
+        result["num_test"] = int(bundle.get("num_test", test_batch.shape[0]))
+        result["test_data_seed"] = int(cfg.test_data_seed) if cfg.test_data_seed is not None else None
     _save_run(result, params, bundle["sentences"], cfg, run_name)
     return result
 

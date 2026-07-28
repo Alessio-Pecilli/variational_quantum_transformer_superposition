@@ -34,6 +34,7 @@ import numpy as np
 from classical_baselines import (
     BaselineConfig,
     aggregate_seed_results,
+    attach_test_bundle,
     kcsa_matrix_param_count,
     nl_model_param_count,
     nl_rank_for_budget,
@@ -63,22 +64,32 @@ def _log(rank: int) -> logging.Logger:
     return logging.getLogger("final_loss")
 
 
-def _aligned_loss(result: dict, T: int) -> float:
+def _aligned_loss(result: dict, T: int, loss_key: str = "final_loss") -> float:
     """Comparable axis: −logμ + log T for mu-models; Renyi/CE as-is for nl."""
-    model = str(result.get("model", ""))
-    final = float(result["final_loss"])
+    model = str(result.get("model", result.get("display", "")))
+    final = float(result[loss_key])
     if model.startswith("nl-CSA"):
         return final
     return final + math.log(T)
 
 
+def _spec_param_label(spec: dict, d: int) -> str:
+    display = spec["display"]
+    if spec["family"] == "kqsa":
+        n = qsa_angle_param_count(d, spec["layers"])
+        return f"{display} ({n} ang)"
+    if spec["family"] == "kcsa":
+        n = kcsa_matrix_param_count(d)
+        return f"{display} ({n} mat)"
+    if spec["family"] == "nl":
+        n = nl_model_param_count(d, spec["layers"], int(spec["nl_rank"]))
+        return f"{display} (~{n} par)"
+    return display
+
+
 def _model_specs(args) -> list[dict]:
-    """Build the 7 FINAL model specifications at fixed (T,d,k)."""
+    """Build FINAL model specifications at fixed (T,d,k)."""
     d = args.d
-    # ~288: default L=2, r≈√d → at d=8, r=3 → 288
-    r288 = args.nl_rank_full if args.nl_rank_full is not None else max(2, int(round(d ** 0.5)))
-    L288 = args.nl_layers_full
-    # ~128 budget: choose rank at L=1 (or CLI)
     L128 = args.nl_layers_small
     r128 = (
         args.nl_rank_small
@@ -122,40 +133,50 @@ def _model_specs(args) -> list[dict]:
             "epochs": args.poly_epochs,
             "lr": args.learning_rate,
         },
-        {
-            "key": "nl_iso_288",
-            "display": "nl-CSA iso ~288",
-            "family": "nl",
-            "nl_embedding_mode": "isometric",
-            "nl_loss_mode": "renyi",
-            "layers": L288,
-            "nl_rank": r288,
-            "epochs": args.nl_epochs,
-            "lr": args.nl_learning_rate,
-        },
-        {
-            "key": "nl_iso_128",
-            "display": "nl-CSA iso ~128",
-            "family": "nl",
-            "nl_embedding_mode": "isometric",
-            "nl_loss_mode": "renyi",
-            "layers": L128,
-            "nl_rank": r128,
-            "epochs": args.nl_epochs,
-            "lr": args.nl_learning_rate,
-        },
-        {
-            "key": "nl_gen_128",
-            "display": "nl-CSA gen ~128",
-            "family": "nl",
-            "nl_embedding_mode": "general",
-            "nl_loss_mode": "renyi",
-            "layers": L128,
-            "nl_rank": r128,
-            "epochs": args.nl_epochs_general,
-            "lr": args.nl_learning_rate_general,
-        },
     ]
+    if getattr(args, "include_nl_288", False):
+        r288 = args.nl_rank_full if args.nl_rank_full is not None else max(2, int(round(d ** 0.5)))
+        specs.append(
+            {
+                "key": "nl_iso_288",
+                "display": "nl-CSA iso ~288",
+                "family": "nl",
+                "nl_embedding_mode": "isometric",
+                "nl_loss_mode": "renyi",
+                "layers": args.nl_layers_full,
+                "nl_rank": r288,
+                "epochs": args.nl_epochs,
+                "lr": args.nl_learning_rate,
+            }
+        )
+    specs.extend(
+        [
+            {
+                "key": "nl_iso_128",
+                "display": "nl-CSA iso ~128",
+                "family": "nl",
+                "nl_embedding_mode": "isometric",
+                "nl_loss_mode": "renyi",
+                "layers": L128,
+                "nl_rank": r128,
+                "epochs": args.nl_epochs,
+                "lr": args.nl_learning_rate,
+            },
+            {
+                "key": "nl_gen_128",
+                "display": "nl-CSA gen ~128",
+                "family": "nl",
+                "nl_embedding_mode": "general",
+                "nl_loss_mode": "renyi",
+                "layers": L128,
+                "nl_rank": r128,
+                "epochs": args.nl_epochs_general,
+                "lr": args.nl_learning_rate_general,
+            },
+        ]
+    )
+    for s in specs:
+        s["param_label"] = _spec_param_label(s, d)
     return specs
 
 
@@ -183,6 +204,8 @@ def _make_cfg(args, spec: dict, model_seed: int, out: Path, k: int) -> BaselineC
         kernel_mode=spec.get("kernel_mode", "monomial"),
         early_stop=False,
         max_epochs=int(spec["epochs"]),
+        test_data_seed=args.test_data_seed,
+        test_max_sentences=args.test_max_sentences,
     )
 
 
@@ -203,6 +226,8 @@ def _enrich_result(result: dict, spec: dict, cfg: BaselineConfig) -> dict:
     result["family"] = spec["family"]
     result["kernel_mode"] = cfg.kernel_mode
     result["aligned_loss"] = _aligned_loss(result, cfg.T)
+    if "final_test_loss" in result:
+        result["aligned_test_loss"] = _aligned_loss(result, cfg.T, loss_key="final_test_loss")
     result["log_T"] = math.log(cfg.T)
     result["model"] = spec["display"]
     return result
@@ -264,6 +289,10 @@ def _isolate_train_one(spec: dict, cfg: BaselineConfig, args: argparse.Namespace
         str(args.nl_epochs_general),
         "--max-sentences",
         str(args.max_sentences),
+        "--test-data-seed",
+        str(args.test_data_seed or 0),
+        "--test-max-sentences",
+        str(args.test_max_sentences),
         "--n-seeds",
         "1",
         "--batch-size",
@@ -380,14 +409,16 @@ def plot_aligned_vs_k(
     mu_points: list[dict],
     nl_refs: list[dict],
     T: int,
+    d: int,
     out_path: Path,
+    param_labels: dict[str, str] | None = None,
+    split_label: str = "train",
+    mean_key: str = "aligned_loss_mean",
+    std_key: str = "aligned_loss_std",
 ) -> None:
-    """Aligned loss vs k: mono + poly on the same axes; nl as horizontal refs.
-
-    Expect each mu_point: {model, k, aligned_loss_mean, aligned_loss_std}.
-    nl_refs: aggregates with aligned_loss_mean (k-independent).
-    """
-    fig, ax = plt.subplots(figsize=(10, 5.8))
+    """Aligned loss vs k: mono + poly; nl as horizontal refs with seed std band."""
+    param_labels = param_labels or {}
+    fig, ax = plt.subplots(figsize=(11, 6.2))
     by_model: dict[str, list[dict]] = {}
     for p in mu_points:
         by_model.setdefault(p["model"], []).append(p)
@@ -395,8 +426,9 @@ def plot_aligned_vs_k(
         rows = sorted(rows, key=lambda r: int(r["k"]))
         st = STYLES.get(name, dict(color="0.3", linestyle="-", marker="o", linewidth=2))
         ks = [int(r["k"]) for r in rows]
-        means = [float(r["aligned_loss_mean"]) for r in rows]
-        stds = [float(r.get("aligned_loss_std", 0.0)) for r in rows]
+        means = [float(r[mean_key]) for r in rows]
+        stds = [float(r.get(std_key, 0.0)) for r in rows]
+        label = param_labels.get(name, name)
         ax.errorbar(
             ks,
             means,
@@ -407,49 +439,87 @@ def plot_aligned_vs_k(
             linewidth=st.get("linewidth", 2.2),
             markersize=7,
             capsize=4,
-            label=name,
+            label=label,
         )
+    if mu_points:
+        x0, x1 = ax.get_xlim()
+    else:
+        x0, x1 = 0.5, 6.5
     for ref in nl_refs:
         name = ref["model"]
         st = STYLES.get(name, dict(color="0.2", linestyle=":", linewidth=2))
+        mean = float(ref[mean_key])
+        std = float(ref.get(std_key, 0.0))
+        label = param_labels.get(name, name)
+        ax.axhspan(mean - std, mean + std, color=st["color"], alpha=0.14, linewidth=0, zorder=0)
         ax.axhline(
-            float(ref["aligned_loss_mean"]),
+            mean,
             color=st["color"],
             linestyle=st["linestyle"],
             linewidth=st.get("linewidth", 2.0),
-            label=f"{name} (k-indep.)",
+            label=f"{label} (k-indep., mean±std seeds)",
         )
+        if std > 0:
+            ax.errorbar(
+                [x1],
+                [mean],
+                yerr=[std],
+                color=st["color"],
+                fmt="none",
+                capsize=5,
+                linewidth=1.5,
+                zorder=5,
+            )
     ax.axhline(math.log(T), color="0.55", linestyle=":", linewidth=1.0, alpha=0.7, label=rf"$\log T$={math.log(T):.2f}")
     ax.set_xlabel("k")
     ax.set_ylabel(r"aligned loss:  $-\log\mu+\log T$  or  Renyi")
-    ax.set_title(f"FINAL aligned loss vs k  (T={T}; mono+poly on same plot)")
+    ax.set_title(
+        f"FINAL aligned loss vs k  (T={T}, d={d}; {split_label}; mono+poly; param counts in legend)"
+    )
     all_k = sorted({int(p["k"]) for p in mu_points})
-    ax.set_xticks(all_k)
+    if all_k:
+        ax.set_xticks(all_k)
     ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=7, loc="best")
+    ax.legend(fontsize=6.5, loc="best")
     fig.tight_layout()
     fig.savefig(out_path, dpi=220)
     plt.close(fig)
 
 
-def plot_final_curves(aggs: list[dict], out_path: Path, ykey: str = "aligned_history") -> None:
+def plot_final_curves(
+    aggs: list[dict],
+    out_path: Path,
+    ykey: str = "aligned_history",
+    T: int | None = None,
+    d: int | None = None,
+    k: int | None = None,
+    param_labels: dict[str, str] | None = None,
+    title: str | None = None,
+) -> None:
     """Training curves with FINAL line styles + error bands."""
+    param_labels = param_labels or {}
     fig, ax = plt.subplots(figsize=(10, 5.6))
     for a in aggs:
         name = a["model"]
         st = STYLES.get(name, dict(color="0.3", linestyle="-", marker=None, linewidth=2))
         ys = np.asarray(a.get(ykey, a["loss_history"]), dtype=float)
         xs = np.arange(1, len(ys) + 1)
-        ax.plot(xs, ys, label=name, **{k: st[k] for k in ("color", "linestyle", "linewidth")})
+        label = param_labels.get(name, name)
+        ax.plot(xs, ys, label=label, **{k: st[k] for k in ("color", "linestyle", "linewidth")})
         std_key = "aligned_std" if ykey.startswith("aligned") else "loss_std"
         if std_key in a and int(a.get("n_seeds", 1)) > 1:
             std = np.asarray(a[std_key], dtype=float)
             ax.fill_between(xs, ys - std, ys + std, color=st["color"], alpha=0.15, linewidth=0)
     ax.set_xlabel("epoch")
     ax.set_ylabel(r"aligned loss:  $-\log\mu+\log T$  or  Renyi")
-    ax.set_title("FINAL training curves (aligned, mean±std)")
+    if title:
+        ax.set_title(title)
+    elif T is not None and d is not None and k is not None:
+        ax.set_title(f"FINAL training curves (aligned, k={k}, T={T}, d={d})")
+    else:
+        ax.set_title("FINAL training curves (aligned, mean±std)")
     ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=7, loc="best")
+    ax.legend(fontsize=6.5, loc="best")
     fig.tight_layout()
     fig.savefig(out_path, dpi=220)
     plt.close(fig)
@@ -477,6 +547,74 @@ def plot_final_raw_curves(aggs: list[dict], out_path: Path) -> None:
     plt.close(fig)
 
 
+def _aggregate_nl_runs(runs: list[dict], spec: dict, T: int) -> dict:
+    runs = _pad_histories(runs)
+    for r in runs:
+        r["model"] = spec["display"]
+    agg = aggregate_seed_results(runs)
+    aligned = np.array(agg["seed_histories"], dtype=float)
+    agg["aligned_history"] = aligned.mean(axis=0).tolist()
+    agg["aligned_std"] = aligned.std(axis=0).tolist()
+    finals = np.array([_aligned_loss(r, T) for r in runs], dtype=float)
+    agg["aligned_loss_mean"] = float(finals.mean())
+    agg["aligned_loss_std"] = float(finals.std())
+    agg["aligned_loss_per_seed"] = finals.tolist()
+    if all("aligned_test_loss" in r for r in runs):
+        tf = np.array([float(r["aligned_test_loss"]) for r in runs], dtype=float)
+        agg["aligned_test_loss_mean"] = float(tf.mean())
+        agg["aligned_test_loss_std"] = float(tf.std())
+        agg["aligned_test_loss_per_seed"] = tf.tolist()
+    agg["raw_final_loss_mean"] = float(agg["final_loss_mean"])
+    agg["raw_final_loss_std"] = float(agg["final_loss_std"])
+    agg["spec"] = spec
+    agg["k"] = None
+    return agg
+
+
+def _aggregate_mu_runs(runs: list[dict], spec: dict, k: int, T: int) -> dict:
+    runs = _pad_histories(runs)
+    for r in runs:
+        r["model"] = spec["display"]
+    agg = aggregate_seed_results(runs)
+    logT = math.log(T)
+    aligned = np.array(agg["seed_histories"], dtype=float) + logT
+    agg["aligned_history"] = aligned.mean(axis=0).tolist()
+    agg["aligned_std"] = aligned.std(axis=0).tolist()
+    finals = np.array([_aligned_loss(r, T) for r in runs], dtype=float)
+    agg["aligned_loss_mean"] = float(finals.mean())
+    agg["aligned_loss_std"] = float(finals.std())
+    agg["aligned_loss_per_seed"] = finals.tolist()
+    if all("aligned_test_loss" in r for r in runs):
+        tf = np.array([float(r["aligned_test_loss"]) for r in runs], dtype=float)
+        agg["aligned_test_loss_mean"] = float(tf.mean())
+        agg["aligned_test_loss_std"] = float(tf.std())
+        agg["aligned_test_loss_per_seed"] = tf.tolist()
+    agg["raw_final_loss_mean"] = float(agg["final_loss_mean"])
+    agg["raw_final_loss_std"] = float(agg["final_loss_std"])
+    agg["spec"] = spec
+    agg["k"] = k
+    return agg
+
+
+def _mu_point_from_agg(agg: dict, spec: dict, k: int, test: bool = False) -> dict:
+    p = {
+        "model": spec["display"],
+        "k": k,
+        "aligned_loss_mean": agg["aligned_loss_mean"],
+        "aligned_loss_std": agg["aligned_loss_std"],
+        "raw_final_loss_mean": agg["raw_final_loss_mean"],
+        "n_params_angles": agg.get("n_params_angles"),
+        "n_params_matrices": agg.get("n_params_matrices"),
+        "n_params_model": agg.get("n_params_model"),
+        "kernel_mode": spec.get("kernel_mode"),
+        "param_label": spec.get("param_label"),
+    }
+    if test:
+        p["aligned_loss_mean"] = agg["aligned_test_loss_mean"]
+        p["aligned_loss_std"] = agg["aligned_test_loss_std"]
+    return p
+
+
 def _check_comparable(aggs: list[dict], tol_ratio: float = 0.35) -> list[str]:
     """Warn if any model's aligned loss is far above the best (convergence check)."""
     warnings = []
@@ -501,11 +639,48 @@ def _replot_from_summary(out: Path) -> int:
     plots = out / "plots"
     plots.mkdir(parents=True, exist_ok=True)
     T = int(summary["config"]["T"])
+    d = int(summary["config"].get("d", 8))
+    param_labels = {
+        s.get("display", s.get("model", "")): s.get("param_label", s.get("display", ""))
+        for s in (summary.get("model_specs") or [])
+    }
+    if not param_labels:
+        param_labels = {p["model"]: p.get("param_label", p["model"]) for p in summary.get("mu_points_vs_k") or []}
+        for a in summary.get("nl_refs") or []:
+            param_labels[a["model"]] = a.get("param_label", a["model"])
     aggs_by_k = summary.get("aggregates_by_k") or {}
     nl_refs = summary.get("nl_refs") or []
     mu_points = summary.get("mu_points_vs_k") or []
     if mu_points:
-        plot_aligned_vs_k(mu_points, nl_refs, T, plots / "final_aligned_loss_vs_k.png")
+        plot_aligned_vs_k(
+            mu_points, nl_refs, T, d, plots / "final_aligned_loss_vs_k.png", param_labels, "train"
+        )
+    mu_points_test = summary.get("mu_points_vs_k_test") or []
+    nl_refs_test = summary.get("nl_refs_test") or nl_refs
+    if mu_points_test:
+        plot_aligned_vs_k(
+            mu_points_test,
+            nl_refs_test,
+            T,
+            d,
+            plots / "final_aligned_loss_vs_k_test.png",
+            param_labels,
+            "held-out test",
+            mean_key="aligned_loss_mean",
+            std_key="aligned_loss_std",
+        )
+    appendix_k = summary.get("config", {}).get("appendix_curves_k", 5)
+    aggs_k5 = aggs_by_k.get(str(appendix_k)) or []
+    if aggs_k5:
+        plot_final_curves(
+            aggs_k5,
+            plots / f"final_training_curves_k{appendix_k}_appendix.png",
+            T=T,
+            d=d,
+            k=int(appendix_k),
+            param_labels=param_labels,
+            title=f"FINAL training curves (appendix, k={appendix_k}, T={T}, d={d})",
+        )
     # legacy single-k aggregates
     aggs = summary.get("aggregates") or []
     if aggs and not aggs_by_k:
@@ -516,7 +691,7 @@ def _replot_from_summary(out: Path) -> int:
         plot_final_aligned_bar(
             aggs_k, T, plots / f"final_aligned_loss_bar_k{k_str}.png", title_suffix=f"k={k_str}"
         )
-        plot_final_curves(aggs_k, plots / f"final_aligned_curves_k{k_str}.png")
+        plot_final_curves(aggs_k, plots / f"final_aligned_curves_k{k_str}.png", T=T, d=d, k=int(k_str), param_labels=param_labels)
         plot_final_raw_curves(aggs_k, plots / f"final_raw_curves_k{k_str}.png")
     print(f"replot done in {plots}")
     return 0
@@ -554,8 +729,11 @@ def main() -> int:
     p.add_argument("--nl-rank-small", type=int, default=None)
     p.add_argument("--nl-param-budget-small", type=int, default=128)
     p.add_argument("--data-seed", type=int, default=42)
+    p.add_argument("--test-data-seed", type=int, default=4242, help="PTB hold-out sample for test loss (0=disable)")
+    p.add_argument("--test-max-sentences", type=int, default=200)
     p.add_argument("--model-seed-base", type=int, default=1042)
-    p.add_argument("--n-seeds", type=int, default=8)
+    p.add_argument("--n-seeds", type=int, default=10)
+    p.add_argument("--appendix-curves-k", type=int, default=5, help="k for appendix training-curves plot")
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--checkpoint-every", type=int, default=20)
     p.add_argument("--output-dir", type=str, default=None)
@@ -571,6 +749,11 @@ def main() -> int:
         help="skip poly-k-QSA / poly-k-CSA (default: include on same plots)",
     )
     p.add_argument(
+        "--include-nl-288",
+        action="store_true",
+        help="include nl-CSA iso ~288 (default: only iso/gen ~128)",
+    )
+    p.add_argument(
         "--isolate-jobs",
         action="store_true",
         help="run each (model,k,seed) in a fresh subprocess to avoid JAX CPU OOM",
@@ -581,6 +764,8 @@ def main() -> int:
         help="train assigned jobs and exit (no aggregate/plots); used by --isolate-jobs children",
     )
     args = p.parse_args()
+    if int(args.test_data_seed) <= 0:
+        args.test_data_seed = None
 
     if args.replot_only:
         return _replot_from_summary(Path(args.replot_only))
@@ -674,14 +859,17 @@ def main() -> int:
         if args.isolate_jobs:
             result = _isolate_train_one(spec, cfg, args, log)
         else:
-            bundle = prepare_data_bundle(cfg)
+            bundle = attach_test_bundle(prepare_data_bundle(cfg), cfg)
             result = _train_one(spec, cfg, bundle, log)
             del bundle
             _clear_jax_memory()
         result["k"] = k
+        test_note = ""
+        if "aligned_test_loss" in result:
+            test_note = f" test_aligned={result['aligned_test_loss']:.4f}"
         print(
             f"[{spec['display']} k={k} seed={ms}] raw={result['final_loss']:.4f} "
-            f"aligned={result['aligned_loss']:.4f}"
+            f"aligned={result['aligned_loss']:.4f}{test_note}"
         )
         local_runs.append(result)
 
@@ -723,32 +911,27 @@ def main() -> int:
             by_mu.setdefault((r["display"], int(r["k"])), []).append(r)
 
     nl_refs: list[dict] = []
+    nl_refs_test: list[dict] = []
     for s in nl_specs:
         name = s["display"]
         runs = sorted(by_nl.get(name, []), key=lambda r: int(r.get("model_seed", 0)))
         if not runs:
             print(f"[WARN] no runs for {name}")
             continue
-        runs = _pad_histories(runs)
-        for r in runs:
-            r["model"] = name
-        agg = aggregate_seed_results(runs)
-        aligned = np.array(agg["seed_histories"], dtype=float)
-        agg["aligned_history"] = aligned.mean(axis=0).tolist()
-        agg["aligned_std"] = aligned.std(axis=0).tolist()
-        finals = np.array([_aligned_loss(r, args.T) for r in runs], dtype=float)
-        agg["aligned_loss_mean"] = float(finals.mean())
-        agg["aligned_loss_std"] = float(finals.std())
-        agg["aligned_loss_per_seed"] = finals.tolist()
-        agg["raw_final_loss_mean"] = float(agg["final_loss_mean"])
-        agg["raw_final_loss_std"] = float(agg["final_loss_std"])
-        agg["spec"] = s
-        agg["k"] = None
+        agg = _aggregate_nl_runs(runs, s, args.T)
+        agg["param_label"] = s.get("param_label")
         nl_refs.append(agg)
+        if "aligned_test_loss_mean" in agg:
+            agg_t = dict(agg)
+            agg_t["aligned_loss_mean"] = agg["aligned_test_loss_mean"]
+            agg_t["aligned_loss_std"] = agg["aligned_test_loss_std"]
+            nl_refs_test.append(agg_t)
         (out / "aggregates" / f"{s['key']}.json").write_text(json.dumps(agg, indent=2), encoding="utf-8")
 
     mu_points: list[dict] = []
+    mu_points_test: list[dict] = []
     aggregates_by_k: dict[str, list[dict]] = {str(k): [] for k in ks}
+    has_test = any("aligned_test_loss" in r for r in (all_runs or []))
     for s in mu_specs:
         for k in ks:
             name = s["display"]
@@ -756,50 +939,54 @@ def main() -> int:
             if not runs:
                 print(f"[WARN] no runs for {name} k={k}")
                 continue
-            runs = _pad_histories(runs)
-            for r in runs:
-                r["model"] = name
-            agg = aggregate_seed_results(runs)
-            logT = math.log(args.T)
-            aligned = np.array(agg["seed_histories"], dtype=float) + logT
-            agg["aligned_history"] = aligned.mean(axis=0).tolist()
-            agg["aligned_std"] = aligned.std(axis=0).tolist()
-            finals = np.array([_aligned_loss(r, args.T) for r in runs], dtype=float)
-            agg["aligned_loss_mean"] = float(finals.mean())
-            agg["aligned_loss_std"] = float(finals.std())
-            agg["aligned_loss_per_seed"] = finals.tolist()
-            agg["raw_final_loss_mean"] = float(agg["final_loss_mean"])
-            agg["raw_final_loss_std"] = float(agg["final_loss_std"])
-            agg["spec"] = s
-            agg["k"] = k
+            agg = _aggregate_mu_runs(runs, s, k, args.T)
+            agg["param_label"] = s.get("param_label")
             aggregates_by_k[str(k)].append(agg)
-            mu_points.append(
-                {
-                    "model": name,
-                    "k": k,
-                    "aligned_loss_mean": agg["aligned_loss_mean"],
-                    "aligned_loss_std": agg["aligned_loss_std"],
-                    "raw_final_loss_mean": agg["raw_final_loss_mean"],
-                    "n_params_angles": agg.get("n_params_angles"),
-                    "n_params_matrices": agg.get("n_params_matrices"),
-                    "kernel_mode": s.get("kernel_mode"),
-                }
-            )
+            mu_points.append(_mu_point_from_agg(agg, s, k, test=False))
+            if has_test and "aligned_test_loss_mean" in agg:
+                mu_points_test.append(_mu_point_from_agg(agg, s, k, test=True))
             (out / "aggregates" / f"{s['key']}_k{k}.json").write_text(
                 json.dumps(agg, indent=2), encoding="utf-8"
             )
 
+    param_labels = {s["display"]: s["param_label"] for s in specs}
     plots = out / "plots"
-    plot_aligned_vs_k(mu_points, nl_refs, args.T, plots / "final_aligned_loss_vs_k.png")
+    plot_aligned_vs_k(
+        mu_points, nl_refs, args.T, args.d, plots / "final_aligned_loss_vs_k.png", param_labels, "train"
+    )
+    if mu_points_test:
+        plot_aligned_vs_k(
+            mu_points_test,
+            nl_refs_test or nl_refs,
+            args.T,
+            args.d,
+            plots / "final_aligned_loss_vs_k_test.png",
+            param_labels,
+            "held-out test",
+        )
+    appendix_k = int(args.appendix_curves_k)
     for k in ks:
         aggs_k = aggregates_by_k[str(k)] + nl_refs
         if not aggs_k:
             continue
         plot_final_aligned_bar(
-            aggs_k, args.T, plots / f"final_aligned_loss_bar_k{k}.png", title_suffix=f"k={k}"
+            aggs_k, args.T, plots / f"final_aligned_loss_bar_k{k}.png", title_suffix=f"k={k}, d={args.d}"
         )
-        plot_final_curves(aggs_k, plots / f"final_aligned_curves_k{k}.png")
+        plot_final_curves(
+            aggs_k, plots / f"final_aligned_curves_k{k}.png", T=args.T, d=args.d, k=k, param_labels=param_labels
+        )
         plot_final_raw_curves(aggs_k, plots / f"final_raw_curves_k{k}.png")
+    aggs_appendix = aggregates_by_k.get(str(appendix_k), []) + nl_refs
+    if aggs_appendix:
+        plot_final_curves(
+            aggs_appendix,
+            plots / f"final_training_curves_k{appendix_k}_appendix.png",
+            T=args.T,
+            d=args.d,
+            k=appendix_k,
+            param_labels=param_labels,
+            title=f"FINAL training curves (appendix, k={appendix_k}, T={args.T}, d={args.d})",
+        )
 
     # Convergence check on all mu points + nl
     flat_for_check = [
@@ -828,22 +1015,38 @@ def main() -> int:
             "n_seeds": args.n_seeds,
             "model_seeds": model_seeds,
             "data_seed": args.data_seed,
+            "test_data_seed": args.test_data_seed,
+            "test_max_sentences": args.test_max_sentences,
+            "appendix_curves_k": int(args.appendix_curves_k),
             "max_sentences": args.max_sentences,
             "batch_size": None if args.batch_size <= 0 else args.batch_size,
             "qsa_angles": qsa_angle_param_count(args.d, args.qsa_layers),
             "csa_matrices": kcsa_matrix_param_count(args.d),
             "include_poly": not args.no_poly,
+            "include_nl_288": bool(args.include_nl_288),
         },
+        "model_specs": [
+            {
+                "key": s["key"],
+                "display": s["display"],
+                "param_label": s.get("param_label"),
+                "family": s["family"],
+            }
+            for s in specs
+        ],
         "styles": STYLES,
         "alignment_note": (
             "Mu-models plotted as −logμ + log T; nl-CSA Renyi plotted as-is. "
-            "poly-k-QSA/CSA use kernel_mode=poly (classical poly / LCU-truncated kernel) "
-            "on the SAME vs-k plot as monomial — hoped to flatten growth of loss with k."
+            "Train loss = final epoch on train split; test loss = same metric on a fresh PTB "
+            f"sample (test_data_seed={args.test_data_seed}, n={args.test_max_sentences}). "
+            "poly-k-QSA/CSA use kernel_mode=poly on the SAME vs-k plot as monomial."
         ),
         "convergence_warnings": warns,
         "trend_notes": trend_notes,
         "mu_points_vs_k": mu_points,
+        "mu_points_vs_k_test": mu_points_test,
         "nl_refs": nl_refs,
+        "nl_refs_test": nl_refs_test,
         "aggregates_by_k": aggregates_by_k,
         "per_seed": [
             {
@@ -853,6 +1056,7 @@ def main() -> int:
                 "model_seed": r.get("model_seed"),
                 "final_loss": r["final_loss"],
                 "aligned_loss": r["aligned_loss"],
+                "aligned_test_loss": r.get("aligned_test_loss"),
                 "n_params_angles": r.get("n_params_angles"),
                 "n_params_matrices": r.get("n_params_matrices"),
                 "n_params_model": r.get("n_params_model"),
