@@ -748,6 +748,10 @@ def train_kqsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
         run_name=run_name,
         loss_fn=mu_loss_sentence,
     )
+ 
+def train_kcsa(
+    cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logger] = None
+) -> dict:
     log = logger or logging.getLogger("baselines")
     run_name = cfg.run_label or f"kcsa_seed{cfg.model_seed}"
     out = _run_dir(cfg, run_name)
