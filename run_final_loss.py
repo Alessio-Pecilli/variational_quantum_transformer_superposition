@@ -499,16 +499,23 @@ def plot_final_curves(
     """Training curves with FINAL line styles + error bands."""
     param_labels = param_labels or {}
     fig, ax = plt.subplots(figsize=(10, 5.6))
+    max_len = 0
+    for a in aggs:
+        max_len = max(max_len, len(np.asarray(a.get(ykey, a["loss_history"]), dtype=float)))
     for a in aggs:
         name = a["model"]
         st = STYLES.get(name, dict(color="0.3", linestyle="-", marker=None, linewidth=2))
         ys = np.asarray(a.get(ykey, a["loss_history"]), dtype=float)
+        if max_len > len(ys) and len(ys) > 0:
+            ys = np.concatenate([ys, np.full(max_len - len(ys), ys[-1], dtype=float)])
         xs = np.arange(1, len(ys) + 1)
         label = param_labels.get(name, name)
         ax.plot(xs, ys, label=label, **{k: st[k] for k in ("color", "linestyle", "linewidth")})
         std_key = "aligned_std" if ykey.startswith("aligned") else "loss_std"
         if std_key in a and int(a.get("n_seeds", 1)) > 1:
             std = np.asarray(a[std_key], dtype=float)
+            if max_len > len(std) and len(std) > 0:
+                std = np.concatenate([std, np.full(max_len - len(std), std[-1], dtype=float)])
             ax.fill_between(xs, ys - std, ys + std, color=st["color"], alpha=0.15, linewidth=0)
     ax.set_xlabel("epoch")
     ax.set_ylabel(r"aligned loss:  $-\log\mu+\log T$  or  Renyi")
@@ -518,6 +525,16 @@ def plot_final_curves(
         ax.set_title(f"FINAL training curves (aligned, k={k}, T={T}, d={d})")
     else:
         ax.set_title("FINAL training curves (aligned, mean±std)")
+    if T is not None and d is not None and k is not None:
+        mu_adv = float(k / math.comb(int(d) + int(k) - 1, int(k)))
+        adv_loss = -math.log(max(mu_adv, 1e-16)) + math.log(int(T))
+        ax.axhline(
+            adv_loss,
+            color="0.25",
+            linestyle=":",
+            linewidth=1.8,
+            label=rf"adv loss $-\log\!\left(k/\binom{{d+k-1}}{{k}}\right)+\log T$ = {adv_loss:.3f}",
+        )
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=6.5, loc="best")
     fig.tight_layout()
@@ -733,7 +750,7 @@ def main() -> int:
     p.add_argument("--test-max-sentences", type=int, default=200)
     p.add_argument("--model-seed-base", type=int, default=1042)
     p.add_argument("--n-seeds", type=int, default=10)
-    p.add_argument("--appendix-curves-k", type=int, default=5, help="k for appendix training-curves plot")
+    p.add_argument("--appendix-curves-k", type=int, default=3, help="k for appendix training-curves plot")
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--checkpoint-every", type=int, default=20)
     p.add_argument("--output-dir", type=str, default=None)

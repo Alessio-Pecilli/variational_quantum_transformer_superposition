@@ -23,6 +23,7 @@ import argparse
 import csv
 import json
 import logging
+import math
 import sys
 import time
 from datetime import datetime
@@ -67,6 +68,15 @@ def _qubit_budget(T: int, d: int, k: int, kernel_mode: str = "monomial") -> int:
 
 def _obar_ylabel() -> str:
     return r"$\bar o = \mathrm{mean}_{i\leq j}|a_{ij}\,s_{ij}^{k}|$  (monomial diagnostic)"
+
+
+def _mu_from_final_loss(final_loss: float) -> float:
+    return float(math.exp(-float(final_loss)))
+
+
+def _mu_advantage(d: int, k: int) -> float:
+    # Requested reference: k / Binomial(d+k-1, k)
+    return float(k / math.comb(int(d) + int(k) - 1, int(k)))
 
 
 def _setup_logger() -> logging.Logger:
@@ -534,6 +544,138 @@ def _plot_vs_d_by_T(
     plt.close(fig)
 
 
+def _aggregate_final_rows_by_seed(rows: list[dict]) -> list[dict]:
+    """Aggregate FINAL grid rows across model seeds by (series,T,d,k,kernel_mode)."""
+    groups: dict[tuple, list[dict]] = {}
+    for r in rows:
+        key = (
+            r.get("series"),
+            int(r.get("T")),
+            int(r.get("d")),
+            int(r.get("k")),
+            str(r.get("kernel_mode", "monomial")),
+        )
+        groups.setdefault(key, []).append(r)
+
+    out: list[dict] = []
+    for key, grp in groups.items():
+        ok = [g for g in grp if g.get("error") is None and g.get("final_loss") is not None]
+        if not ok:
+            continue
+        mu_vals = np.array([_mu_from_final_loss(float(g["final_loss"])) for g in ok], dtype=float)
+        losses = np.array([float(g["final_loss"]) for g in ok], dtype=float)
+        base = dict(ok[0])
+        base["n_seeds"] = int(len(ok))
+        base["final_loss"] = float(losses.mean())
+        base["final_loss_std"] = float(losses.std())
+        base["mu_mean"] = float(mu_vals.mean())
+        base["mu_std"] = float(mu_vals.std())
+        base["mu_values"] = mu_vals.tolist()
+        base["mu_advantage"] = _mu_advantage(int(base["d"]), int(base["k"]))
+        out.append(base)
+    return out
+
+
+def _plot_final_mu_panels(
+    agg_rows: list[dict],
+    out_root: Path,
+    max_T: int,
+    mu_ks: list[int],
+) -> None:
+    """Professor revision: plot mu (not obar) with multi-seed error bars."""
+    # ---------- mu vs T (d=16), same color per k, style by curve type ----------
+    fig, ax = plt.subplots(figsize=(9.4, 5.6))
+    for i, k in enumerate(mu_ks):
+        color = _DATA_COLORS[i % len(_DATA_COLORS)]
+        pts_mono = sorted(
+            [
+                r
+                for r in agg_rows
+                if int(r["d"]) == 16
+                and int(r["k"]) == int(k)
+                and str(r.get("kernel_mode", "monomial")) == "monomial"
+            ],
+            key=lambda r: int(r["T"]),
+        )
+        pts_poly = sorted(
+            [
+                r
+                for r in agg_rows
+                if int(r["d"]) == 16
+                and int(r["k"]) == int(k)
+                and str(r.get("kernel_mode", "monomial")) == "poly"
+            ],
+            key=lambda r: int(r["T"]),
+        )
+        if pts_mono:
+            Ts = [int(r["T"]) for r in pts_mono]
+            ys = [float(r["mu_mean"]) for r in pts_mono]
+            es = [float(r["mu_std"]) for r in pts_mono]
+            ax.errorbar(Ts, ys, yerr=es, color=color, marker="o", linestyle="-", linewidth=2.2, capsize=4, label=f"k={k} mono")
+            # Advantage is T-independent
+            adv = float(pts_mono[0]["mu_advantage"])
+            ax.axhline(adv, color=color, linestyle=":", linewidth=1.8, alpha=0.95, label=f"k={k} advantage")
+        if pts_poly:
+            Ts = [int(r["T"]) for r in pts_poly]
+            ys = [float(r["mu_mean"]) for r in pts_poly]
+            es = [float(r["mu_std"]) for r in pts_poly]
+            ax.errorbar(Ts, ys, yerr=es, color=color, marker="s", linestyle="--", linewidth=2.0, capsize=4, label=f"k={k} poly")
+    ax.set_xlabel("T")
+    ax.set_ylabel(r"$\mu$  (mean $\pm$ std over seeds)")
+    ax.set_title(rf"$\mu$ vs $T$  (d=16, T\leq{max_T})")
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=7, loc="best")
+    fig.tight_layout()
+    fig.savefig(out_root / "mu_vs_T.png", dpi=220)
+    plt.close(fig)
+
+    # ---------- mu vs d (T=max_T) for k=2,3,5 ----------
+    fig, ax = plt.subplots(figsize=(9.4, 5.6))
+    ks_d = [k for k in (2, 3, 5) if k in set(mu_ks)]
+    for i, k in enumerate(ks_d):
+        color = _DATA_COLORS[i % len(_DATA_COLORS)]
+        pts_mono = sorted(
+            [
+                r
+                for r in agg_rows
+                if int(r["T"]) == int(max_T)
+                and int(r["k"]) == int(k)
+                and str(r.get("kernel_mode", "monomial")) == "monomial"
+            ],
+            key=lambda r: int(r["d"]),
+        )
+        pts_poly = sorted(
+            [
+                r
+                for r in agg_rows
+                if int(r["T"]) == int(max_T)
+                and int(r["k"]) == int(k)
+                and str(r.get("kernel_mode", "monomial")) == "poly"
+            ],
+            key=lambda r: int(r["d"]),
+        )
+        if pts_mono:
+            ds = [int(r["d"]) for r in pts_mono]
+            ys = [float(r["mu_mean"]) for r in pts_mono]
+            es = [float(r["mu_std"]) for r in pts_mono]
+            ax.errorbar(ds, ys, yerr=es, color=color, marker="o", linestyle="-", linewidth=2.2, capsize=4, label=f"k={k} mono")
+            adv = [float(r["mu_advantage"]) for r in pts_mono]
+            ax.plot(ds, adv, color=color, linestyle=":", linewidth=1.8, marker="^", markersize=4, label=f"k={k} advantage")
+        if pts_poly:
+            ds = [int(r["d"]) for r in pts_poly]
+            ys = [float(r["mu_mean"]) for r in pts_poly]
+            es = [float(r["mu_std"]) for r in pts_poly]
+            ax.errorbar(ds, ys, yerr=es, color=color, marker="s", linestyle="--", linewidth=2.0, capsize=4, label=f"k={k} poly")
+    ax.set_xlabel("d")
+    ax.set_ylabel(r"$\mu$  (mean $\pm$ std over seeds)")
+    ax.set_title(rf"$\mu$ vs $d$  (T={max_T})")
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=7, loc="best")
+    fig.tight_layout()
+    fig.savefig(out_root / "mu_vs_d.png", dpi=220)
+    plt.close(fig)
+
+
 def _write_summary(
     out_root: Path,
     preset: str,
@@ -703,7 +845,7 @@ def _build_final_obar_jobs(
         for d in PANEL_D_ON_T:
             for T in Ts:
                 _add(T, d, 3, "T_by_d", km)
-        for k in (2, 3):
+        for k in (2, 3, 5):
             for d in SWEEP_D:
                 _add(max_T, d, k, f"d_k{k}", km)
         for T in panel_Ts:
@@ -810,9 +952,15 @@ def _replot_study_dir(out_root: Path, args) -> int:
         by_label = {r["label"]: r for r in all_rows if "label" in r}
         max_T = int(man.get("max_T", 64))
         obar_ks = man.get("obar_ks") or [1, 2, 3, 5, 6]
-        _plot_final_obar_panels(
-            list(by_label.values()), out_root, max_T=max_T, obar_ks=obar_ks
-        )
+        if man.get("metric") == "mu" or man.get("all_rows_seed_agg"):
+            agg_rows = list(man.get("all_rows_seed_agg") or [])
+            if not agg_rows:
+                agg_rows = _aggregate_final_rows_by_seed(list(by_label.values()))
+            _plot_final_mu_panels(agg_rows, out_root, max_T=max_T, mu_ks=list(obar_ks))
+        else:
+            _plot_final_obar_panels(
+                list(by_label.values()), out_root, max_T=max_T, obar_ks=obar_ks
+            )
         print(f"replot FINAL panels in {out_root}")
         return 0
 
@@ -1029,6 +1177,18 @@ def main() -> int:
         action="store_true",
         help="with --final-obar-grid, also train poly kernel and overlay on same plots",
     )
+    parser.add_argument(
+        "--final-n-seeds",
+        type=int,
+        default=5,
+        help="number of model seeds per FINAL point (for error bars)",
+    )
+    parser.add_argument(
+        "--final-seed-base",
+        type=int,
+        default=42,
+        help="base model seed for FINAL multi-seed grid",
+    )
     args = parser.parse_args()
 
     if args.long:
@@ -1129,15 +1289,25 @@ def main() -> int:
         if rank == 0:
             print(
                 f"FINAL obar grid (max_T={args.max_T}, ks={final_obar_ks}, "
-                f"also_poly={args.also_poly}, target_loss={args.target_loss})"
+                f"also_poly={args.also_poly}, target_loss={args.target_loss}, "
+                f"n_seeds={args.final_n_seeds})"
             )
-        jobs = _build_final_obar_jobs(
+        base_jobs = _build_final_obar_jobs(
             local_max_qubits=args.local_max_qubits,
             kernel_mode=args.kernel_mode,
             max_T=int(args.max_T),
             obar_ks=final_obar_ks,
             also_poly=bool(args.also_poly),
         )
+        jobs = []
+        for bj in base_jobs:
+            for si in range(int(args.final_n_seeds)):
+                model_seed = int(args.final_seed_base) + si
+                jj = dict(bj)
+                jj["model_seed"] = model_seed
+                jj["base_label"] = bj["label"]
+                jj["label"] = f"{bj['label']}_seed{model_seed}"
+                jobs.append(jj)
     else:
         if args.only in (None, "T"):
             for T in sweep_T:
@@ -1248,7 +1418,12 @@ def main() -> int:
     for job in my_jobs:
         opts = dict(train_opts)
         opts["kernel_mode"] = job.get("kernel_mode", args.kernel_mode)
-        kw = {**train_kw, "k": job["k"], "train_opts": opts}
+        kw = {
+            **train_kw,
+            "k": job["k"],
+            "seed": int(job.get("model_seed", train_kw["seed"])),
+            "train_opts": opts,
+        }
         try:
             row = _train_point(
                 T=job["T"],
@@ -1259,6 +1434,8 @@ def main() -> int:
             )
             row["series"] = job["series"]
             row["kernel_mode"] = opts["kernel_mode"]
+            row["model_seed"] = int(job.get("model_seed", kw["seed"]))
+            row["base_label"] = job.get("base_label", job["label"])
             local_rows.append(row)
         except Exception as exc:
             print(f"[WARN] sweep point failed {job['label']}: {exc}")
@@ -1270,6 +1447,8 @@ def main() -> int:
                     "d": job["d"],
                     "k": job["k"],
                     "kernel_mode": opts["kernel_mode"],
+                    "model_seed": int(job.get("model_seed", kw["seed"])),
+                    "base_label": job.get("base_label", job["label"]),
                     "error": str(exc),
                     "mean_O_ij": float("nan"),
                     "obar": float("nan"),
@@ -1293,21 +1472,24 @@ def main() -> int:
     print("=" * 60)
 
     if args.final_obar_grid:
-        _plot_final_obar_panels(
-            all_rows, out_root, max_T=int(args.max_T), obar_ks=final_obar_ks
+        agg_rows = _aggregate_final_rows_by_seed(all_rows)
+        _write_csv(out_root / "summary_mu_seed_agg.csv", agg_rows)
+        _plot_final_mu_panels(
+            agg_rows, out_root, max_T=int(args.max_T), mu_ks=final_obar_ks
         )
         if args.target_loss is not None:
             bad = [
-                r for r in all_rows
+                r
+                for r in agg_rows
                 if r.get("final_loss") is not None
                 and float(r["final_loss"]) > float(args.target_loss)
             ]
             if bad:
-                print("\n[WARN] Punti con loss > target_loss (da ritrenare):")
+                print("\n[WARN] Punti (media seed) con loss > target_loss (da ritrenare):")
                 for r in sorted(bad, key=lambda x: (int(x["T"]), int(x["d"]), int(x["k"]))):
                     print(
                         f"  {r['label']}: loss={float(r['final_loss']):.4f} "
-                        f"> {args.target_loss}  (obar={float(r.get('obar', float('nan'))):.4f})"
+                        f"> {args.target_loss}  (mu={float(r.get('mu_mean', float('nan'))):.4e})"
                     )
         total_wall = time.perf_counter() - t_start
         manifest = {
@@ -1317,6 +1499,8 @@ def main() -> int:
             "max_T": int(args.max_T),
             "obar_ks": final_obar_ks,
             "also_poly": bool(args.also_poly),
+            "final_n_seeds": int(args.final_n_seeds),
+            "final_seed_base": int(args.final_seed_base),
             "circuit_mode": "section2",
             "epochs": args.epochs,
             "max_sentences": args.max_sentences,
@@ -1327,6 +1511,8 @@ def main() -> int:
             "local_max_qubits": args.local_max_qubits,
             "mpi_ranks": size,
             "all_rows": all_rows,
+            "all_rows_seed_agg": agg_rows,
+            "metric": "mu",
         }
         (out_root / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
         _write_summary(

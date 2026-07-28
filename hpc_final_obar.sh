@@ -7,7 +7,7 @@
 #SBATCH --qos=boost_qos_lprod
 #SBATCH --account=iscrc_qusala
 #
-# FINAL obar (transformer / run_study) campaign — classical mu path.
+# FINAL mu panels (transformer / run_study) campaign — multi-seed.
 # Memory-safe: fewer MPI ranks + srun --mem=0 (step default was ~4G → instant OOM).
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
@@ -44,6 +44,8 @@ TARGET_LOSS="${TARGET_LOSS:-3.8}"
 MAX_EPOCHS="${MAX_EPOCHS:-2000}"
 EPOCHS="${EPOCHS:-}"
 MAX_SENTENCES="${MAX_SENTENCES:-}"
+FINAL_N_SEEDS="${FINAL_N_SEEDS:-5}"
+FINAL_SEED_BASE="${FINAL_SEED_BASE:-42}"
 KERNEL_MODE="${KERNEL_MODE:-monomial}"
 POLY_TAG=""
 if [[ "$ALSO_POLY" == "1" ]]; then
@@ -53,7 +55,8 @@ KS_TAG="${FINAL_KS//,/-}"
 OUTPUT_DIR="${OUTPUT_DIR:-results/study/final_obar_T${MAX_T}_ks${KS_TAG}_tl${TARGET_LOSS}${POLY_TAG}}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
-echo "FINAL obar: MAX_T=$MAX_T ks=$FINAL_KS ALSO_POLY=$ALSO_POLY TARGET_LOSS=$TARGET_LOSS"
+echo "FINAL mu: MAX_T=$MAX_T ks=$FINAL_KS ALSO_POLY=$ALSO_POLY TARGET_LOSS=$TARGET_LOSS"
+echo "final_n_seeds=$FINAL_N_SEEDS seed_base=$FINAL_SEED_BASE"
 if [[ "$MAX_T" -ge 64 ]]; then
   echo "[WARN] PTB has only ~3 unique T=64 sentences; prefer MAX_T=32 unless you accept heavy duplication."
 fi
@@ -95,6 +98,8 @@ ARGS=(
   --kernel-mode "$KERNEL_MODE"
   --target-loss "$TARGET_LOSS"
   --max-epochs "$MAX_EPOCHS"
+  --final-n-seeds "$FINAL_N_SEEDS"
+  --final-seed-base "$FINAL_SEED_BASE"
 )
 if [[ "$ALSO_POLY" == "1" ]]; then
   ARGS+=(--also-poly)
