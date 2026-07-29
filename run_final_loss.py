@@ -53,9 +53,9 @@ STYLES: dict[str, dict[str, Any]] = {
     "k-CSA": dict(color="#E69F00", linestyle="-", marker="s", linewidth=2.4),
     "poly-k-QSA L=16": dict(color="#0072B2", linestyle="--", marker="^", linewidth=2.2),
     "poly-k-CSA": dict(color="#E69F00", linestyle="--", marker="v", linewidth=2.2),
-    "nl-CSA iso ~288": dict(color="#000000", linestyle="--", marker="D", linewidth=2.2),
-    "nl-CSA iso ~128": dict(color="#000000", linestyle="-", marker="s", linewidth=2.2),
-    "nl-CSA gen ~128": dict(color="#000000", linestyle=":", marker="x", linewidth=2.4),
+    "nl-CSA iso ~288": dict(color="#888888", linestyle="--", marker="D", linewidth=2.2),
+    "nl-CSA iso ~128": dict(color="#B0B0B0", linestyle="-", marker="s", linewidth=2.2),  # light envelope
+    "nl-CSA gen ~128": dict(color="#222222", linestyle=":", marker="x", linewidth=2.4),  # dark envelope
 }
 
 
@@ -382,7 +382,7 @@ def _pad_histories(runs: list[dict]) -> list[dict]:
 
 
 def _log_mu_ratio_per_run(r: dict, T: int) -> float:
-    """log(mu_0/mu) = L_final - L_init using aligned losses from training history."""
+    """log(mu/mu_0) = L_init - L_final (positive = improvement vs random init)."""
     L_final = _aligned_loss(r, T)
     hist = r.get("loss_history", [])
     if not hist:
@@ -391,7 +391,7 @@ def _log_mu_ratio_per_run(r: dict, T: int) -> float:
     L_init = float(hist[0])
     if not model.startswith("nl-CSA"):
         L_init += math.log(T)
-    return float(L_final - L_init)
+    return float(L_init - L_final)
 
 
 def _append_log_mu_ratio(agg: dict, runs: list[dict], T: int) -> None:
@@ -403,7 +403,7 @@ def _append_log_mu_ratio(agg: dict, runs: list[dict], T: int) -> None:
     if aligned.size:
         agg["aligned_init_mean"] = float(aligned[0])
     finals = np.array([_aligned_loss(r, T) for r in runs], dtype=float)
-    inits = finals - ratios
+    inits = finals + ratios  # ratio = L0 - L_final => L0 = L_final + ratio
     agg["aligned_init_per_seed"] = inits.tolist()
 
 
@@ -477,7 +477,9 @@ def plot_aligned_vs_k(
         mean = float(ref[mean_key])
         std = float(ref.get(std_key, 0.0))
         label = param_labels.get(name, name)
-        ax.axhspan(mean - std, mean + std, color=st["color"], alpha=0.14, linewidth=0, zorder=0)
+        # iso: lighter fill; gen: darker fill (same color as line)
+        fill_alpha = 0.22 if "iso" in name else 0.28
+        ax.axhspan(mean - std, mean + std, color=st["color"], alpha=fill_alpha, linewidth=0, zorder=0)
         ax.axhline(
             mean,
             color=st["color"],
@@ -540,7 +542,8 @@ def plot_log_mu_ratio_vs_k(
         mean = float(ref["log_mu_ratio_mean"])
         std = float(ref.get("log_mu_ratio_std", 0.0))
         label = param_labels.get(name, name)
-        ax.axhspan(mean - std, mean + std, color=st["color"], alpha=0.14, linewidth=0, zorder=0)
+        fill_alpha = 0.22 if "iso" in name else 0.28
+        ax.axhspan(mean - std, mean + std, color=st["color"], alpha=fill_alpha, linewidth=0, zorder=0)
         ax.axhline(
             mean,
             color=st["color"],
@@ -548,11 +551,11 @@ def plot_log_mu_ratio_vs_k(
             linewidth=st.get("linewidth", 2.0),
             label=f"{label} (k-indep., envelope=seed std)",
         )
-    ax.axhline(0.0, color="0.55", linestyle=":", linewidth=1.0, alpha=0.7, label=r"no improvement ($\log(\mu_0/\mu)=0$)")
+    ax.axhline(0.0, color="0.55", linestyle=":", linewidth=1.0, alpha=0.7, label=r"no improvement ($\log(\mu/\mu_0)=0$)")
     ax.set_xlabel("k")
-    ax.set_ylabel(r"$\log(\mu_0/\mu)$  (= $L_{\mathrm{final}} - L_0$; nl-CSA: Renyi $\Delta$)")
+    ax.set_ylabel(r"$\log(\mu/\mu_0)$  (= $L_0 - L_{\mathrm{final}}$; positive = improvement)")
     ax.set_title(
-        f"FINAL log($\\mu_0$/$\\mu$) vs k  (T={T}, d={d}; random-init baseline; param counts in legend)"
+        f"FINAL log($\\mu$/$\\mu_0$) vs k  (T={T}, d={d}; random-init baseline; param counts in legend)"
     )
     all_k = sorted({int(p["k"]) for p in mu_points})
     if all_k:
@@ -726,15 +729,14 @@ def _mu_point_from_agg(agg: dict, spec: dict, k: int, test: bool = False) -> dic
 
 
 def _backfill_log_mu_ratio_fields(agg: dict) -> None:
-    if "log_mu_ratio_mean" in agg:
-        return
+    """Backfill log(mu/mu_0)=L0-L_final from histories (always recompute sign)."""
     ratios: list[float] = []
     for hist in agg.get("seed_histories", []):
         if hist:
-            ratios.append(float(hist[-1]) - float(hist[0]))
+            ratios.append(float(hist[0]) - float(hist[-1]))  # L0 - L_final
     if not ratios and agg.get("aligned_history"):
         ah = agg["aligned_history"]
-        ratios = [float(ah[-1]) - float(ah[0])]
+        ratios = [float(ah[0]) - float(ah[-1])]
     if ratios:
         arr = np.array(ratios, dtype=float)
         agg["log_mu_ratio_mean"] = float(arr.mean())
