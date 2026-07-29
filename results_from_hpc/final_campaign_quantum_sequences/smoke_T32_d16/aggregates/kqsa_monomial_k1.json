@@ -1,0 +1,33 @@
+{
+  "model": "k-QSA L=16",
+  "family": "kqsa",
+  "kernel_mode": "monomial",
+  "k": 1,
+  "runs": [
+    {
+      "seed": 1042,
+      "loss_history": [
+        11.927933767530892,
+        11.908821048534076
+      ],
+      "aligned_history": [
+        15.393669670330619,
+        15.374556951333803
+      ],
+      "aligned_loss": 15.374556951333803,
+      "test_neglog_fid": 2.982877292584237
+    }
+  ],
+  "aligned_history": [
+    15.393669670330619,
+    15.374556951333803
+  ],
+  "aligned_std": [
+    0.0,
+    0.0
+  ],
+  "aligned_loss_mean": 15.374556951333803,
+  "aligned_loss_std": 0.0,
+  "aligned_test_loss_mean": 2.982877292584237,
+  "aligned_test_loss_std": 0.0
+}

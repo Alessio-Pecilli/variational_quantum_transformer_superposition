@@ -1,0 +1,33 @@
+{
+  "model": "k-CSA",
+  "family": "kcsa",
+  "kernel_mode": "monomial",
+  "k": 1,
+  "runs": [
+    {
+      "seed": 1042,
+      "loss_history": [
+        11.624516723984119,
+        11.624945303321834
+      ],
+      "aligned_history": [
+        15.090252626783846,
+        15.09068120612156
+      ],
+      "aligned_loss": 15.09068120612156,
+      "test_neglog_fid": 2.810134145498537
+    }
+  ],
+  "aligned_history": [
+    15.090252626783846,
+    15.09068120612156
+  ],
+  "aligned_std": [
+    0.0,
+    0.0
+  ],
+  "aligned_loss_mean": 15.09068120612156,
+  "aligned_loss_std": 0.0,
+  "aligned_test_loss_mean": 2.810134145498537,
+  "aligned_test_loss_std": 0.0
+}

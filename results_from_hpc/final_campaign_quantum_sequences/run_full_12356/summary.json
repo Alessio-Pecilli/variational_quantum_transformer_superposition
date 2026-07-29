@@ -1,0 +1,277 @@
+{
+  "config": {
+    "train_size": 128,
+    "test_size": 64,
+    "T": 32,
+    "d": 16,
+    "n_qubits": 4,
+    "dt": 1.0,
+    "ks": "1,2,3,5,6",
+    "epochs": 60,
+    "poly_epochs": 90,
+    "lr": 0.002,
+    "layers": 8,
+    "seed": 7,
+    "model_seed_base": 1042,
+    "n_seeds": 2,
+    "output_dir": "results_from_hpc/final_campaign_quantum_sequences/run_full_12356",
+    "quick": false
+  },
+  "mu_points_vs_k": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "aligned_loss_mean": 14.314023400708887,
+      "aligned_loss_std": 0.016292943313515273
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "aligned_loss_mean": 16.98185229238342,
+      "aligned_loss_std": 0.023430169474671914
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 3,
+      "aligned_loss_mean": 18.718605998218287,
+      "aligned_loss_std": 0.028819753331950082
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 5,
+      "aligned_loss_mean": 21.76112867264034,
+      "aligned_loss_std": 0.11694395847345973
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 6,
+      "aligned_loss_mean": 22.851093706913634,
+      "aligned_loss_std": 0.09047905879923945
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "aligned_loss_mean": 15.451162011777091,
+      "aligned_loss_std": 0.05777581028236156
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "aligned_loss_mean": 17.758585321537193,
+      "aligned_loss_std": 0.0023594132926056943
+    },
+    {
+      "model": "k-CSA",
+      "k": 3,
+      "aligned_loss_mean": 19.792643072876167,
+      "aligned_loss_std": 0.09489237489121828
+    },
+    {
+      "model": "k-CSA",
+      "k": 5,
+      "aligned_loss_mean": 22.905595807236132,
+      "aligned_loss_std": 0.025882326673942302
+    },
+    {
+      "model": "k-CSA",
+      "k": 6,
+      "aligned_loss_mean": 24.096263233297513,
+      "aligned_loss_std": 0.11126213795028761
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "aligned_loss_mean": 12.20651776624035,
+      "aligned_loss_std": 0.08322785386071363
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "aligned_loss_mean": 14.081491008131422,
+      "aligned_loss_std": 0.22688990098681305
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 3,
+      "aligned_loss_mean": 14.853123766946911,
+      "aligned_loss_std": 0.043883424579548524
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 5,
+      "aligned_loss_mean": 16.415173209790986,
+      "aligned_loss_std": 0.009209683263163626
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 6,
+      "aligned_loss_mean": 16.579869053557548,
+      "aligned_loss_std": 0.04958086988107624
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "aligned_loss_mean": 14.00012919677479,
+      "aligned_loss_std": 0.21416477525887512
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "aligned_loss_mean": 15.832462722218146,
+      "aligned_loss_std": 0.2517644776584467
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 3,
+      "aligned_loss_mean": 16.915063488446656,
+      "aligned_loss_std": 0.36459307530847695
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 5,
+      "aligned_loss_mean": 18.395244122830082,
+      "aligned_loss_std": 0.21219907181086128
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 6,
+      "aligned_loss_mean": 18.403586368979745,
+      "aligned_loss_std": 0.14082351207409793
+    }
+  ],
+  "mu_points_vs_k_test": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "aligned_test_loss_mean": 2.732151851293903,
+      "aligned_test_loss_std": 0.11976134051280374
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "aligned_test_loss_mean": 2.84668180922347,
+      "aligned_test_loss_std": 0.07709839958064402
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 3,
+      "aligned_test_loss_mean": 2.6868966999997044,
+      "aligned_test_loss_std": 0.029265717609247233
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 5,
+      "aligned_test_loss_mean": 2.6447348232557286,
+      "aligned_test_loss_std": 0.03544864476037768
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 6,
+      "aligned_test_loss_mean": 2.7697880995333293,
+      "aligned_test_loss_std": 0.04562734214811681
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "aligned_test_loss_mean": 2.8283719458553738,
+      "aligned_test_loss_std": 0.037660414186128754
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "aligned_test_loss_mean": 2.8745378520265072,
+      "aligned_test_loss_std": 0.086356081479398
+    },
+    {
+      "model": "k-CSA",
+      "k": 3,
+      "aligned_test_loss_mean": 2.9459518581549338,
+      "aligned_test_loss_std": 0.013322390648817573
+    },
+    {
+      "model": "k-CSA",
+      "k": 5,
+      "aligned_test_loss_mean": 2.8892256377025136,
+      "aligned_test_loss_std": 0.005445976643532413
+    },
+    {
+      "model": "k-CSA",
+      "k": 6,
+      "aligned_test_loss_mean": 2.878717769821475,
+      "aligned_test_loss_std": 0.039260816593185366
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "aligned_test_loss_mean": 2.6790110776731857,
+      "aligned_test_loss_std": 0.16453467672926392
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "aligned_test_loss_mean": 2.670913765700342,
+      "aligned_test_loss_std": 0.013452054121275037
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 3,
+      "aligned_test_loss_mean": 2.7111237686213965,
+      "aligned_test_loss_std": 0.15155426780177694
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 5,
+      "aligned_test_loss_mean": 2.6850153213957135,
+      "aligned_test_loss_std": 0.05472265845823299
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 6,
+      "aligned_test_loss_mean": 2.6669130733025197,
+      "aligned_test_loss_std": 0.004318817958173682
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "aligned_test_loss_mean": 2.7486102012654343,
+      "aligned_test_loss_std": 0.05562336054113848
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "aligned_test_loss_mean": 2.7756517847094075,
+      "aligned_test_loss_std": 0.043110215455197665
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 3,
+      "aligned_test_loss_mean": 2.719517294006761,
+      "aligned_test_loss_std": 0.011649970717925617
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 5,
+      "aligned_test_loss_mean": 2.8319797723685087,
+      "aligned_test_loss_std": 0.08996688680924514
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 6,
+      "aligned_test_loss_mean": 2.873940721919141,
+      "aligned_test_loss_std": 0.05950819867904755
+    }
+  ],
+  "dataset": {
+    "train_shape": [
+      128,
+      33,
+      16
+    ],
+    "test_shape": [
+      64,
+      33,
+      16
+    ],
+    "note": "Hamiltonian parameters (J,h) vary per trajectory and are never given as model inputs."
+  }
+}

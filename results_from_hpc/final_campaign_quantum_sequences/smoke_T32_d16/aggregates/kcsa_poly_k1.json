@@ -1,0 +1,33 @@
+{
+  "model": "poly-k-CSA",
+  "family": "kcsa",
+  "kernel_mode": "poly",
+  "k": 1,
+  "runs": [
+    {
+      "seed": 1042,
+      "loss_history": [
+        10.635601008984665,
+        10.635986403382901
+      ],
+      "aligned_history": [
+        14.101336911784392,
+        14.101722306182628
+      ],
+      "aligned_loss": 14.101722306182628,
+      "test_neglog_fid": 2.8273668107506658
+    }
+  ],
+  "aligned_history": [
+    14.101336911784392,
+    14.101722306182628
+  ],
+  "aligned_std": [
+    0.0,
+    0.0
+  ],
+  "aligned_loss_mean": 14.101722306182628,
+  "aligned_loss_std": 0.0,
+  "aligned_test_loss_mean": 2.8273668107506658,
+  "aligned_test_loss_std": 0.0
+}
