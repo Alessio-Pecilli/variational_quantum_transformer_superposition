@@ -793,7 +793,11 @@ def _check_comparable(aggs: list[dict], tol_ratio: float = 0.35) -> list[str]:
     return warnings
 
 
-def _replot_from_summary(out: Path, appendix_curves_k: int | None = None) -> int:
+def _replot_from_summary(
+    out: Path,
+    appendix_curves_k: int | None = None,
+    appendix_curves_ks: str | None = None,
+) -> int:
     summary_path = out / "summary.json"
     if not summary_path.exists():
         raise FileNotFoundError(summary_path)
@@ -843,7 +847,7 @@ def _replot_from_summary(out: Path, appendix_curves_k: int | None = None) -> int
             std_key="aligned_loss_std",
         )
     appendix_ks = _parse_ks(
-        str(summary.get("config", {}).get("appendix_curves_ks", "")),
+        appendix_curves_ks or str(summary.get("config", {}).get("appendix_curves_ks", "")),
         [3, 5],
     )
     if appendix_curves_k is not None:
@@ -939,7 +943,7 @@ def main() -> int:
     if args.replot_only:
         return _replot_from_summary(
             Path(args.replot_only),
-            appendix_curves_k=int(args.appendix_curves_k),
+            appendix_curves_ks=args.appendix_curves_ks,
         )
 
     if args.k is not None:
