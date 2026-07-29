@@ -20,6 +20,8 @@ PLOT_STYLES = {
     "k-CSA": dict(color="#E69F00", linestyle="-", marker="s", linewidth=2.4),
     "poly-k-QSA L=16": dict(color="#0072B2", linestyle="--", marker="^", linewidth=2.2),
     "poly-k-CSA": dict(color="#E69F00", linestyle="--", marker="v", linewidth=2.2),
+    "nl-CSA iso": dict(color="#000000", linestyle="-", marker="s", linewidth=2.2),
+    "nl-CSA gen": dict(color="#000000", linestyle=":", marker="x", linewidth=2.4),
 }
 
 
@@ -173,6 +175,20 @@ def _lcu_coeffs(k: int, d: int) -> jnp.ndarray:
 def _kernel_matrix(s: jnp.ndarray, k: int, mode: str, d: int) -> tuple[jnp.ndarray, jnp.ndarray]:
     if mode == "monomial":
         return s**k, jnp.asarray(1.0, dtype=jnp.float64)
+    if mode == "soft":
+        # Causal fidelity-softmax; k-independent (nl-CSA).
+        beta = jnp.sqrt(float(d))
+        g = jnp.abs(s) ** 2
+        t_q, t_k = s.shape
+        if t_q == t_k:
+            tri = jnp.tril(jnp.ones((t_q, t_k), dtype=jnp.float64))
+            e = jnp.exp(beta * g) * tri
+        else:
+            # Single query row (e.g. T+1 fidelity): columns are already the causal prefix.
+            e = jnp.exp(beta * g)
+        z = jnp.sum(e, axis=1, keepdims=True)
+        z = jnp.where(z < 1e-12, 1.0, z)
+        return e / z, jnp.asarray(1.0, dtype=jnp.float64)
     c = _lcu_coeffs(k, d)
     g = jnp.zeros_like(s)
     s_pow = jnp.ones_like(s)
@@ -187,7 +203,12 @@ def _wv_from_params(params: dict[str, jnp.ndarray], d: int, family: str) -> tupl
     if family == "kqsa":
         w = _complex_ansatz_matrix(params["wp"])[:d, :d]
         v = _complex_ansatz_matrix(params["vp"])[:d, :d]
+    elif family == "nlcsa_gen":
+        # Free (non-unitary) complex maps: quantum-sequence analogue of nl-CSA "general".
+        w = params["w_raw"]
+        v = params["v_raw"]
     else:
+        # k-CSA and nl-CSA iso: free unitary W,V (isometric value map).
         w = _unitary_from_raw(params["w_raw"])
         v = _unitary_from_raw(params["v_raw"])
     return w, v
@@ -269,11 +290,13 @@ def _init_params(family: str, d: int, T: int, layers: int, seed: int) -> dict[st
             "vp": jnp.asarray(rng.standard_normal((layers, n, 3)), dtype=jnp.float64),
             "phi": jnp.zeros((T,), dtype=jnp.float64),
         }
-    w_raw = rng.standard_normal((d, d)) + 1j * rng.standard_normal((d, d))
-    v_raw = rng.standard_normal((d, d)) + 1j * rng.standard_normal((d, d))
+    scale = 1.0 / math.sqrt(d) if family == "nlcsa_gen" else 1.0
+    w_raw = scale * (rng.standard_normal((d, d)) + 1j * rng.standard_normal((d, d)))
+    v_raw = scale * (rng.standard_normal((d, d)) + 1j * rng.standard_normal((d, d)))
     return {
         "w_raw": jnp.asarray(w_raw, dtype=jnp.complex128),
         "v_raw": jnp.asarray(v_raw, dtype=jnp.complex128),
+        # Shared learned phases across sequences; reused as-is at test (never phi*).
         "phi": jnp.zeros((T,), dtype=jnp.float64),
     }
 
@@ -403,14 +426,17 @@ def plot_vs_k(
     ykey_mean: str,
     ykey_std: str,
     ylabel: str,
+    nl_refs: list[dict[str, Any]] | None = None,
 ) -> None:
     fig, ax = plt.subplots(figsize=(10.5, 6))
     by_model: dict[str, list[dict[str, Any]]] = {}
     for row in mu_points:
         by_model.setdefault(row["model"], []).append(row)
+    all_ks: list[int] = []
     for name, rows in by_model.items():
         rows = sorted(rows, key=lambda x: int(x["k"]))
         ks = [int(r["k"]) for r in rows]
+        all_ks.extend(ks)
         means = [float(r[ykey_mean]) for r in rows]
         stds = [float(r[ykey_std]) for r in rows]
         st = PLOT_STYLES.get(name, dict(color="0.3", linestyle="-", marker="o", linewidth=2.2))
@@ -425,6 +451,22 @@ def plot_vs_k(
             capsize=4,
             label=name,
         )
+    if nl_refs and all_ks:
+        xmin, xmax = min(all_ks), max(all_ks)
+        xs = np.linspace(xmin, xmax, 64)
+        for ref in nl_refs:
+            name = str(ref["model"])
+            mean = float(ref[ykey_mean])
+            std = float(ref[ykey_std])
+            st = PLOT_STYLES.get(name, dict(color="0.1", linestyle="-", linewidth=2.0))
+            ax.axhline(
+                mean,
+                color=st["color"],
+                linestyle=st["linestyle"],
+                linewidth=st["linewidth"],
+                label=f"{name} (k-indep.)",
+            )
+            ax.fill_between(xs, mean - std, mean + std, color=st["color"], alpha=0.10, linewidth=0)
     ax.set_xlabel("k")
     ax.set_ylabel(ylabel)
     ax.set_title(title)
@@ -465,7 +507,7 @@ def plot_convergence_curves(aggs: list[dict[str, Any]], out_path: Path, T: int) 
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Quantum-sequences k sweep (mono+poly)")
+    parser = argparse.ArgumentParser(description="Quantum-sequences k sweep (mono+poly+nl)")
     parser.add_argument("--train-size", type=int, default=256)
     parser.add_argument("--test-size", type=int, default=128)
     parser.add_argument("--T", type=int, default=32)
@@ -475,6 +517,7 @@ def main() -> int:
     parser.add_argument("--ks", type=str, default="1,2,3,5,6")
     parser.add_argument("--epochs", type=int, default=400)
     parser.add_argument("--poly-epochs", type=int, default=600)
+    parser.add_argument("--nl-epochs", type=int, default=400)
     parser.add_argument("--min-epochs", type=int, default=40)
     parser.add_argument("--patience", type=int, default=30)
     parser.add_argument("--loss-rel-tol", type=float, default=1e-4)
@@ -485,6 +528,13 @@ def main() -> int:
     parser.add_argument("--model-seed-base", type=int, default=1042)
     parser.add_argument("--n-seeds", type=int, default=5)
     parser.add_argument("--output-dir", type=str, default="results_from_hpc/final_campaign_quantum_sequences/loss")
+    parser.add_argument(
+        "--reuse-mu-summary",
+        type=str,
+        default="",
+        help="If set, reuse mu-model points from an existing summary.json and only train nl-CSA.",
+    )
+    parser.add_argument("--skip-nl", action="store_true", help="Skip nl-CSA iso/gen horizontal refs.")
     parser.add_argument("--quick", action="store_true")
     args = parser.parse_args()
 
@@ -497,6 +547,7 @@ def main() -> int:
         args.ks = "1,2"
         args.epochs = 40
         args.poly_epochs = 50
+        args.nl_epochs = 40
         args.min_epochs = 10
         args.patience = 8
         args.n_seeds = 2
@@ -523,16 +574,29 @@ def main() -> int:
         dt=args.dt,
         seed=args.seed,
     )
-    model_specs = [
-        ("k-QSA L=16", "kqsa", "monomial", args.epochs),
-        ("k-CSA", "kcsa", "monomial", args.epochs),
-        ("poly-k-QSA L=16", "kqsa", "poly", args.poly_epochs),
-        ("poly-k-CSA", "kcsa", "poly", args.poly_epochs),
-    ]
-    mu_points_train = []
-    mu_points_test_fid = []
-    mu_points_test_mu = []
+
+    mu_points_train: list[dict[str, Any]] = []
+    mu_points_test_fid: list[dict[str, Any]] = []
+    mu_points_test_mu: list[dict[str, Any]] = []
     convergence_aggs: list[dict[str, Any]] = []
+    nl_refs_train: list[dict[str, Any]] = []
+    nl_refs_test_mu: list[dict[str, Any]] = []
+    nl_refs_test_fid: list[dict[str, Any]] = []
+
+    if args.reuse_mu_summary:
+        prev = json.loads(Path(args.reuse_mu_summary).read_text(encoding="utf-8"))
+        mu_points_train = list(prev.get("mu_points_vs_k", []))
+        mu_points_test_mu = list(prev.get("mu_points_vs_k_test_mu", []))
+        mu_points_test_fid = list(prev.get("mu_points_vs_k_test_fidelity", []))
+        print(f"[reuse] loaded mu-model points from {args.reuse_mu_summary}")
+        model_specs: list[tuple[str, str, str, int]] = []
+    else:
+        model_specs = [
+            ("k-QSA L=16", "kqsa", "monomial", args.epochs),
+            ("k-CSA", "kcsa", "monomial", args.epochs),
+            ("poly-k-QSA L=16", "kqsa", "poly", args.poly_epochs),
+            ("poly-k-CSA", "kcsa", "poly", args.poly_epochs),
+        ]
 
     for display, family, mode, max_epochs in model_specs:
         for k in ks:
@@ -612,19 +676,112 @@ def main() -> int:
                     }
                 )
             print(
-                f"[{display} k={k}] train={agg['aligned_loss_mean']:.4f}±{agg['aligned_loss_std']:.4f} | "
-                f"test_mu={agg['aligned_test_mu_loss_mean']:.4f}±{agg['aligned_test_mu_loss_std']:.4f} | "
-                f"test_-logF={agg['aligned_test_fidelity_loss_mean']:.4f}±{agg['aligned_test_fidelity_loss_std']:.4f} | "
+                f"[{display} k={k}] train={agg['aligned_loss_mean']:.4f}+/-{agg['aligned_loss_std']:.4f} | "
+                f"test_mu={agg['aligned_test_mu_loss_mean']:.4f}+/-{agg['aligned_test_mu_loss_std']:.4f} | "
+                f"test_-logF={agg['aligned_test_fidelity_loss_mean']:.4f}+/-{agg['aligned_test_fidelity_loss_std']:.4f} | "
+                f"epochs~{agg['epochs_run_mean']:.0f} conv={agg['converged_fraction']:.0%}"
+            )
+
+    if not args.skip_nl:
+        # Softmax kernel is k-independent: train once and plot as horizontal refs.
+        nl_specs = [
+            ("nl-CSA iso", "nlcsa_iso", "soft", args.nl_epochs),
+            ("nl-CSA gen", "nlcsa_gen", "soft", args.nl_epochs),
+        ]
+        bookkeeping_k = ks[0]
+        for display, family, mode, max_epochs in nl_specs:
+            runs = []
+            for s_idx in range(args.n_seeds):
+                mseed = args.model_seed_base + s_idx
+                trained = train_model(
+                    train_states=dataset.train_states,
+                    test_states=dataset.test_states,
+                    family=family,
+                    kernel_mode=mode,
+                    k=bookkeeping_k,
+                    layers=args.layers,
+                    max_epochs=max_epochs,
+                    lr=args.lr,
+                    seed=mseed + 911,
+                    min_epochs=args.min_epochs,
+                    patience=args.patience,
+                    loss_rel_tol=args.loss_rel_tol,
+                    eval_every=args.eval_every,
+                )
+                test_fid = _predict_last_fidelity(
+                    dataset.test_states, trained["params"], family=family, mode=mode, k=bookkeeping_k
+                )
+                runs.append(
+                    {
+                        "seed": mseed,
+                        "loss_history": trained["loss_history"],
+                        "aligned_history": trained["aligned_history"],
+                        "test_loss_history": trained["test_loss_history"],
+                        "test_loss_epochs": trained["test_loss_epochs"],
+                        "aligned_test_history": trained["aligned_test_history"],
+                        "aligned_loss": float(trained["final_loss"] + math.log(args.T)),
+                        "aligned_test_mu_loss": float(trained["final_test_mu_loss"] + math.log(args.T)),
+                        "test_neglog_fid": float(-math.log(max(test_fid, 1e-12))),
+                        "epochs_run": trained["epochs_run"],
+                        "converged": trained["converged"],
+                        "stop_reason": trained["stop_reason"],
+                    }
+                )
+            agg = aggregate(runs)
+            payload = {
+                "model": display,
+                "family": family,
+                "kernel_mode": mode,
+                "k": "independent",
+                "runs": runs,
+                **agg,
+            }
+            (aggs_dir / f"{family}_soft.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+            nl_refs_train.append(
+                {
+                    "model": display,
+                    "aligned_loss_mean": agg["aligned_loss_mean"],
+                    "aligned_loss_std": agg["aligned_loss_std"],
+                }
+            )
+            nl_refs_test_mu.append(
+                {
+                    "model": display,
+                    "aligned_test_mu_loss_mean": agg["aligned_test_mu_loss_mean"],
+                    "aligned_test_mu_loss_std": agg["aligned_test_mu_loss_std"],
+                }
+            )
+            nl_refs_test_fid.append(
+                {
+                    "model": display,
+                    "aligned_test_fidelity_loss_mean": agg["aligned_test_fidelity_loss_mean"],
+                    "aligned_test_fidelity_loss_std": agg["aligned_test_fidelity_loss_std"],
+                }
+            )
+            convergence_aggs.append(
+                {
+                    "model": display,
+                    "aligned_history": agg["aligned_history"],
+                    "aligned_std": agg["aligned_std"],
+                    "test_loss_epochs": runs[0]["test_loss_epochs"],
+                    "aligned_test_history": runs[0]["aligned_test_history"],
+                }
+            )
+            print(
+                f"[{display} k-indep] train={agg['aligned_loss_mean']:.4f}+/-{agg['aligned_loss_std']:.4f} | "
+                f"test_mu={agg['aligned_test_mu_loss_mean']:.4f}+/-{agg['aligned_test_mu_loss_std']:.4f} | "
+                f"test_-logF={agg['aligned_test_fidelity_loss_mean']:.4f}+/-{agg['aligned_test_fidelity_loss_std']:.4f} | "
                 f"epochs~{agg['epochs_run_mean']:.0f} conv={agg['converged_fraction']:.0%}"
             )
 
     plot_vs_k(
         mu_points_train,
         plots / "final_aligned_loss_vs_k.png",
-        f"FINAL aligned loss vs k (T={args.T}, d={args.d}; train; mono+poly)",
+        f"FINAL aligned loss vs k (T={args.T}, d={args.d}; train; mono+poly+nl)",
         "aligned_loss_mean",
         "aligned_loss_std",
         r"aligned loss: $-\log\mu+\log T$",
+        nl_refs=nl_refs_train,
     )
     plot_vs_k(
         mu_points_test_mu,
@@ -633,6 +790,7 @@ def main() -> int:
         "aligned_test_mu_loss_mean",
         "aligned_test_mu_loss_std",
         r"test aligned loss: $-\log\mu+\log T$",
+        nl_refs=nl_refs_test_mu,
     )
     plot_vs_k(
         mu_points_test_fid,
@@ -641,6 +799,7 @@ def main() -> int:
         "aligned_test_fidelity_loss_mean",
         "aligned_test_fidelity_loss_std",
         r"test loss: $-\log(\mathrm{prediction\ fidelity})$",
+        nl_refs=nl_refs_test_fid,
     )
     if convergence_aggs:
         plot_convergence_curves(
@@ -654,6 +813,9 @@ def main() -> int:
         "mu_points_vs_k": mu_points_train,
         "mu_points_vs_k_test_mu": mu_points_test_mu,
         "mu_points_vs_k_test_fidelity": mu_points_test_fid,
+        "nl_refs_train": nl_refs_train,
+        "nl_refs_test_mu": nl_refs_test_mu,
+        "nl_refs_test_fidelity": nl_refs_test_fid,
         "dataset": {
             "train_shape": list(dataset.train_states.shape),
             "test_shape": list(dataset.test_states.shape),
@@ -661,7 +823,13 @@ def main() -> int:
         },
         "training_note": (
             "Early stopping on train -log(mu) with patience; best checkpoint used for test metrics. "
-            "Test mu-loss uses the same coherent readout as train; test fidelity is separate single-step T+1 metric."
+            "Test mu-loss uses the SAME learned shared phi_j from training (never optimal phi* recomputed on test). "
+            "Test fidelity is per-step T+1 and is phase-invariant (phi unused). "
+            "nl-CSA iso/gen use soft kernel (k-independent horizontal refs): iso=unitary W/V, gen=free W/V."
+        ),
+        "phi_protocol": (
+            "phi_j are trainable shared parameters of length T, optimized on train and frozen/reused at test. "
+            "Do NOT set phi_j=-arg(A_j) at test; that would be oracle phase alignment, not the learned model."
         ),
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")

@@ -1,0 +1,444 @@
+{
+  "config": {
+    "train_size": 256,
+    "test_size": 128,
+    "T": 32,
+    "d": 16,
+    "n_qubits": 4,
+    "dt": 1.0,
+    "ks": "1,2,3,5,6",
+    "epochs": 400,
+    "poly_epochs": 600,
+    "nl_epochs": 400,
+    "min_epochs": 60,
+    "patience": 40,
+    "loss_rel_tol": 0.0001,
+    "eval_every": 5,
+    "lr": 0.002,
+    "layers": 16,
+    "seed": 7,
+    "model_seed_base": 1042,
+    "n_seeds": 5,
+    "output_dir": "results_from_hpc/final_campaign_quantum_sequences/run_full_v3_nl",
+    "reuse_mu_summary": "results_from_hpc/final_campaign_quantum_sequences/run_full_v2/summary.json",
+    "skip_nl": false,
+    "quick": false
+  },
+  "mu_points_vs_k": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "aligned_loss_mean": 15.478098604127098,
+      "aligned_loss_std": 0.07758360559809754
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "aligned_loss_mean": 17.867456596303974,
+      "aligned_loss_std": 0.09073489102828838
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 3,
+      "aligned_loss_mean": 19.80496556598978,
+      "aligned_loss_std": 0.13855109067175508
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 5,
+      "aligned_loss_mean": 22.897430513604633,
+      "aligned_loss_std": 0.17771429080911372
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 6,
+      "aligned_loss_mean": 24.266132804229848,
+      "aligned_loss_std": 0.038826663625184984
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "aligned_loss_mean": 15.370062684467339,
+      "aligned_loss_std": 0.09015896683154069
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "aligned_loss_mean": 17.972598195833253,
+      "aligned_loss_std": 0.08640782987794751
+    },
+    {
+      "model": "k-CSA",
+      "k": 3,
+      "aligned_loss_mean": 19.87429071826898,
+      "aligned_loss_std": 0.06467977847928856
+    },
+    {
+      "model": "k-CSA",
+      "k": 5,
+      "aligned_loss_mean": 22.949989243217402,
+      "aligned_loss_std": 0.06105259251059967
+    },
+    {
+      "model": "k-CSA",
+      "k": 6,
+      "aligned_loss_mean": 24.205113738058213,
+      "aligned_loss_std": 0.05812735912967038
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "aligned_loss_mean": 14.045398555383647,
+      "aligned_loss_std": 0.11249878205194536
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "aligned_loss_mean": 15.887920526498212,
+      "aligned_loss_std": 0.24220964720862753
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 3,
+      "aligned_loss_mean": 16.84581828833615,
+      "aligned_loss_std": 0.25346664088273607
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 5,
+      "aligned_loss_mean": 18.396400845732924,
+      "aligned_loss_std": 0.1259567206745039
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 6,
+      "aligned_loss_mean": 18.3748402043914,
+      "aligned_loss_std": 0.21113641137397343
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "aligned_loss_mean": 14.079250456108454,
+      "aligned_loss_std": 0.1433528213365629
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "aligned_loss_mean": 15.940823373261987,
+      "aligned_loss_std": 0.11845714037866337
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 3,
+      "aligned_loss_mean": 16.92667067443743,
+      "aligned_loss_std": 0.2724344657670303
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 5,
+      "aligned_loss_mean": 18.198117383107203,
+      "aligned_loss_std": 0.20717437316466278
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 6,
+      "aligned_loss_mean": 18.448174884406985,
+      "aligned_loss_std": 0.19080023128954812
+    }
+  ],
+  "mu_points_vs_k_test_mu": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "aligned_test_mu_loss_mean": 15.395662056200067,
+      "aligned_test_mu_loss_std": 0.04219042087581255
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "aligned_test_mu_loss_mean": 17.88062895201569,
+      "aligned_test_mu_loss_std": 0.06607219284847722
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 3,
+      "aligned_test_mu_loss_mean": 19.76247098344784,
+      "aligned_test_mu_loss_std": 0.10846562117128865
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 5,
+      "aligned_test_mu_loss_mean": 22.873879478633857,
+      "aligned_test_mu_loss_std": 0.18659003093953894
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 6,
+      "aligned_test_mu_loss_mean": 24.17757282645053,
+      "aligned_test_mu_loss_std": 0.16436890283428257
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "aligned_test_mu_loss_mean": 15.409390286596974,
+      "aligned_test_mu_loss_std": 0.06427928859516494
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "aligned_test_mu_loss_mean": 17.849533639238665,
+      "aligned_test_mu_loss_std": 0.0732963692341824
+    },
+    {
+      "model": "k-CSA",
+      "k": 3,
+      "aligned_test_mu_loss_mean": 19.798316723503774,
+      "aligned_test_mu_loss_std": 0.1256924842670013
+    },
+    {
+      "model": "k-CSA",
+      "k": 5,
+      "aligned_test_mu_loss_mean": 22.93131624113214,
+      "aligned_test_mu_loss_std": 0.11588224867277865
+    },
+    {
+      "model": "k-CSA",
+      "k": 6,
+      "aligned_test_mu_loss_mean": 24.1077086214354,
+      "aligned_test_mu_loss_std": 0.08809974112736063
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "aligned_test_mu_loss_mean": 14.165850196313912,
+      "aligned_test_mu_loss_std": 0.1753782462050963
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "aligned_test_mu_loss_mean": 16.047397272224615,
+      "aligned_test_mu_loss_std": 0.14945407195535007
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 3,
+      "aligned_test_mu_loss_mean": 16.90038014720281,
+      "aligned_test_mu_loss_std": 0.19819055240208075
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 5,
+      "aligned_test_mu_loss_mean": 18.41473338419924,
+      "aligned_test_mu_loss_std": 0.157672813246801
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 6,
+      "aligned_test_mu_loss_mean": 18.470677923581736,
+      "aligned_test_mu_loss_std": 0.3482075466992986
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "aligned_test_mu_loss_mean": 14.15833574134437,
+      "aligned_test_mu_loss_std": 0.14744262561146748
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "aligned_test_mu_loss_mean": 15.945033151135167,
+      "aligned_test_mu_loss_std": 0.21738290206375224
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 3,
+      "aligned_test_mu_loss_mean": 17.091685579320405,
+      "aligned_test_mu_loss_std": 0.26844452157661575
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 5,
+      "aligned_test_mu_loss_mean": 18.29302146033595,
+      "aligned_test_mu_loss_std": 0.20401143868446733
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 6,
+      "aligned_test_mu_loss_mean": 18.62273886520804,
+      "aligned_test_mu_loss_std": 0.31477741863589487
+    }
+  ],
+  "mu_points_vs_k_test_fidelity": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "aligned_test_fidelity_loss_mean": 2.804617831019949,
+      "aligned_test_fidelity_loss_std": 0.0715768557457258
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "aligned_test_fidelity_loss_mean": 2.7741130183135416,
+      "aligned_test_fidelity_loss_std": 0.10080446881515001
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 3,
+      "aligned_test_fidelity_loss_mean": 2.778525303682737,
+      "aligned_test_fidelity_loss_std": 0.08590573208320348
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 5,
+      "aligned_test_fidelity_loss_mean": 2.8052848612519594,
+      "aligned_test_fidelity_loss_std": 0.09580744271388683
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 6,
+      "aligned_test_fidelity_loss_mean": 2.7841348070381096,
+      "aligned_test_fidelity_loss_std": 0.05329923671342726
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "aligned_test_fidelity_loss_mean": 2.7619611077057384,
+      "aligned_test_fidelity_loss_std": 0.06954875192177369
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "aligned_test_fidelity_loss_mean": 2.7500759548985814,
+      "aligned_test_fidelity_loss_std": 0.07589586164267766
+    },
+    {
+      "model": "k-CSA",
+      "k": 3,
+      "aligned_test_fidelity_loss_mean": 2.697726993064223,
+      "aligned_test_fidelity_loss_std": 0.030954334418822237
+    },
+    {
+      "model": "k-CSA",
+      "k": 5,
+      "aligned_test_fidelity_loss_mean": 2.7760165245852866,
+      "aligned_test_fidelity_loss_std": 0.036003994952516515
+    },
+    {
+      "model": "k-CSA",
+      "k": 6,
+      "aligned_test_fidelity_loss_mean": 2.828213333108875,
+      "aligned_test_fidelity_loss_std": 0.08333645401608947
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "aligned_test_fidelity_loss_mean": 2.7881833712512534,
+      "aligned_test_fidelity_loss_std": 0.0562546026466471
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "aligned_test_fidelity_loss_mean": 2.8059499585969343,
+      "aligned_test_fidelity_loss_std": 0.04312301772754587
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 3,
+      "aligned_test_fidelity_loss_mean": 2.7313054869712037,
+      "aligned_test_fidelity_loss_std": 0.0773353348913921
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 5,
+      "aligned_test_fidelity_loss_mean": 2.7741943628358214,
+      "aligned_test_fidelity_loss_std": 0.10099904036263789
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 6,
+      "aligned_test_fidelity_loss_mean": 2.795968083008794,
+      "aligned_test_fidelity_loss_std": 0.07053143818284129
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "aligned_test_fidelity_loss_mean": 2.760790300401278,
+      "aligned_test_fidelity_loss_std": 0.05730118377362925
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "aligned_test_fidelity_loss_mean": 2.774155874771199,
+      "aligned_test_fidelity_loss_std": 0.05333776891632191
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 3,
+      "aligned_test_fidelity_loss_mean": 2.812538511135179,
+      "aligned_test_fidelity_loss_std": 0.06645365973874119
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 5,
+      "aligned_test_fidelity_loss_mean": 2.7499163818697183,
+      "aligned_test_fidelity_loss_std": 0.03474035101909294
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 6,
+      "aligned_test_fidelity_loss_mean": 2.7538654816355064,
+      "aligned_test_fidelity_loss_std": 0.14286667815668488
+    }
+  ],
+  "nl_refs_train": [
+    {
+      "model": "nl-CSA iso",
+      "aligned_loss_mean": 16.523937110584967,
+      "aligned_loss_std": 0.23950609694296504
+    },
+    {
+      "model": "nl-CSA gen",
+      "aligned_loss_mean": 15.661349199627017,
+      "aligned_loss_std": 0.29733500881874547
+    }
+  ],
+  "nl_refs_test_mu": [
+    {
+      "model": "nl-CSA iso",
+      "aligned_test_mu_loss_mean": 16.620171483655817,
+      "aligned_test_mu_loss_std": 0.2556976987509025
+    },
+    {
+      "model": "nl-CSA gen",
+      "aligned_test_mu_loss_mean": 15.751427341224332,
+      "aligned_test_mu_loss_std": 0.39377990552598213
+    }
+  ],
+  "nl_refs_test_fidelity": [
+    {
+      "model": "nl-CSA iso",
+      "aligned_test_fidelity_loss_mean": 2.7906306832365324,
+      "aligned_test_fidelity_loss_std": 0.09120775236872793
+    },
+    {
+      "model": "nl-CSA gen",
+      "aligned_test_fidelity_loss_mean": 2.7925358156918327,
+      "aligned_test_fidelity_loss_std": 0.06680564247753809
+    }
+  ],
+  "dataset": {
+    "train_shape": [
+      256,
+      33,
+      16
+    ],
+    "test_shape": [
+      128,
+      33,
+      16
+    ],
+    "note": "Hamiltonian parameters (J,h) vary per trajectory and are never given as model inputs."
+  },
+  "training_note": "Early stopping on train -log(mu) with patience; best checkpoint used for test metrics. Test mu-loss uses the SAME learned shared phi_j from training (never optimal phi* recomputed on test). Test fidelity is per-step T+1 and is phase-invariant (phi unused). nl-CSA iso/gen use soft kernel (k-independent horizontal refs): iso=unitary W/V, gen=free W/V.",
+  "phi_protocol": "phi_j are trainable shared parameters of length T, optimized on train and frozen/reused at test. Do NOT set phi_j=-arg(A_j) at test; that would be oracle phase alignment, not the learned model."
+}
