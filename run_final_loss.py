@@ -648,7 +648,7 @@ def _check_comparable(aggs: list[dict], tol_ratio: float = 0.35) -> list[str]:
     return warnings
 
 
-def _replot_from_summary(out: Path) -> int:
+def _replot_from_summary(out: Path, appendix_curves_k: int | None = None) -> int:
     summary_path = out / "summary.json"
     if not summary_path.exists():
         raise FileNotFoundError(summary_path)
@@ -686,11 +686,15 @@ def _replot_from_summary(out: Path) -> int:
             mean_key="aligned_loss_mean",
             std_key="aligned_loss_std",
         )
-    appendix_k = summary.get("config", {}).get("appendix_curves_k", 5)
-    aggs_k5 = aggs_by_k.get(str(appendix_k)) or []
-    if aggs_k5:
+    appendix_k = int(
+        appendix_curves_k
+        if appendix_curves_k is not None
+        else summary.get("config", {}).get("appendix_curves_k", 3)
+    )
+    aggs_appendix = aggs_by_k.get(str(appendix_k)) or []
+    if aggs_appendix:
         plot_final_curves(
-            aggs_k5,
+            aggs_appendix,
             plots / f"final_training_curves_k{appendix_k}_appendix.png",
             T=T,
             d=d,
@@ -785,7 +789,10 @@ def main() -> int:
         args.test_data_seed = None
 
     if args.replot_only:
-        return _replot_from_summary(Path(args.replot_only))
+        return _replot_from_summary(
+            Path(args.replot_only),
+            appendix_curves_k=int(args.appendix_curves_k),
+        )
 
     if args.k is not None:
         ks = [int(args.k)]
