@@ -1,8 +1,15 @@
 ﻿# HPC results (Leonardo)
 
-## FINAL campaign (27 Jul 2026) — current
+## FINAL campaign v2 (29 Jul 2026) — current
 
-Multi-seed loss + ōbar (professor brief). Pack with plots, summaries, email draft:
+Revised plots: μ panels, loss 10-seed + test hold-out, nl-CSA ~128 only, appendix curves k=3.
+
+- [final_campaign_v2/](final_campaign_v2/)
+- Email draft: [final_campaign_v2/EMAIL_PROF.md](final_campaign_v2/EMAIL_PROF.md)
+
+## FINAL campaign v1 (27 Jul 2026)
+
+Multi-seed loss + ōbar (first definitive run). Pack with plots, summaries, email draft:
 
 - [final_campaign_definitive/](final_campaign_definitive/)
 - Email draft: [final_campaign_definitive/EMAIL_PROF.md](final_campaign_definitive/EMAIL_PROF.md)

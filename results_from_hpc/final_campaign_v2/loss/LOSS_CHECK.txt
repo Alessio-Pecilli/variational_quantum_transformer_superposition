@@ -1,0 +1,30 @@
+FINAL loss v2 — Leonardo job 50570347 (completed 2026-07-29 01:52 CEST)
+Dir: results/final_loss/v2_T16_d8_ks1-2-3-5-6_L16_n10_test
+Runs: 220 (50 k-QSA + 50 k-CSA + 50 poly-k-QSA + 50 poly-k-CSA + 20 nl-CSA), 10 seeds each
+
+Setup
+  T=16, d=8, k=1,2,3,5,6, QSA L=16 (96 angles), CSA 128 matrices
+  nl-CSA: only iso~128 and gen~128 (~144 params each)
+  test hold-out: data_seed=4242, max_sentences=200
+  train: max_sentences=800, batch=16, isolate-jobs (1 MPI rank)
+
+Aligned loss (train, mean ± std over 10 seeds)
+  k-QSA L=16 (96 ang):  k=1 4.279±0.103 | k=2 4.841±0.123 | k=3 5.325±0.133 | k=5 6.230±0.201 | k=6 6.622±0.223
+  k-CSA (128 mat):      k=1 4.709±0.352 | k=2 5.459±0.614 | k=3 5.769±0.891 | k=5 6.952±1.089 | k=6 7.536±1.101
+  poly-k-QSA (96 ang):  k=1 4.202±0.585 | k=2 4.342±0.078 | k=3 4.564±0.057 | k=5 4.831±0.058 | k=6 4.882±0.058
+  poly-k-CSA (128 mat): k=1 4.710±0.846 | k=2 5.678±1.465 | k=3 5.694±1.579 | k=5 5.325±0.413 | k=6 5.356±0.365
+  nl-CSA iso ~128:      6.579±0.033 (k-independent)
+  nl-CSA gen ~128:      6.930±0.781 (k-independent)
+
+Trend k=1 → k=6
+  k-QSA:      +2.343
+  k-CSA:      +2.827
+  poly-k-QSA: +0.680
+  poly-k-CSA: +0.646
+
+Test hold-out (aligned): essentially identical to train (same ordering; deltas <0.01 on means).
+
+Convergence warnings (aligned vs best poly-k-QSA k=1 = 4.202)
+  k-QSA k=5,6; k-CSA k=3,5,6; poly-k-CSA k=2,3; nl-CSA iso/gen — see job log.
+
+Appendix training curves: k=3 (replot 2026-07-29), includes nl-CSA + advantage line −log(k/C(d+k−1,k))+log T.
