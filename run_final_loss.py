@@ -691,7 +691,7 @@ def _replot_from_summary(out: Path, appendix_curves_k: int | None = None) -> int
         if appendix_curves_k is not None
         else summary.get("config", {}).get("appendix_curves_k", 3)
     )
-    aggs_appendix = aggs_by_k.get(str(appendix_k)) or []
+    aggs_appendix = (aggs_by_k.get(str(appendix_k)) or []) + (summary.get("nl_refs") or [])
     if aggs_appendix:
         plot_final_curves(
             aggs_appendix,
