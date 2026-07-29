@@ -381,6 +381,32 @@ def _pad_histories(runs: list[dict]) -> list[dict]:
     return out
 
 
+def _log_mu_ratio_per_run(r: dict, T: int) -> float:
+    """log(mu_0/mu) = L_final - L_init using aligned losses from training history."""
+    L_final = _aligned_loss(r, T)
+    hist = r.get("loss_history", [])
+    if not hist:
+        return 0.0
+    model = str(r.get("model", r.get("display", "")))
+    L_init = float(hist[0])
+    if not model.startswith("nl-CSA"):
+        L_init += math.log(T)
+    return float(L_final - L_init)
+
+
+def _append_log_mu_ratio(agg: dict, runs: list[dict], T: int) -> None:
+    ratios = np.array([_log_mu_ratio_per_run(r, T) for r in runs], dtype=float)
+    agg["log_mu_ratio_mean"] = float(ratios.mean())
+    agg["log_mu_ratio_std"] = float(ratios.std())
+    agg["log_mu_ratio_per_seed"] = ratios.tolist()
+    aligned = np.asarray(agg.get("aligned_history", []), dtype=float)
+    if aligned.size:
+        agg["aligned_init_mean"] = float(aligned[0])
+    finals = np.array([_aligned_loss(r, T) for r in runs], dtype=float)
+    inits = finals - ratios
+    agg["aligned_init_per_seed"] = inits.tolist()
+
+
 def plot_final_aligned_bar(aggs: list[dict], T: int, out_path: Path, title_suffix: str = "") -> None:
     """Final aligned loss mean±std (bar) with FINAL styles."""
     fig, ax = plt.subplots(figsize=(10, 5.2))
@@ -464,6 +490,69 @@ def plot_aligned_vs_k(
     ax.set_ylabel(r"aligned loss:  $-\log\mu+\log T$  or  Renyi")
     ax.set_title(
         f"FINAL aligned loss vs k  (T={T}, d={d}; {split_label}; mono+poly; param counts in legend)"
+    )
+    all_k = sorted({int(p["k"]) for p in mu_points})
+    if all_k:
+        ax.set_xticks(all_k)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=6.5, loc="best")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=220)
+    plt.close(fig)
+
+
+def plot_log_mu_ratio_vs_k(
+    mu_points: list[dict],
+    nl_refs: list[dict],
+    T: int,
+    d: int,
+    out_path: Path,
+    param_labels: dict[str, str] | None = None,
+) -> None:
+    """log(mu_0/mu) vs k = L_final - L_init (random-init baseline)."""
+    param_labels = param_labels or {}
+    fig, ax = plt.subplots(figsize=(11, 6.2))
+    by_model: dict[str, list[dict]] = {}
+    for p in mu_points:
+        by_model.setdefault(p["model"], []).append(p)
+    for name, rows in by_model.items():
+        rows = sorted(rows, key=lambda r: int(r["k"]))
+        st = STYLES.get(name, dict(color="0.3", linestyle="-", marker="o", linewidth=2))
+        ks = [int(r["k"]) for r in rows]
+        means = [float(r["log_mu_ratio_mean"]) for r in rows]
+        stds = [float(r.get("log_mu_ratio_std", 0.0)) for r in rows]
+        label = param_labels.get(name, name)
+        ax.errorbar(
+            ks,
+            means,
+            yerr=stds,
+            color=st["color"],
+            linestyle=st["linestyle"],
+            marker=st.get("marker", "o"),
+            linewidth=st.get("linewidth", 2.2),
+            markersize=7,
+            capsize=4,
+            label=label,
+        )
+    for ref in nl_refs:
+        name = ref["model"]
+        st = STYLES.get(name, dict(color="0.2", linestyle=":", linewidth=2))
+        mean = float(ref["log_mu_ratio_mean"])
+        std = float(ref.get("log_mu_ratio_std", 0.0))
+        label = param_labels.get(name, name)
+        ax.axhspan(mean - std, mean + std, color=st["color"], alpha=0.14, linewidth=0, zorder=0)
+        ax.axhline(
+            mean,
+            color=st["color"],
+            linestyle=st["linestyle"],
+            linewidth=st.get("linewidth", 2.0),
+            label=f"{label} (k-indep., envelope=seed std)",
+        )
+    ax.axhline(0.0, color="0.55", linestyle=":", linewidth=1.0, alpha=0.7, label=r"no improvement ($\log(\mu_0/\mu)=0$)")
+    ax.set_xlabel("k")
+    ax.set_ylabel(r"$\log(\mu_0/\mu)$  (= $L_{\mathrm{final}} - L_0$; nl-CSA: Renyi $\Delta$)")
+    ax.set_title(
+        f"FINAL log($\\mu_0$/$\\mu$) vs k  (T={T}, d={d}; random-init baseline; param counts in legend)"
     )
     all_k = sorted({int(p["k"]) for p in mu_points})
     if all_k:
@@ -583,6 +672,7 @@ def _aggregate_nl_runs(runs: list[dict], spec: dict, T: int) -> dict:
         agg["aligned_test_loss_per_seed"] = tf.tolist()
     agg["raw_final_loss_mean"] = float(agg["final_loss_mean"])
     agg["raw_final_loss_std"] = float(agg["final_loss_std"])
+    _append_log_mu_ratio(agg, runs, T)
     agg["spec"] = spec
     agg["k"] = None
     return agg
@@ -608,6 +698,7 @@ def _aggregate_mu_runs(runs: list[dict], spec: dict, k: int, T: int) -> dict:
         agg["aligned_test_loss_per_seed"] = tf.tolist()
     agg["raw_final_loss_mean"] = float(agg["final_loss_mean"])
     agg["raw_final_loss_std"] = float(agg["final_loss_std"])
+    _append_log_mu_ratio(agg, runs, T)
     agg["spec"] = spec
     agg["k"] = k
     return agg
@@ -625,11 +716,65 @@ def _mu_point_from_agg(agg: dict, spec: dict, k: int, test: bool = False) -> dic
         "n_params_model": agg.get("n_params_model"),
         "kernel_mode": spec.get("kernel_mode"),
         "param_label": spec.get("param_label"),
+        "log_mu_ratio_mean": agg["log_mu_ratio_mean"],
+        "log_mu_ratio_std": agg["log_mu_ratio_std"],
     }
     if test:
         p["aligned_loss_mean"] = agg["aligned_test_loss_mean"]
         p["aligned_loss_std"] = agg["aligned_test_loss_std"]
     return p
+
+
+def _backfill_log_mu_ratio_fields(agg: dict) -> None:
+    if "log_mu_ratio_mean" in agg:
+        return
+    ratios: list[float] = []
+    for hist in agg.get("seed_histories", []):
+        if hist:
+            ratios.append(float(hist[-1]) - float(hist[0]))
+    if not ratios and agg.get("aligned_history"):
+        ah = agg["aligned_history"]
+        ratios = [float(ah[-1]) - float(ah[0])]
+    if ratios:
+        arr = np.array(ratios, dtype=float)
+        agg["log_mu_ratio_mean"] = float(arr.mean())
+        agg["log_mu_ratio_std"] = float(arr.std())
+        agg["log_mu_ratio_per_seed"] = arr.tolist()
+
+
+def _mu_point_log_ratio(agg: dict, spec: dict, k: int | None) -> dict:
+    _backfill_log_mu_ratio_fields(agg)
+    return {
+        "model": spec.get("display", agg.get("model", "")),
+        "k": k,
+        "log_mu_ratio_mean": agg["log_mu_ratio_mean"],
+        "log_mu_ratio_std": agg.get("log_mu_ratio_std", 0.0),
+        "param_label": spec.get("param_label", agg.get("param_label")),
+    }
+
+
+def _plot_appendix_curves(
+    aggregates_by_k: dict,
+    nl_refs: list[dict],
+    appendix_ks: list[int],
+    T: int,
+    d: int,
+    plots: Path,
+    param_labels: dict[str, str],
+) -> None:
+    for appendix_k in appendix_ks:
+        aggs_appendix = (aggregates_by_k.get(str(appendix_k)) or []) + nl_refs
+        if not aggs_appendix:
+            continue
+        plot_final_curves(
+            aggs_appendix,
+            plots / f"final_training_curves_k{appendix_k}_appendix.png",
+            T=T,
+            d=d,
+            k=int(appendix_k),
+            param_labels=param_labels,
+            title=f"FINAL training curves (appendix, k={appendix_k}, T={T}, d={d})",
+        )
 
 
 def _check_comparable(aggs: list[dict], tol_ratio: float = 0.35) -> list[str]:
@@ -674,6 +819,17 @@ def _replot_from_summary(out: Path, appendix_curves_k: int | None = None) -> int
         )
     mu_points_test = summary.get("mu_points_vs_k_test") or []
     nl_refs_test = summary.get("nl_refs_test") or nl_refs
+    for ref in nl_refs:
+        _backfill_log_mu_ratio_fields(ref)
+    for aggs_k in aggs_by_k.values():
+        for agg in aggs_k:
+            _backfill_log_mu_ratio_fields(agg)
+    log_mu_points = []
+    for k_str, aggs_k in aggs_by_k.items():
+        for agg in aggs_k:
+            log_mu_points.append(_mu_point_log_ratio(agg, agg.get("spec", {}), int(k_str)))
+    if log_mu_points:
+        plot_log_mu_ratio_vs_k(log_mu_points, nl_refs, T, d, plots / "final_log_mu_ratio_vs_k.png", param_labels)
     if mu_points_test:
         plot_aligned_vs_k(
             mu_points_test,
@@ -686,22 +842,13 @@ def _replot_from_summary(out: Path, appendix_curves_k: int | None = None) -> int
             mean_key="aligned_loss_mean",
             std_key="aligned_loss_std",
         )
-    appendix_k = int(
-        appendix_curves_k
-        if appendix_curves_k is not None
-        else summary.get("config", {}).get("appendix_curves_k", 3)
+    appendix_ks = _parse_ks(
+        str(summary.get("config", {}).get("appendix_curves_ks", "")),
+        [3, 5],
     )
-    aggs_appendix = (aggs_by_k.get(str(appendix_k)) or []) + (summary.get("nl_refs") or [])
-    if aggs_appendix:
-        plot_final_curves(
-            aggs_appendix,
-            plots / f"final_training_curves_k{appendix_k}_appendix.png",
-            T=T,
-            d=d,
-            k=int(appendix_k),
-            param_labels=param_labels,
-            title=f"FINAL training curves (appendix, k={appendix_k}, T={T}, d={d})",
-        )
+    if appendix_curves_k is not None:
+        appendix_ks = [int(appendix_curves_k)]
+    _plot_appendix_curves(aggs_by_k, nl_refs, appendix_ks, T, d, plots, param_labels)
     # legacy single-k aggregates
     aggs = summary.get("aggregates") or []
     if aggs and not aggs_by_k:
@@ -754,7 +901,8 @@ def main() -> int:
     p.add_argument("--test-max-sentences", type=int, default=200)
     p.add_argument("--model-seed-base", type=int, default=1042)
     p.add_argument("--n-seeds", type=int, default=10)
-    p.add_argument("--appendix-curves-k", type=int, default=3, help="k for appendix training-curves plot")
+    p.add_argument("--appendix-curves-k", type=int, default=3, help="legacy single k for appendix training-curves plot")
+    p.add_argument("--appendix-curves-ks", type=str, default="3,5", help="comma-separated k values for appendix training curves")
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--checkpoint-every", type=int, default=20)
     p.add_argument("--output-dir", type=str, default=None)
@@ -988,7 +1136,16 @@ def main() -> int:
             param_labels,
             "held-out test",
         )
-    appendix_k = int(args.appendix_curves_k)
+    log_mu_points = []
+    for s in mu_specs:
+        for k in ks:
+            for agg in aggregates_by_k[str(k)]:
+                if agg["model"] == s["display"]:
+                    log_mu_points.append(_mu_point_log_ratio(agg, s, k))
+                    break
+    if log_mu_points:
+        plot_log_mu_ratio_vs_k(log_mu_points, nl_refs, args.T, args.d, plots / "final_log_mu_ratio_vs_k.png", param_labels)
+    appendix_ks = _parse_ks(args.appendix_curves_ks, [3, 5])
     for k in ks:
         aggs_k = aggregates_by_k[str(k)] + nl_refs
         if not aggs_k:
@@ -1000,17 +1157,7 @@ def main() -> int:
             aggs_k, plots / f"final_aligned_curves_k{k}.png", T=args.T, d=args.d, k=k, param_labels=param_labels
         )
         plot_final_raw_curves(aggs_k, plots / f"final_raw_curves_k{k}.png")
-    aggs_appendix = aggregates_by_k.get(str(appendix_k), []) + nl_refs
-    if aggs_appendix:
-        plot_final_curves(
-            aggs_appendix,
-            plots / f"final_training_curves_k{appendix_k}_appendix.png",
-            T=args.T,
-            d=args.d,
-            k=appendix_k,
-            param_labels=param_labels,
-            title=f"FINAL training curves (appendix, k={appendix_k}, T={args.T}, d={args.d})",
-        )
+    _plot_appendix_curves(aggregates_by_k, nl_refs, appendix_ks, args.T, args.d, plots, param_labels)
 
     # Convergence check on all mu points + nl
     flat_for_check = [
@@ -1042,6 +1189,7 @@ def main() -> int:
             "test_data_seed": args.test_data_seed,
             "test_max_sentences": args.test_max_sentences,
             "appendix_curves_k": int(args.appendix_curves_k),
+            "appendix_curves_ks": args.appendix_curves_ks,
             "max_sentences": args.max_sentences,
             "batch_size": None if args.batch_size <= 0 else args.batch_size,
             "qsa_angles": qsa_angle_param_count(args.d, args.qsa_layers),

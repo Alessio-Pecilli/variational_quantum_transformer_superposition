@@ -54,6 +54,7 @@ FINAL_TARGET_LOSS = 3.8  # professor: ~3.8 is acceptable for FINAL obar
 # data curve, with different dash (Haar=dashed, advantage=dotted).
 _DATA_MARKERS = ("o", "s", "D", "^", "v")
 _DATA_COLORS = ("#0072B2", "#E69F00", "#009E73", "#CC79A7", "#56B4E9")
+_K_COLOR_IDX = {2: 0, 5: 1, 3: 2, 1: 3, 6: 4}
 _REF_HAAR_COLOR = "#000000"  # fallback when a single global Haar is drawn
 _REF_ADV_COLOR = "#666666"
 
@@ -586,8 +587,8 @@ def _plot_final_mu_panels(
     # ---------- mu vs T (d=16), only k=2,5 for readability ----------
     fig, ax = plt.subplots(figsize=(9.4, 5.6))
     mu_ks_T = [k for k in (2, 5) if k in set(mu_ks)]
-    for i, k in enumerate(mu_ks_T):
-        color = _DATA_COLORS[i % len(_DATA_COLORS)]
+    for k in mu_ks_T:
+        color = _DATA_COLORS[_K_COLOR_IDX.get(k, 0)]
         pts_mono = sorted(
             [
                 r
@@ -630,11 +631,11 @@ def _plot_final_mu_panels(
     fig.savefig(out_root / "mu_vs_T.png", dpi=220)
     plt.close(fig)
 
-    # ---------- mu vs d (T=max_T) for k=2,3,5 ----------
+    # ---------- mu vs d (T=max_T) for k=2,5 only (same colors as mu vs T) ----------
     fig, ax = plt.subplots(figsize=(9.4, 5.6))
-    ks_d = [k for k in (2, 3, 5) if k in set(mu_ks)]
-    for i, k in enumerate(ks_d):
-        color = _DATA_COLORS[i % len(_DATA_COLORS)]
+    ks_d = [k for k in (2, 5) if k in set(mu_ks)]
+    for k in ks_d:
+        color = _DATA_COLORS[_K_COLOR_IDX.get(k, 0)]
         pts_mono = sorted(
             [
                 r
