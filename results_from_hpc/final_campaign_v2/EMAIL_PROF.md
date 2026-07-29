@@ -66,10 +66,10 @@ Il monomio **cresce** con k, il polinomio resta **quasi piatto** — coerente co
 
 ## 2. μ VS T / μ VS d (al posto di ōbar)
 
-- **μ vs T** (d=16, k=2,3,5; mono/poly/advantage; 5 seed):  
+- **μ vs T** (d=16, k=2,3,5; mono/poly/advantage; **10 seed**):  
   https://github.com/Alessio-Pecilli/variational_quantum_transformer_superposition/blob/PennyLaneG/results_from_hpc/final_campaign_v2/mu/mu_vs_T.png
 
-- **μ vs d** (T=32, k=2,3,5; mono/poly/advantage; 5 seed):  
+- **μ vs d** (T=32, k=2,3,5; mono/poly/advantage; **10 seed**):  
   https://github.com/Alessio-Pecilli/variational_quantum_transformer_superposition/blob/PennyLaneG/results_from_hpc/final_campaign_v2/mu/mu_vs_d.png
 
 - Manifest (griglia completa):  
@@ -91,7 +91,7 @@ Setup: target_loss=3.8, convergenza fino a 2000 ep, T≤32, k=1,2,3,5,6, mono+po
 | Campagna | Parametri chiave |
 |----------|------------------|
 | Loss v2 | T=16, d=8, k=1,2,3,5,6, 10 seed, QSA L=16, job Leonardo `50570347` (~10h) |
-| μ panels | T≤32, 5 seed, target 3.8, job `50570724` |
+| μ panels | T≤32, **10 seed** (42–51), target 3.8, jobs `50683086`+`50683088` (~11 min) |
 | Test | seed 4242, 200 frasi PTB hold-out |
 
 ## Codice

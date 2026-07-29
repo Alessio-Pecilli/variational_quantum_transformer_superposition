@@ -12,8 +12,8 @@ Revised professor plots: **μ panels**, **loss with 10 seeds**, **nl-CSA ~128 on
 | **Loss** | T=16, d=8, k=1,2,3,5,6, **10 seeds**, QSA L=16 (96 angles), CSA 128 matrices |
 | **Loss models** | k-QSA, k-CSA, poly-k-QSA, poly-k-CSA, **nl-CSA iso~128 + gen~128 only** |
 | **Test split** | PTB hold-out, `test_data_seed=4242`, 200 sentences |
-| **μ panels** | target_loss=3.8, T≤32, k=1,2,3,5,6, mono+poly, **5 seeds** (42–46), advantage line k/C(d+k−1,k) |
-| **HPC** | Leonardo job `50570347` (loss, ~10h), mu chain `50570724` (~10 min) |
+| **μ panels** | target_loss=3.8, T≤32, k=1,2,3,5,6, mono+poly, **10 seeds** (42–51), advantage line k/C(d+k−1,k) |
+| **HPC** | Leonardo job `50570347` (loss, ~10h), mu jobs `50683086`+`50683088` (~11 min, 10 seed) |
 
 ## Main results (aligned loss = −log μ + log T)
 
