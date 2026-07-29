@@ -21,14 +21,16 @@ https://github.com/Alessio-Pecilli/variational_quantum_transformer_superposition
 **Test hold-out:**  
 https://github.com/Alessio-Pecilli/variational_quantum_transformer_superposition/blob/PennyLaneG/results_from_hpc/final_campaign_v2/loss/plots/final_aligned_loss_vs_k_test.png
 
-### NUOVO: log(μ₀/μ) vs k
+### NUOVO: log(μ/μ₀) vs k (segno positivo = miglioramento)
 
 Metrica di miglioramento rispetto all'inizializzazione random:  
-**log(μ₀/μ) = L_final − L₀**, dove L = −log μ + log T (nl-CSA: Δ Renyi).
+**log(μ/μ₀) = L₀ − L_final**, dove L = −log μ + log T (nl-CSA: Δ Renyi). Valori **positivi** = miglioramento.
 
 https://github.com/Alessio-Pecilli/variational_quantum_transformer_superposition/blob/PennyLaneG/results_from_hpc/final_campaign_v2/loss/plots/final_log_mu_ratio_vs_k.png
 
-Qui si vede chiaramente il comportamento crescente in k per il monomio (miglioramento decrescente / loss residua crescente), mentre il polinomio resta quasi piatto.
+**nl-CSA iso:** nel plot girato è **positivo** (~+1.45), non negativo — ha migliorato rispetto a L₀ (loss 8.03→6.58). Gen ancora di più (~+11.3, partiva da L₀ molto alto).
+
+**Envelope nl-CSA:** iso = grigio chiaro, gen = nero scuro (train e test).
 
 ### NUOVO: small-data test (80 frasi train vs 800)
 
