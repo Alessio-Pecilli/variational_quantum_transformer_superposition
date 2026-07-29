@@ -457,19 +457,8 @@ def plot_aligned_vs_k(
             color=st["color"],
             linestyle=st["linestyle"],
             linewidth=st.get("linewidth", 2.0),
-            label=f"{label} (k-indep., mean±std seeds)",
+            label=f"{label} (k-indep., envelope=seed std)",
         )
-        if std > 0:
-            ax.errorbar(
-                [x1],
-                [mean],
-                yerr=[std],
-                color=st["color"],
-                fmt="none",
-                capsize=5,
-                linewidth=1.5,
-                zorder=5,
-            )
     ax.axhline(math.log(T), color="0.55", linestyle=":", linewidth=1.0, alpha=0.7, label=rf"$\log T$={math.log(T):.2f}")
     ax.set_xlabel("k")
     ax.set_ylabel(r"aligned loss:  $-\log\mu+\log T$  or  Renyi")
@@ -502,6 +491,15 @@ def plot_final_curves(
     max_len = 0
     for a in aggs:
         max_len = max(max_len, len(np.asarray(a.get(ykey, a["loss_history"]), dtype=float)))
+
+    def _smooth(y: np.ndarray, win: int = 15) -> np.ndarray:
+        if len(y) < win:
+            return y
+        kernel = np.ones(win) / win
+        # causal convolution, pad with first value
+        padded = np.concatenate([np.full(win - 1, y[0]), y])
+        return np.convolve(padded, kernel, mode="valid")
+
     for a in aggs:
         name = a["model"]
         st = STYLES.get(name, dict(color="0.3", linestyle="-", marker=None, linewidth=2))
@@ -510,13 +508,15 @@ def plot_final_curves(
             ys = np.concatenate([ys, np.full(max_len - len(ys), ys[-1], dtype=float)])
         xs = np.arange(1, len(ys) + 1)
         label = param_labels.get(name, name)
-        ax.plot(xs, ys, label=label, **{k: st[k] for k in ("color", "linestyle", "linewidth")})
+        ys_plot = _smooth(ys)
+        ax.plot(xs, ys_plot, label=label, **{k: st[k] for k in ("color", "linestyle", "linewidth")})
         std_key = "aligned_std" if ykey.startswith("aligned") else "loss_std"
         if std_key in a and int(a.get("n_seeds", 1)) > 1:
             std = np.asarray(a[std_key], dtype=float)
             if max_len > len(std) and len(std) > 0:
                 std = np.concatenate([std, np.full(max_len - len(std), std[-1], dtype=float)])
-            ax.fill_between(xs, ys - std, ys + std, color=st["color"], alpha=0.15, linewidth=0)
+            std_s = _smooth(std)
+            ax.fill_between(xs, ys_plot - std_s, ys_plot + std_s, color=st["color"], alpha=0.15, linewidth=0)
     ax.set_xlabel("epoch")
     ax.set_ylabel(r"aligned loss:  $-\log\mu+\log T$  or  Renyi")
     if title:

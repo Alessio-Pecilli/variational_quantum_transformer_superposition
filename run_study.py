@@ -583,9 +583,10 @@ def _plot_final_mu_panels(
     mu_ks: list[int],
 ) -> None:
     """Professor revision: plot mu (not obar) with multi-seed error bars."""
-    # ---------- mu vs T (d=16), same color per k, style by curve type ----------
+    # ---------- mu vs T (d=16), only k=2,5 for readability ----------
     fig, ax = plt.subplots(figsize=(9.4, 5.6))
-    for i, k in enumerate(mu_ks):
+    mu_ks_T = [k for k in (2, 5) if k in set(mu_ks)]
+    for i, k in enumerate(mu_ks_T):
         color = _DATA_COLORS[i % len(_DATA_COLORS)]
         pts_mono = sorted(
             [
@@ -666,10 +667,11 @@ def _plot_final_mu_panels(
             ys = [float(r["mu_mean"]) for r in pts_poly]
             es = [float(r["mu_std"]) for r in pts_poly]
             ax.errorbar(ds, ys, yerr=es, color=color, marker="s", linestyle="--", linewidth=2.0, capsize=4, label=f"k={k} poly")
+    ax.set_yscale("log")
     ax.set_xlabel("d")
-    ax.set_ylabel(r"$\mu$  (mean $\pm$ std over seeds)")
+    ax.set_ylabel(r"$\mu$  (mean $\pm$ std over seeds, log scale)")
     ax.set_title(rf"$\mu$ vs $d$  (T={max_T})")
-    ax.grid(True, alpha=0.3)
+    ax.grid(True, alpha=0.3, which="both")
     ax.legend(fontsize=7, loc="best")
     fig.tight_layout()
     fig.savefig(out_root / "mu_vs_d.png", dpi=220)
