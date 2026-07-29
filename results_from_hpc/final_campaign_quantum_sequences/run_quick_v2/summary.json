@@ -1,0 +1,188 @@
+{
+  "config": {
+    "train_size": 64,
+    "test_size": 32,
+    "T": 8,
+    "d": 16,
+    "n_qubits": 4,
+    "dt": 1.0,
+    "ks": "1,2",
+    "epochs": 40,
+    "poly_epochs": 50,
+    "min_epochs": 10,
+    "patience": 8,
+    "loss_rel_tol": 0.0001,
+    "eval_every": 2,
+    "lr": 0.002,
+    "layers": 2,
+    "seed": 7,
+    "model_seed_base": 1042,
+    "n_seeds": 2,
+    "output_dir": "results_from_hpc/final_campaign_quantum_sequences/run_quick_v2",
+    "quick": true
+  },
+  "mu_points_vs_k": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "aligned_loss_mean": 11.551886045390392,
+      "aligned_loss_std": 0.15140372256904655
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "aligned_loss_mean": 13.969923075045033,
+      "aligned_loss_std": 0.024930028768288537
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "aligned_loss_mean": 11.869363569314356,
+      "aligned_loss_std": 0.3119582752837422
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "aligned_loss_mean": 13.983497231968325,
+      "aligned_loss_std": 0.09549872749515753
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "aligned_loss_mean": 11.234879973961194,
+      "aligned_loss_std": 0.18000203354108635
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "aligned_loss_mean": 12.820939281943279,
+      "aligned_loss_std": 0.08655673953359333
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "aligned_loss_mean": 11.263911137277745,
+      "aligned_loss_std": 0.03987733975844687
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "aligned_loss_mean": 12.792886887388281,
+      "aligned_loss_std": 0.07947623929048309
+    }
+  ],
+  "mu_points_vs_k_test_mu": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "aligned_test_mu_loss_mean": 11.621159452019237,
+      "aligned_test_mu_loss_std": 0.12416499520739954
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "aligned_test_mu_loss_mean": 14.061377004966776,
+      "aligned_test_mu_loss_std": 0.3339212299631349
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "aligned_test_mu_loss_mean": 11.548228291557042,
+      "aligned_test_mu_loss_std": 0.25643620076342
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "aligned_test_mu_loss_mean": 13.882373439310863,
+      "aligned_test_mu_loss_std": 0.0024793227699202447
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "aligned_test_mu_loss_mean": 11.13688462733262,
+      "aligned_test_mu_loss_std": 0.02071333437109768
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "aligned_test_mu_loss_mean": 12.889534097070559,
+      "aligned_test_mu_loss_std": 0.21798993284122492
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "aligned_test_mu_loss_mean": 11.307805893742984,
+      "aligned_test_mu_loss_std": 0.3517400093183829
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "aligned_test_mu_loss_mean": 12.963760021914204,
+      "aligned_test_mu_loss_std": 0.044648634498291706
+    }
+  ],
+  "mu_points_vs_k_test_fidelity": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "aligned_test_fidelity_loss_mean": 2.8061775485201954,
+      "aligned_test_fidelity_loss_std": 0.1267190109599401
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "aligned_test_fidelity_loss_mean": 2.8050341059478683,
+      "aligned_test_fidelity_loss_std": 0.06477117453998793
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "aligned_test_fidelity_loss_mean": 2.9234814431348526,
+      "aligned_test_fidelity_loss_std": 0.05296820837618421
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "aligned_test_fidelity_loss_mean": 2.9478344716632687,
+      "aligned_test_fidelity_loss_std": 0.05138879126982854
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "aligned_test_fidelity_loss_mean": 2.8107038321264604,
+      "aligned_test_fidelity_loss_std": 0.043949806990261964
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "aligned_test_fidelity_loss_mean": 2.8000250903308443,
+      "aligned_test_fidelity_loss_std": 0.13048407044970922
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "aligned_test_fidelity_loss_mean": 3.06447044480013,
+      "aligned_test_fidelity_loss_std": 0.008740680717277405
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "aligned_test_fidelity_loss_mean": 2.9189108359515723,
+      "aligned_test_fidelity_loss_std": 0.05763146299547195
+    }
+  ],
+  "dataset": {
+    "train_shape": [
+      64,
+      9,
+      16
+    ],
+    "test_shape": [
+      32,
+      9,
+      16
+    ],
+    "note": "Hamiltonian parameters (J,h) vary per trajectory and are never given as model inputs."
+  },
+  "training_note": "Early stopping on train -log(mu) with patience; best checkpoint used for test metrics. Test mu-loss uses the same coherent readout as train; test fidelity is separate single-step T+1 metric."
+}
