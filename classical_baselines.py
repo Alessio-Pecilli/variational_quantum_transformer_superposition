@@ -30,6 +30,7 @@ from encoding import Encoding
 from pennylane_jax_vqt import isometrize_matrix
 from qsa_training import (
     QSATrainConfig,
+    CE_uniform_jax,
     L_half_uniform_jax,
     _feature_qubits,
     _normalize_rows,
@@ -261,6 +262,15 @@ def l_half_uniform_kqsa_sentence(params, token_ids, pe, cfg: BaselineConfig):
     return L_half_uniform_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode, epsilon=cfg.epsilon)
 
 
+def l1_ce_kqsa_sentence(params, token_ids, pe, cfg: BaselineConfig):
+    """k-QSA eval: L_1 = CE_uniform (Shannon) at fixed W,V."""
+    emb = _embedding_forward(params["embedding"], cfg)
+    X, Y = sequence_xy_from_tokens(token_ids, emb, pe)
+    W = ortho_matrix_jax(params["weights_w"], cfg.d)
+    V = ortho_matrix_jax(params["weights_v"], cfg.d)
+    return CE_uniform_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode, epsilon=cfg.epsilon)
+
+
 def _kqsa_loss_for_cfg(cfg: BaselineConfig):
     return lb_kqsa_loss_sentence if cfg.loss_objective == "L_B" else mu_loss_sentence
 
@@ -300,14 +310,22 @@ def l_half_uniform_kcsa_sentence(params, token_ids, pe, cfg: BaselineConfig):
     return L_half_uniform_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode, epsilon=cfg.epsilon)
 
 
+def l1_ce_kcsa_sentence(params, token_ids, pe, cfg: BaselineConfig):
+    emb = _embedding_forward(params["embedding"], cfg)
+    X, Y = sequence_xy_from_tokens(token_ids, emb, pe)
+    W = _orthogonalize_classical(params["W_raw"])
+    V = _orthogonalize_classical(params["V_raw"])
+    return CE_uniform_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode, epsilon=cfg.epsilon)
+
+
 def _kcsa_loss_for_cfg(cfg: BaselineConfig):
     return lb_kcsa_loss_sentence if cfg.loss_objective == "L_B" else kcsa_mu_loss_sentence
 
 
-def _l_half_uniform_for_model(model: str):
+def _eval_fns_for_mu_model(model: str):
     if model == "k-QSA":
-        return l_half_uniform_kqsa_sentence
-    return l_half_uniform_kcsa_sentence
+        return l_half_uniform_kqsa_sentence, l1_ce_kqsa_sentence
+    return l_half_uniform_kcsa_sentence, l1_ce_kcsa_sentence
 
 
 def init_kcsa_params(vocab_size: int, cfg: BaselineConfig, key: jax.Array) -> dict:
@@ -434,6 +452,33 @@ def nlcsa_val_ce_sentence(params, token_ids, pe, cfg: BaselineConfig):
     """Always standard CE for cross-architecture comparison."""
     logits = nlcsa_logits_sentence(params, token_ids, pe, cfg)
     return cross_entropy_loss_from_logits(logits, token_ids, cfg.epsilon)
+
+
+def nlcsa_renyi_sentence(params, token_ids, pe, cfg: BaselineConfig):
+    """Always Renyi / L_half_uniform on nl-CSA logits."""
+    logits = nlcsa_logits_sentence(params, token_ids, pe, cfg)
+    loss, _ = renyi_loss_from_logits(logits, token_ids, cfg.epsilon)
+    return loss
+
+
+def _attach_nl_eval_metrics(result: dict, params, bundle: dict, cfg: BaselineConfig) -> None:
+    """Record both L_half (Renyi) and L_1 (Shannon CE) on train/test for nl-CSA."""
+    train_batch = bundle["token_batch"][bundle["train_idx"]]
+    pe = bundle["pe"]
+    result["final_L_half_uniform"] = eval_batch_mean_loss(
+        params, train_batch, pe, cfg, nlcsa_renyi_sentence
+    )
+    result["final_L_1"] = eval_batch_mean_loss(
+        params, train_batch, pe, cfg, nlcsa_val_ce_sentence
+    )
+    if "test_token_batch" in bundle:
+        test_batch = bundle["test_token_batch"]
+        result["final_test_L_half_uniform"] = eval_batch_mean_loss(
+            params, test_batch, pe, cfg, nlcsa_renyi_sentence
+        )
+        result["final_test_L_1"] = eval_batch_mean_loss(
+            params, test_batch, pe, cfg, nlcsa_val_ce_sentence
+        )
 
 
 # --------------------------------------------------------------------------- #
@@ -749,9 +794,12 @@ def _finalize_mu_result(
         "note": note,
     }
     train_batch = bundle["token_batch"][bundle["train_idx"]]
-    lhalf_fn = _l_half_uniform_for_model(name)
+    lhalf_fn, l1_fn = _eval_fns_for_mu_model(name)
     result["final_L_half_uniform"] = eval_batch_mean_loss(
         params, train_batch, bundle["pe"], cfg, lhalf_fn
+    )
+    result["final_L_1"] = eval_batch_mean_loss(
+        params, train_batch, bundle["pe"], cfg, l1_fn
     )
     if cfg.loss_objective == "L_B":
         result["final_L_B"] = float(result["final_loss"])
@@ -762,6 +810,9 @@ def _finalize_mu_result(
         )
         result["final_test_L_half_uniform"] = eval_batch_mean_loss(
             params, test_batch, bundle["pe"], cfg, lhalf_fn
+        )
+        result["final_test_L_1"] = eval_batch_mean_loss(
+            params, test_batch, bundle["pe"], cfg, l1_fn
         )
         if cfg.loss_objective == "L_B":
             result["final_test_L_B"] = float(result["final_test_loss"])
@@ -965,6 +1016,7 @@ def train_nlcsa(
         )
         result["num_test"] = int(bundle.get("num_test", test_batch.shape[0]))
         result["test_data_seed"] = int(cfg.test_data_seed) if cfg.test_data_seed is not None else None
+    _attach_nl_eval_metrics(result, params, bundle, cfg)
     _save_run(result, params, bundle["sentences"], cfg, run_name)
     return result
 
@@ -1027,6 +1079,78 @@ def _save_run(result: dict, params, sentences, cfg: BaselineConfig, tag: str) ->
         "param_files": sorted(p.name for p in params_dir.glob("*.npy")),
     }
     np.save(out / "meta.npy", meta, allow_pickle=True)
+
+
+def load_params_from_run(run_dir: Path, template_params) -> dict:
+    """Reload params tree from params_final.npz using a template pytree."""
+    path = Path(run_dir) / "params_final.npz"
+    if not path.exists():
+        raise FileNotFoundError(path)
+    raw = np.load(path)
+
+    def _fill(tree, prefix=""):
+        if isinstance(tree, dict):
+            return {k: _fill(v, f"{prefix}/{k}" if prefix else str(k)) for k, v in tree.items()}
+        if isinstance(tree, (list, tuple)):
+            seq = [_fill(v, f"{prefix}/{i}") for i, v in enumerate(tree)]
+            return type(tree)(seq)
+        key = prefix.replace("/", "__")
+        return jnp.asarray(raw[key])
+
+    return _fill(template_params)
+
+
+def backfill_eval_metrics_for_run(
+    run_dir: Path,
+    cfg: BaselineConfig,
+    bundle: dict,
+    family: str,
+) -> dict:
+    """Recompute L_half / L_1 train+test from saved params and update metrics.json."""
+    run_dir = Path(run_dir)
+    metrics_path = run_dir / "metrics.json"
+    result = json.loads(metrics_path.read_text(encoding="utf-8"))
+    need = (
+        "final_L_half_uniform" not in result
+        or "final_L_1" not in result
+        or (
+            "test_token_batch" in bundle
+            and (
+                "final_test_L_half_uniform" not in result
+                or "final_test_L_1" not in result
+            )
+        )
+    )
+    if not need:
+        return result
+
+    key = jax.random.PRNGKey(int(cfg.model_seed or 0))
+    if family == "kqsa":
+        template = init_qsa_params(bundle["encoding"].vocabSize, bundle["qcfg"], key)
+        name = "k-QSA"
+    elif family == "kcsa":
+        template = init_kcsa_params(bundle["encoding"].vocabSize, cfg, key)
+        name = "k-CSA"
+    else:
+        template, _ = init_nlcsa_params(bundle["encoding"].vocabSize, cfg, key)
+        name = "nl-CSA"
+
+    params = load_params_from_run(run_dir, template)
+    train_batch = bundle["token_batch"][bundle["train_idx"]]
+    pe = bundle["pe"]
+    if family in ("kqsa", "kcsa"):
+        lhalf_fn, l1_fn = _eval_fns_for_mu_model(name)
+        result["final_L_half_uniform"] = eval_batch_mean_loss(params, train_batch, pe, cfg, lhalf_fn)
+        result["final_L_1"] = eval_batch_mean_loss(params, train_batch, pe, cfg, l1_fn)
+        if "test_token_batch" in bundle:
+            tb = bundle["test_token_batch"]
+            result["final_test_L_half_uniform"] = eval_batch_mean_loss(params, tb, pe, cfg, lhalf_fn)
+            result["final_test_L_1"] = eval_batch_mean_loss(params, tb, pe, cfg, l1_fn)
+    else:
+        _attach_nl_eval_metrics(result, params, bundle, cfg)
+
+    metrics_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    return result
 
 
 def aggregate_seed_results(runs: List[dict]) -> dict:

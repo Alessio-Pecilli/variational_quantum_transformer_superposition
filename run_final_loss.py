@@ -35,6 +35,7 @@ from classical_baselines import (
     BaselineConfig,
     aggregate_seed_results,
     attach_test_bundle,
+    backfill_eval_metrics_for_run,
     kcsa_matrix_param_count,
     nl_model_param_count,
     nl_rank_for_budget,
@@ -56,6 +57,8 @@ STYLES: dict[str, dict[str, Any]] = {
     "nl-CSA iso ~288": dict(color="#888888", linestyle="--", marker="D", linewidth=2.2),
     "nl-CSA iso ~128": dict(color="#B0B0B0", linestyle="-", marker="s", linewidth=2.2),  # light envelope
     "nl-CSA gen ~128": dict(color="#222222", linestyle=":", marker="x", linewidth=2.4),  # dark envelope
+    "nl-CSA iso CE ~128": dict(color="#666666", linestyle="--", marker="D", linewidth=2.2),
+    "nl-CSA gen CE ~128": dict(color="#000000", linestyle="-.", marker="+", linewidth=2.4),
 }
 
 
@@ -178,6 +181,34 @@ def _model_specs(args) -> list[dict]:
             },
         ]
     )
+    if getattr(args, "loss_objective", "mu") == "L_B":
+        # CE-trained nl for L_1 (Shannon) vs-k plots
+        specs.extend(
+            [
+                {
+                    "key": "nl_iso_ce_128",
+                    "display": "nl-CSA iso CE ~128",
+                    "family": "nl",
+                    "nl_embedding_mode": "isometric",
+                    "nl_loss_mode": "ce",
+                    "layers": L128,
+                    "nl_rank": r128,
+                    "epochs": args.nl_epochs,
+                    "lr": args.nl_learning_rate,
+                },
+                {
+                    "key": "nl_gen_ce_128",
+                    "display": "nl-CSA gen CE ~128",
+                    "family": "nl",
+                    "nl_embedding_mode": "general",
+                    "nl_loss_mode": "ce",
+                    "layers": L128,
+                    "nl_rank": r128,
+                    "epochs": args.nl_epochs_general,
+                    "lr": args.nl_learning_rate_general,
+                },
+            ]
+        )
     for s in specs:
         s["param_label"] = _spec_param_label(s, d)
     return specs
@@ -575,6 +606,72 @@ def plot_LB_Lhalf_comparison_vs_k(
     plt.close(fig)
 
 
+def plot_eval_metric_vs_k(
+    mu_points: list[dict],
+    nl_refs: list[dict],
+    T: int,
+    d: int,
+    out_path: Path,
+    param_labels: dict[str, str] | None = None,
+    split_label: str = "train",
+    mean_key: str = "L_half_uniform_mean",
+    std_key: str = "L_half_uniform_std",
+    ylabel: str = r"$L_{1/2}^{\mathrm{unif}}$",
+    title_metric: str = r"$L_{1/2}^{\mathrm{unif}}$",
+) -> None:
+    """Eval metric vs k for all models (mu curves + nl horizontal envelope)."""
+    param_labels = param_labels or {}
+    fig, ax = plt.subplots(figsize=(11, 6.2))
+    by_model: dict[str, list[dict]] = {}
+    for p in mu_points:
+        by_model.setdefault(p["model"], []).append(p)
+    for name, rows in by_model.items():
+        rows = sorted(rows, key=lambda r: int(r["k"]))
+        st = STYLES.get(name, dict(color="0.3", linestyle="-", marker="o", linewidth=2))
+        ks = [int(r["k"]) for r in rows]
+        means = [float(r[mean_key]) for r in rows]
+        stds = [float(r.get(std_key, 0.0)) for r in rows]
+        label = param_labels.get(name, name)
+        ax.errorbar(
+            ks,
+            means,
+            yerr=stds,
+            color=st["color"],
+            linestyle=st["linestyle"],
+            marker=st.get("marker", "o"),
+            linewidth=st.get("linewidth", 2.2),
+            markersize=7,
+            capsize=4,
+            label=label,
+        )
+    for ref in nl_refs:
+        name = ref["model"]
+        st = STYLES.get(name, dict(color="0.2", linestyle=":", linewidth=2))
+        mean = float(ref[mean_key])
+        std = float(ref.get(std_key, 0.0))
+        label = param_labels.get(name, name)
+        fill_alpha = 0.22 if "iso" in name else 0.28
+        ax.axhspan(mean - std, mean + std, color=st["color"], alpha=fill_alpha, linewidth=0, zorder=0)
+        ax.axhline(
+            mean,
+            color=st["color"],
+            linestyle=st["linestyle"],
+            linewidth=st.get("linewidth", 2.0),
+            label=f"{label} (k-indep., envelope=seed std)",
+        )
+    ax.set_xlabel("k")
+    ax.set_ylabel(ylabel)
+    ax.set_title(f"FINAL {title_metric} vs k  (T={T}, d={d}; {split_label})")
+    all_k = sorted({int(p["k"]) for p in mu_points})
+    if all_k:
+        ax.set_xticks(all_k)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=6.5, loc="best")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=220)
+    plt.close(fig)
+
+
 def plot_log_mu_ratio_vs_k(
     mu_points: list[dict],
     nl_refs: list[dict],
@@ -747,6 +844,7 @@ def _aggregate_nl_runs(runs: list[dict], spec: dict, T: int) -> dict:
         agg["aligned_test_loss_per_seed"] = tf.tolist()
     agg["raw_final_loss_mean"] = float(agg["final_loss_mean"])
     agg["raw_final_loss_std"] = float(agg["final_loss_std"])
+    _append_eval_fields_nl(agg, runs)
     _append_log_mu_ratio(agg, runs, T)
     agg["spec"] = spec
     agg["k"] = None
@@ -775,6 +873,11 @@ def _aggregate_mu_runs(runs: list[dict], spec: dict, k: int, T: int, loss_object
         agg["L_half_uniform_mean"] = float(lh.mean())
         agg["L_half_uniform_std"] = float(lh.std())
         agg["L_half_uniform_per_seed"] = lh.tolist()
+    if all("final_L_1" in r for r in runs):
+        l1 = np.array([float(r["final_L_1"]) for r in runs], dtype=float)
+        agg["L_1_mean"] = float(l1.mean())
+        agg["L_1_std"] = float(l1.std())
+        agg["L_1_per_seed"] = l1.tolist()
     if all("aligned_test_loss" in r for r in runs):
         tf = np.array([float(r["aligned_test_loss"]) for r in runs], dtype=float)
         agg["aligned_test_loss_mean"] = float(tf.mean())
@@ -784,6 +887,10 @@ def _aggregate_mu_runs(runs: list[dict], spec: dict, k: int, T: int, loss_object
         tlh = np.array([float(r["final_test_L_half_uniform"]) for r in runs], dtype=float)
         agg["L_half_uniform_test_mean"] = float(tlh.mean())
         agg["L_half_uniform_test_std"] = float(tlh.std())
+    if all("final_test_L_1" in r for r in runs):
+        tl1 = np.array([float(r["final_test_L_1"]) for r in runs], dtype=float)
+        agg["L_1_test_mean"] = float(tl1.mean())
+        agg["L_1_test_std"] = float(tl1.std())
     agg["raw_final_loss_mean"] = float(agg["final_loss_mean"])
     agg["raw_final_loss_std"] = float(agg["final_loss_std"])
     if loss_objective != "L_B":
@@ -791,6 +898,151 @@ def _aggregate_mu_runs(runs: list[dict], spec: dict, k: int, T: int, loss_object
     agg["spec"] = spec
     agg["k"] = k
     return agg
+
+
+def _eval_point_from_agg(agg: dict, spec: dict, k: int | None, metric: str, test: bool = False) -> dict | None:
+    """Build a vs-k point for L_half or L_1 (train or test). Returns None if missing."""
+    if metric == "L_half":
+        train_m, train_s = "L_half_uniform_mean", "L_half_uniform_std"
+        test_m, test_s = "L_half_uniform_test_mean", "L_half_uniform_test_std"
+        out_m, out_s = train_m, train_s
+    else:
+        train_m, train_s = "L_1_mean", "L_1_std"
+        test_m, test_s = "L_1_test_mean", "L_1_test_std"
+        out_m, out_s = train_m, train_s
+    src_m, src_s = (test_m, test_s) if test else (train_m, train_s)
+    if src_m not in agg:
+        return None
+    return {
+        "model": spec.get("display", agg.get("model", "")),
+        "k": k,
+        "param_label": spec.get("param_label", agg.get("param_label")),
+        out_m: float(agg[src_m]),
+        out_s: float(agg.get(src_s, 0.0)),
+    }
+
+
+def _plot_eval_panels(
+    mu_aggs: list[dict],
+    nl_refs_half: list[dict],
+    nl_refs_l1: list[dict],
+    T: int,
+    d: int,
+    plots: Path,
+    param_labels: dict[str, str],
+) -> None:
+    """Train/test L_half and L_1 vs k panels."""
+    for metric, nl_refs, ylabel, title, train_name, test_name, mean_key, std_key in (
+        (
+            "L_half",
+            nl_refs_half,
+            r"$L_{1/2}^{\mathrm{unif}}$",
+            r"$L_{1/2}^{\mathrm{unif}}$",
+            "final_Lhalf_vs_k_train.png",
+            "final_Lhalf_vs_k_test.png",
+            "L_half_uniform_mean",
+            "L_half_uniform_std",
+        ),
+        (
+            "L_1",
+            nl_refs_l1,
+            r"$L_1$ (Shannon CE)",
+            r"$L_1$ (Shannon CE)",
+            "final_L1_vs_k_train.png",
+            "final_L1_vs_k_test.png",
+            "L_1_mean",
+            "L_1_std",
+        ),
+    ):
+        pts_tr, pts_te = [], []
+        for agg in mu_aggs:
+            spec = agg.get("spec") or {"display": agg["model"]}
+            k = agg.get("k")
+            if k is None:
+                continue
+            p_tr = _eval_point_from_agg(agg, spec, int(k), metric, test=False)
+            p_te = _eval_point_from_agg(agg, spec, int(k), metric, test=True)
+            if p_tr is not None:
+                pts_tr.append(p_tr)
+            if p_te is not None:
+                pts_te.append(p_te)
+        nl_tr = [r for r in nl_refs if mean_key in r]
+        nl_te = []
+        for r in nl_refs:
+            p = _eval_point_from_agg(r, r.get("spec") or {"display": r["model"]}, None, metric, test=True)
+            if p is not None:
+                nl_te.append(p)
+            elif mean_key in r:
+                # fall back to train metric keys already on agg for envelope
+                pass
+        # Build nl test refs with train keys filled from test values for plot_eval_metric_vs_k
+        nl_te_plot = []
+        for r in nl_refs:
+            p = _eval_point_from_agg(r, r.get("spec") or {"display": r["model"]}, None, metric, test=True)
+            if p is not None:
+                nl_te_plot.append(
+                    {
+                        "model": p["model"],
+                        "param_label": p.get("param_label"),
+                        mean_key: p[mean_key],
+                        std_key: p[std_key],
+                    }
+                )
+        if pts_tr and nl_tr:
+            plot_eval_metric_vs_k(
+                pts_tr, nl_tr, T, d, plots / train_name, param_labels, "train",
+                mean_key=mean_key, std_key=std_key, ylabel=ylabel, title_metric=title,
+            )
+        elif pts_tr:
+            plot_eval_metric_vs_k(
+                pts_tr, [], T, d, plots / train_name, param_labels, "train",
+                mean_key=mean_key, std_key=std_key, ylabel=ylabel, title_metric=title,
+            )
+        if pts_te:
+            plot_eval_metric_vs_k(
+                pts_te, nl_te_plot, T, d, plots / test_name, param_labels, "held-out test",
+                mean_key=mean_key, std_key=std_key, ylabel=ylabel, title_metric=title,
+            )
+
+
+def _append_eval_fields_nl(agg: dict, runs: list[dict]) -> None:
+    if all("final_L_half_uniform" in r for r in runs):
+        lh = np.array([float(r["final_L_half_uniform"]) for r in runs], dtype=float)
+        agg["L_half_uniform_mean"] = float(lh.mean())
+        agg["L_half_uniform_std"] = float(lh.std())
+    elif str(runs[0].get("nl_loss_mode", runs[0].get("train_metric", ""))) in ("renyi",):
+        # Renyi train loss IS L_half
+        lh = np.array([float(r["final_loss"]) for r in runs], dtype=float)
+        agg["L_half_uniform_mean"] = float(lh.mean())
+        agg["L_half_uniform_std"] = float(lh.std())
+    if all("final_L_1" in r for r in runs):
+        l1 = np.array([float(r["final_L_1"]) for r in runs], dtype=float)
+        agg["L_1_mean"] = float(l1.mean())
+        agg["L_1_std"] = float(l1.std())
+    elif str(runs[0].get("nl_loss_mode", runs[0].get("train_metric", ""))) == "ce":
+        l1 = np.array([float(r["final_loss"]) for r in runs], dtype=float)
+        agg["L_1_mean"] = float(l1.mean())
+        agg["L_1_std"] = float(l1.std())
+    if all("final_test_L_half_uniform" in r for r in runs):
+        tlh = np.array([float(r["final_test_L_half_uniform"]) for r in runs], dtype=float)
+        agg["L_half_uniform_test_mean"] = float(tlh.mean())
+        agg["L_half_uniform_test_std"] = float(tlh.std())
+    elif all("aligned_test_loss" in r for r in runs) and str(
+        runs[0].get("nl_loss_mode", runs[0].get("train_metric", ""))
+    ) == "renyi":
+        tlh = np.array([float(r["aligned_test_loss"]) for r in runs], dtype=float)
+        agg["L_half_uniform_test_mean"] = float(tlh.mean())
+        agg["L_half_uniform_test_std"] = float(tlh.std())
+    if all("final_test_L_1" in r for r in runs):
+        tl1 = np.array([float(r["final_test_L_1"]) for r in runs], dtype=float)
+        agg["L_1_test_mean"] = float(tl1.mean())
+        agg["L_1_test_std"] = float(tl1.std())
+    elif all("aligned_test_loss" in r for r in runs) and str(
+        runs[0].get("nl_loss_mode", runs[0].get("train_metric", ""))
+    ) == "ce":
+        tl1 = np.array([float(r["aligned_test_loss"]) for r in runs], dtype=float)
+        agg["L_1_test_mean"] = float(tl1.mean())
+        agg["L_1_test_std"] = float(tl1.std())
 
 
 def _mu_point_from_agg(agg: dict, spec: dict, k: int, test: bool = False) -> dict:
@@ -905,14 +1157,17 @@ def _replot_from_summary(
             param_labels[a["model"]] = a.get("param_label", a["model"])
     aggs_by_k = summary.get("aggregates_by_k") or {}
     nl_refs = summary.get("nl_refs") or []
+    nl_refs_renyi = [a for a in nl_refs if "CE" not in a.get("model", "")]
+    nl_refs_ce = [a for a in nl_refs if "CE" in a.get("model", "")]
     mu_points = summary.get("mu_points_vs_k") or []
     if mu_points:
         plot_aligned_vs_k(
-            mu_points, nl_refs, T, d, plots / "final_aligned_loss_vs_k.png", param_labels, "train",
+            mu_points, nl_refs_renyi or nl_refs, T, d, plots / "final_aligned_loss_vs_k.png", param_labels, "train",
             loss_objective=loss_objective,
         )
     mu_points_test = summary.get("mu_points_vs_k_test") or []
     nl_refs_test = summary.get("nl_refs_test") or nl_refs
+    nl_refs_test_renyi = [a for a in nl_refs_test if "CE" not in a.get("model", "")]
     for ref in nl_refs:
         _backfill_log_mu_ratio_fields(ref)
     for aggs_k in aggs_by_k.values():
@@ -923,11 +1178,11 @@ def _replot_from_summary(
         for agg in aggs_k:
             log_mu_points.append(_mu_point_log_ratio(agg, agg.get("spec", {}), int(k_str)))
     if log_mu_points and loss_objective != "L_B":
-        plot_log_mu_ratio_vs_k(log_mu_points, nl_refs, T, d, plots / "final_log_mu_ratio_vs_k.png", param_labels)
+        plot_log_mu_ratio_vs_k(log_mu_points, nl_refs_renyi or nl_refs, T, d, plots / "final_log_mu_ratio_vs_k.png", param_labels)
     if mu_points_test:
         plot_aligned_vs_k(
             mu_points_test,
-            nl_refs_test,
+            nl_refs_test_renyi or nl_refs_test,
             T,
             d,
             plots / "final_aligned_loss_vs_k_test.png",
@@ -947,13 +1202,34 @@ def _replot_from_summary(
         plot_LB_Lhalf_comparison_vs_k(
             poly_cmp, T, d, plots / "final_LB_vs_Lhalf_poly_train.png", param_labels, "poly-kernel"
         )
+    if loss_objective == "L_B":
+        all_mu_aggs = [a for ks_aggs in aggs_by_k.values() for a in ks_aggs]
+        _plot_eval_panels(
+            all_mu_aggs,
+            nl_refs_renyi or nl_refs,
+            nl_refs_ce or nl_refs_renyi or nl_refs,
+            T,
+            d,
+            plots,
+            param_labels,
+        )
+        if "3" in aggs_by_k and aggs_by_k["3"]:
+            plot_final_curves(
+                aggs_by_k["3"],
+                plots / "final_LB_training_curves_k3.png",
+                T=T,
+                d=d,
+                k=3,
+                param_labels=param_labels,
+                title=f"FINAL L_B training curves (k=3, T={T}, d={d})",
+            )
     appendix_ks = _parse_ks(
         appendix_curves_ks or str(summary.get("config", {}).get("appendix_curves_ks", "")),
         [3, 5],
     )
     if appendix_curves_k is not None:
         appendix_ks = [int(appendix_curves_k)]
-    _plot_appendix_curves(aggs_by_k, nl_refs, appendix_ks, T, d, plots, param_labels)
+    _plot_appendix_curves(aggs_by_k, nl_refs_renyi or nl_refs, appendix_ks, T, d, plots, param_labels)
     # legacy single-k aggregates
     aggs = summary.get("aggregates") or []
     if aggs and not aggs_by_k:
@@ -1170,11 +1446,25 @@ def main() -> int:
     # Prefer on-disk metrics for aggregation so a resumed/partial MPI run still
     # includes every completed (model,k,seed) even if another rank died earlier.
     disk_runs: list[dict] = []
+    bundle_for_eval = None
+    if args.loss_objective == "L_B":
+        # Shared data for backfilling L_half / L_1 on already-finished runs.
+        cfg0 = _make_cfg(args, specs[0], model_seeds[0], out, k=ks[0])
+        bundle_for_eval = prepare_data_bundle(cfg0)
+        if args.test_data_seed is not None:
+            bundle_for_eval = attach_test_bundle(bundle_for_eval, cfg0)
     for job in jobs:
         spec = job["spec"]
         ms = int(job["seed"])
         k = int(job["k"])
         cfg = _make_cfg(args, spec, ms, out, k=k)
+        if bundle_for_eval is not None:
+            run_dir = _run_dir_for(cfg)
+            if (run_dir / "metrics.json").exists() and (run_dir / "params_final.npz").exists():
+                try:
+                    backfill_eval_metrics_for_run(run_dir, cfg, bundle_for_eval, spec["family"])
+                except Exception as exc:
+                    print(f"[WARN] backfill failed for {cfg.run_label}: {exc}")
         loaded = _load_enriched_from_disk(spec, cfg)
         if loaded is None:
             print(f"[WARN] missing metrics for {cfg.run_label}")
@@ -1212,6 +1502,11 @@ def main() -> int:
             nl_refs_test.append(agg_t)
         (out / "aggregates" / f"{s['key']}.json").write_text(json.dumps(agg, indent=2), encoding="utf-8")
 
+    nl_refs_renyi = [a for a in nl_refs if "CE" not in a["model"]]
+    nl_refs_ce = [a for a in nl_refs if "CE" in a["model"]]
+    nl_refs_test_renyi = [a for a in nl_refs_test if "CE" not in a["model"]]
+    nl_refs_test_ce = [a for a in nl_refs_test if "CE" in a["model"]]
+
     mu_points: list[dict] = []
     mu_points_test: list[dict] = []
     aggregates_by_k: dict[str, list[dict]] = {str(k): [] for k in ks}
@@ -1236,13 +1531,13 @@ def main() -> int:
     param_labels = {s["display"]: s["param_label"] for s in specs}
     plots = out / "plots"
     plot_aligned_vs_k(
-        mu_points, nl_refs, args.T, args.d, plots / "final_aligned_loss_vs_k.png", param_labels, "train",
+        mu_points, nl_refs_renyi, args.T, args.d, plots / "final_aligned_loss_vs_k.png", param_labels, "train",
         loss_objective=args.loss_objective,
     )
     if mu_points_test:
         plot_aligned_vs_k(
             mu_points_test,
-            nl_refs_test or nl_refs,
+            nl_refs_test_renyi or nl_refs_renyi,
             args.T,
             args.d,
             plots / "final_aligned_loss_vs_k_test.png",
@@ -1279,6 +1574,27 @@ def main() -> int:
                 param_labels,
                 "poly-kernel",
             )
+        all_mu_aggs = [a for ks_aggs in aggregates_by_k.values() for a in ks_aggs]
+        _plot_eval_panels(
+            all_mu_aggs,
+            nl_refs_renyi,
+            nl_refs_ce or nl_refs_renyi,
+            args.T,
+            args.d,
+            plots,
+            param_labels,
+        )
+        # Training curves L_B at k=3 for k-QSA / k-CSA (mono+poly)
+        if "3" in aggregates_by_k and aggregates_by_k["3"]:
+            plot_final_curves(
+                aggregates_by_k["3"],
+                plots / "final_LB_training_curves_k3.png",
+                T=args.T,
+                d=args.d,
+                k=3,
+                param_labels=param_labels,
+                title=f"FINAL L_B training curves (k=3, T={args.T}, d={args.d})",
+            )
     log_mu_points = []
     for s in mu_specs:
         for k in ks:
@@ -1290,7 +1606,7 @@ def main() -> int:
         plot_log_mu_ratio_vs_k(log_mu_points, nl_refs, args.T, args.d, plots / "final_log_mu_ratio_vs_k.png", param_labels)
     appendix_ks = _parse_ks(args.appendix_curves_ks, [3, 5])
     for k in ks:
-        aggs_k = aggregates_by_k[str(k)] + nl_refs
+        aggs_k = aggregates_by_k[str(k)] + nl_refs_renyi
         if not aggs_k:
             continue
         plot_final_aligned_bar(
@@ -1300,13 +1616,13 @@ def main() -> int:
             aggs_k, plots / f"final_aligned_curves_k{k}.png", T=args.T, d=args.d, k=k, param_labels=param_labels
         )
         plot_final_raw_curves(aggs_k, plots / f"final_raw_curves_k{k}.png")
-    _plot_appendix_curves(aggregates_by_k, nl_refs, appendix_ks, args.T, args.d, plots, param_labels)
+    _plot_appendix_curves(aggregates_by_k, nl_refs_renyi, appendix_ks, args.T, args.d, plots, param_labels)
 
     # Convergence check on all mu points + nl
     flat_for_check = [
         {"model": f"{p['model']} k={p['k']}", "aligned_loss_mean": p["aligned_loss_mean"]}
         for p in mu_points
-    ] + nl_refs
+    ] + nl_refs_renyi
     warns = _check_comparable(flat_for_check)
 
     # Trend diagnostic: does mono loss grow with k?

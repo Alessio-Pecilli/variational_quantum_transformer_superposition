@@ -272,6 +272,26 @@ def loss_B_jax(
     return -jnp.log(jnp.maximum(F, epsilon))
 
 
+def _per_step_p_jax(
+    X: jnp.ndarray,
+    Y: jnp.ndarray,
+    W: jnp.ndarray,
+    V: jnp.ndarray,
+    k: int,
+    kernel_mode: str = "monomial",
+    beta: Optional[float] = None,
+    epsilon: float = 1e-12,
+) -> jnp.ndarray:
+    """p_j = |<y_j|z_j>|^2 / ||z_j||^2 from the classical-sequence readout."""
+    s = X @ W @ X.T
+    a = Y @ V @ X.T
+    K, _ = _kernel_matrix_jax(s, k, kernel_mode=kernel_mode, beta=beta, d=X.shape[1])
+    Aj = jnp.sum(a * K, axis=1)
+    Zj = K @ (X @ V.T)
+    w = jnp.linalg.norm(Zj, axis=1)
+    return jnp.clip(Aj ** 2 / jnp.maximum(w ** 2, epsilon), epsilon, 1.0)
+
+
 def L_half_uniform_jax(
     X: jnp.ndarray,
     Y: jnp.ndarray,
@@ -283,14 +303,23 @@ def L_half_uniform_jax(
     epsilon: float = 1e-12,
 ) -> jnp.ndarray:
     """L_half_uniform = -2 log((1/T) sum_j sqrt(p_j)),  p_j = |<y_j|z_j>|^2/||z_j||^2."""
-    s = X @ W @ X.T
-    a = Y @ V @ X.T
-    K, _ = _kernel_matrix_jax(s, k, kernel_mode=kernel_mode, beta=beta, d=X.shape[1])
-    Aj = jnp.sum(a * K, axis=1)
-    Zj = K @ (X @ V.T)
-    w = jnp.linalg.norm(Zj, axis=1)
-    p = jnp.clip(Aj ** 2 / jnp.maximum(w ** 2, epsilon), epsilon, 1.0)
+    p = _per_step_p_jax(X, Y, W, V, k, kernel_mode=kernel_mode, beta=beta, epsilon=epsilon)
     return -2.0 * jnp.log(jnp.maximum(jnp.mean(jnp.sqrt(p)), epsilon))
+
+
+def CE_uniform_jax(
+    X: jnp.ndarray,
+    Y: jnp.ndarray,
+    W: jnp.ndarray,
+    V: jnp.ndarray,
+    k: int,
+    kernel_mode: str = "monomial",
+    beta: Optional[float] = None,
+    epsilon: float = 1e-12,
+) -> jnp.ndarray:
+    """L_1 = CE_uniform = -(1/T) sum_j log p_j  (Shannon cross-entropy, uniform weights)."""
+    p = _per_step_p_jax(X, Y, W, V, k, kernel_mode=kernel_mode, beta=beta, epsilon=epsilon)
+    return -jnp.mean(jnp.log(p))
 
 
 def _prepare_dataset(cfg: QSATrainConfig) -> Tuple[Encoding, List[str], jnp.ndarray, jnp.ndarray]:
