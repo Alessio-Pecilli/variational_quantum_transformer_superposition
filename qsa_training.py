@@ -195,6 +195,104 @@ def classical_mu_jax(
     return (S / (lam * ntri)) ** 2
 
 
+def _kernel_matrix_jax(
+    s: jnp.ndarray,
+    k: int,
+    kernel_mode: str = "monomial",
+    beta: Optional[float] = None,
+    d: Optional[int] = None,
+) -> Tuple[jnp.ndarray, jnp.ndarray]:
+    """Causal kernel K[j,i] and subnormalization lam (classical-sequence readout)."""
+    from math import factorial
+
+    mask = jnp.tril(jnp.ones((s.shape[0], s.shape[0]), dtype=jnp.float64))
+    if kernel_mode == "monomial":
+        return (s ** k) * mask, jnp.asarray(1.0, dtype=jnp.float64)
+    if beta is None:
+        beta = jnp.sqrt(jnp.asarray(float(d or s.shape[1]), dtype=jnp.float64))
+    g = jnp.zeros_like(s)
+    s_pow = jnp.ones_like(s)
+    lam = jnp.asarray(0.0, dtype=jnp.float64)
+    for p in range(k + 1):
+        c_p = (beta ** p) / float(factorial(p))
+        if p > 0:
+            s_pow = s_pow * s
+        g = g + c_p * s_pow
+        lam = lam + c_p
+    return g * mask, lam
+
+
+def mu_zeta_nu_jax(
+    X: jnp.ndarray,
+    Y: jnp.ndarray,
+    W: jnp.ndarray,
+    V: jnp.ndarray,
+    k: int,
+    kernel_mode: str = "monomial",
+    beta: Optional[float] = None,
+    phi: Optional[jnp.ndarray] = None,
+) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
+    """Circuit readout observables (mu, zeta, nu) for classical-sequence ansatz.
+
+    Real orthogonal W,V with phi=None (no trainable phases) matches new_loss classical_seq.
+    """
+    T = X.shape[0]
+    d = X.shape[1]
+    s = X @ W @ X.T
+    a = Y @ V @ X.T
+    K, lam = _kernel_matrix_jax(s, k, kernel_mode=kernel_mode, beta=beta, d=d)
+    Aj = jnp.sum(a * K, axis=1)
+    Zj = K @ (X @ V.T)
+    wj2 = jnp.sum(Zj ** 2, axis=1)
+    ntri = T * (T + 1) / 2.0
+    if phi is None:
+        phi = jnp.zeros(T, dtype=jnp.float64)
+    mu = jnp.abs(jnp.sum(jnp.exp(1j * phi) * Aj)) ** 2 / (lam * ntri) ** 2
+    zeta = jnp.sum(wj2) / (lam ** 2 * T * ntri)
+    nu = jnp.sum(Aj ** 2) / (lam ** 2 * T * ntri)
+    return mu, zeta, nu
+
+
+def loss_B_jax(
+    X: jnp.ndarray,
+    Y: jnp.ndarray,
+    W: jnp.ndarray,
+    V: jnp.ndarray,
+    k: int,
+    kernel_mode: str = "monomial",
+    beta: Optional[float] = None,
+    phi: Optional[jnp.ndarray] = None,
+    epsilon: float = 1e-12,
+) -> jnp.ndarray:
+    """L_B = -log F,  F = (T+1)/(2T) * mu/zeta  (objective B; real ansatz, phi=0)."""
+    mu, zeta, _ = mu_zeta_nu_jax(X, Y, W, V, k, kernel_mode=kernel_mode, beta=beta, phi=phi)
+    T = X.shape[0]
+    pref = (T + 1) / (2 * T)
+    F = pref * mu / jnp.maximum(zeta, epsilon)
+    return -jnp.log(jnp.maximum(F, epsilon))
+
+
+def L_half_uniform_jax(
+    X: jnp.ndarray,
+    Y: jnp.ndarray,
+    W: jnp.ndarray,
+    V: jnp.ndarray,
+    k: int,
+    kernel_mode: str = "monomial",
+    beta: Optional[float] = None,
+    epsilon: float = 1e-12,
+) -> jnp.ndarray:
+    """L_half_uniform = -2 log((1/T) sum_j sqrt(p_j)),  p_j = |<y_j|z_j>|^2/||z_j||^2."""
+    s = X @ W @ X.T
+    a = Y @ V @ X.T
+    K, _ = _kernel_matrix_jax(s, k, kernel_mode=kernel_mode, beta=beta, d=X.shape[1])
+    Aj = jnp.sum(a * K, axis=1)
+    Zj = K @ (X @ V.T)
+    w = jnp.linalg.norm(Zj, axis=1)
+    p = jnp.clip(Aj ** 2 / jnp.maximum(w ** 2, epsilon), epsilon, 1.0)
+    return -2.0 * jnp.log(jnp.maximum(jnp.mean(jnp.sqrt(p)), epsilon))
+
+
 def _prepare_dataset(cfg: QSATrainConfig) -> Tuple[Encoding, List[str], jnp.ndarray, jnp.ndarray]:
     sentences = get_training_sentences()
     if len(sentences) < cfg.max_sentences:

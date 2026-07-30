@@ -65,10 +65,13 @@ def _log(rank: int) -> logging.Logger:
 
 
 def _aligned_loss(result: dict, T: int, loss_key: str = "final_loss") -> float:
-    """Comparable axis: −logμ + log T for mu-models; Renyi/CE as-is for nl."""
+    """Plot axis: L_B or L_half (nl) as-is; legacy mu-models use −logμ+log T."""
     model = str(result.get("model", result.get("display", "")))
     final = float(result[loss_key])
     if model.startswith("nl-CSA"):
+        return final
+    cfg = result.get("config") or {}
+    if cfg.get("loss_objective") == "L_B":
         return final
     return final + math.log(T)
 
@@ -206,6 +209,7 @@ def _make_cfg(args, spec: dict, model_seed: int, out: Path, k: int) -> BaselineC
         max_epochs=int(spec["epochs"]),
         test_data_seed=args.test_data_seed,
         test_max_sentences=args.test_max_sentences,
+        loss_objective=getattr(args, "loss_objective", "mu"),
     )
 
 
@@ -317,6 +321,8 @@ def _isolate_train_one(spec: dict, cfg: BaselineConfig, args: argparse.Namespace
         "--models",
         spec["key"],
     ]
+    if getattr(args, "loss_objective", "mu") == "L_B":
+        cmd.extend(["--loss-objective", "L_B"])
     env = os.environ.copy()
     env["JAX_PLATFORMS"] = "cpu"
     env["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
@@ -431,6 +437,12 @@ def plot_final_aligned_bar(aggs: list[dict], T: int, out_path: Path, title_suffi
     plt.close(fig)
 
 
+def _loss_ylabel(loss_objective: str) -> str:
+    if loss_objective == "L_B":
+        return r"loss:  $L_B$  (k-QSA/k-CSA)  or  $L_{1/2}^{\mathrm{unif}}$  (nl-CSA)"
+    return r"aligned loss:  $-\log\mu+\log T$  or  Renyi"
+
+
 def plot_aligned_vs_k(
     mu_points: list[dict],
     nl_refs: list[dict],
@@ -441,6 +453,7 @@ def plot_aligned_vs_k(
     split_label: str = "train",
     mean_key: str = "aligned_loss_mean",
     std_key: str = "aligned_loss_std",
+    loss_objective: str = "mu",
 ) -> None:
     """Aligned loss vs k: mono + poly; nl as horizontal refs with seed std band."""
     param_labels = param_labels or {}
@@ -489,15 +502,74 @@ def plot_aligned_vs_k(
         )
     ax.axhline(math.log(T), color="0.55", linestyle=":", linewidth=1.0, alpha=0.7, label=rf"$\log T$={math.log(T):.2f}")
     ax.set_xlabel("k")
-    ax.set_ylabel(r"aligned loss:  $-\log\mu+\log T$  or  Renyi")
+    ax.set_ylabel(_loss_ylabel(loss_objective))
     ax.set_title(
-        f"FINAL aligned loss vs k  (T={T}, d={d}; {split_label}; mono+poly; param counts in legend)"
+        f"FINAL loss vs k  (T={T}, d={d}; {split_label}; mono+poly; param counts in legend)"
     )
     all_k = sorted({int(p["k"]) for p in mu_points})
     if all_k:
         ax.set_xticks(all_k)
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=6.5, loc="best")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=220)
+    plt.close(fig)
+
+
+def plot_LB_Lhalf_comparison_vs_k(
+    aggs: list[dict],
+    T: int,
+    d: int,
+    out_path: Path,
+    param_labels: dict[str, str] | None = None,
+    kernel_label: str = "monomial",
+) -> None:
+    """Train-set comparison: L_B vs L_half_uniform at final params (k-QSA + k-CSA only)."""
+    param_labels = param_labels or {}
+    fig, ax = plt.subplots(figsize=(11, 6.2))
+    for agg in aggs:
+        name = agg["model"]
+        k = int(agg["k"])
+        st = STYLES.get(name, dict(color="0.3", linestyle="-", marker="o", linewidth=2))
+        label = param_labels.get(name, name)
+        lb_m = float(agg["aligned_loss_mean"])
+        lb_s = float(agg.get("aligned_loss_std", 0.0))
+        lh_m = float(agg.get("L_half_uniform_mean", float("nan")))
+        lh_s = float(agg.get("L_half_uniform_std", 0.0))
+        ax.errorbar(
+            [k - 0.08],
+            [lb_m],
+            yerr=[lb_s],
+            color=st["color"],
+            linestyle="-",
+            marker=st.get("marker", "o"),
+            linewidth=st.get("linewidth", 2.2),
+            markersize=7,
+            capsize=4,
+            label=f"{label}  $L_B$",
+        )
+        ax.errorbar(
+            [k + 0.08],
+            [lh_m],
+            yerr=[lh_s],
+            color=st["color"],
+            linestyle="--",
+            marker="x",
+            linewidth=st.get("linewidth", 2.0),
+            markersize=6,
+            capsize=4,
+            label=f"{label}  $L_{{1/2}}^{{\\mathrm{{unif}}}}$",
+        )
+    ax.set_xlabel("k")
+    ax.set_ylabel(r"train loss at final params:  $L_B$ (solid) vs $L_{1/2}^{\mathrm{unif}}$ (dashed)")
+    ax.set_title(
+        f"L_B vs $L_{{1/2}}^{{\\mathrm{{unif}}}}$ comparison  ({kernel_label}; T={T}, d={d}; train)"
+    )
+    ks = sorted({int(a["k"]) for a in aggs})
+    if ks:
+        ax.set_xticks(ks)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=6.0, loc="best", ncol=2)
     fig.tight_layout()
     fig.savefig(out_path, dpi=220)
     plt.close(fig)
@@ -681,27 +753,41 @@ def _aggregate_nl_runs(runs: list[dict], spec: dict, T: int) -> dict:
     return agg
 
 
-def _aggregate_mu_runs(runs: list[dict], spec: dict, k: int, T: int) -> dict:
+def _aggregate_mu_runs(runs: list[dict], spec: dict, k: int, T: int, loss_objective: str = "mu") -> dict:
     runs = _pad_histories(runs)
     for r in runs:
         r["model"] = spec["display"]
     agg = aggregate_seed_results(runs)
     logT = math.log(T)
-    aligned = np.array(agg["seed_histories"], dtype=float) + logT
+    hist = np.array(agg["seed_histories"], dtype=float)
+    if loss_objective == "L_B":
+        aligned = hist
+    else:
+        aligned = hist + logT
     agg["aligned_history"] = aligned.mean(axis=0).tolist()
     agg["aligned_std"] = aligned.std(axis=0).tolist()
     finals = np.array([_aligned_loss(r, T) for r in runs], dtype=float)
     agg["aligned_loss_mean"] = float(finals.mean())
     agg["aligned_loss_std"] = float(finals.std())
     agg["aligned_loss_per_seed"] = finals.tolist()
+    if all("final_L_half_uniform" in r for r in runs):
+        lh = np.array([float(r["final_L_half_uniform"]) for r in runs], dtype=float)
+        agg["L_half_uniform_mean"] = float(lh.mean())
+        agg["L_half_uniform_std"] = float(lh.std())
+        agg["L_half_uniform_per_seed"] = lh.tolist()
     if all("aligned_test_loss" in r for r in runs):
         tf = np.array([float(r["aligned_test_loss"]) for r in runs], dtype=float)
         agg["aligned_test_loss_mean"] = float(tf.mean())
         agg["aligned_test_loss_std"] = float(tf.std())
         agg["aligned_test_loss_per_seed"] = tf.tolist()
+    if all("final_test_L_half_uniform" in r for r in runs):
+        tlh = np.array([float(r["final_test_L_half_uniform"]) for r in runs], dtype=float)
+        agg["L_half_uniform_test_mean"] = float(tlh.mean())
+        agg["L_half_uniform_test_std"] = float(tlh.std())
     agg["raw_final_loss_mean"] = float(agg["final_loss_mean"])
     agg["raw_final_loss_std"] = float(agg["final_loss_std"])
-    _append_log_mu_ratio(agg, runs, T)
+    if loss_objective != "L_B":
+        _append_log_mu_ratio(agg, runs, T)
     agg["spec"] = spec
     agg["k"] = k
     return agg
@@ -719,8 +805,8 @@ def _mu_point_from_agg(agg: dict, spec: dict, k: int, test: bool = False) -> dic
         "n_params_model": agg.get("n_params_model"),
         "kernel_mode": spec.get("kernel_mode"),
         "param_label": spec.get("param_label"),
-        "log_mu_ratio_mean": agg["log_mu_ratio_mean"],
-        "log_mu_ratio_std": agg["log_mu_ratio_std"],
+        "log_mu_ratio_mean": agg.get("log_mu_ratio_mean"),
+        "log_mu_ratio_std": agg.get("log_mu_ratio_std"),
     }
     if test:
         p["aligned_loss_mean"] = agg["aligned_test_loss_mean"]
@@ -808,6 +894,7 @@ def _replot_from_summary(
     plots.mkdir(parents=True, exist_ok=True)
     T = int(summary["config"]["T"])
     d = int(summary["config"].get("d", 8))
+    loss_objective = str(summary["config"].get("loss_objective", "mu"))
     param_labels = {
         s.get("display", s.get("model", "")): s.get("param_label", s.get("display", ""))
         for s in (summary.get("model_specs") or [])
@@ -821,7 +908,8 @@ def _replot_from_summary(
     mu_points = summary.get("mu_points_vs_k") or []
     if mu_points:
         plot_aligned_vs_k(
-            mu_points, nl_refs, T, d, plots / "final_aligned_loss_vs_k.png", param_labels, "train"
+            mu_points, nl_refs, T, d, plots / "final_aligned_loss_vs_k.png", param_labels, "train",
+            loss_objective=loss_objective,
         )
     mu_points_test = summary.get("mu_points_vs_k_test") or []
     nl_refs_test = summary.get("nl_refs_test") or nl_refs
@@ -834,7 +922,7 @@ def _replot_from_summary(
     for k_str, aggs_k in aggs_by_k.items():
         for agg in aggs_k:
             log_mu_points.append(_mu_point_log_ratio(agg, agg.get("spec", {}), int(k_str)))
-    if log_mu_points:
+    if log_mu_points and loss_objective != "L_B":
         plot_log_mu_ratio_vs_k(log_mu_points, nl_refs, T, d, plots / "final_log_mu_ratio_vs_k.png", param_labels)
     if mu_points_test:
         plot_aligned_vs_k(
@@ -847,6 +935,17 @@ def _replot_from_summary(
             "held-out test",
             mean_key="aligned_loss_mean",
             std_key="aligned_loss_std",
+            loss_objective=loss_objective,
+        )
+    mono_cmp = summary.get("comparison_mono") or []
+    poly_cmp = summary.get("comparison_poly") or []
+    if mono_cmp:
+        plot_LB_Lhalf_comparison_vs_k(
+            mono_cmp, T, d, plots / "final_LB_vs_Lhalf_mono_train.png", param_labels, "monomial"
+        )
+    if poly_cmp:
+        plot_LB_Lhalf_comparison_vs_k(
+            poly_cmp, T, d, plots / "final_LB_vs_Lhalf_poly_train.png", param_labels, "poly-kernel"
         )
     appendix_ks = _parse_ks(
         appendix_curves_ks or str(summary.get("config", {}).get("appendix_curves_ks", "")),
@@ -932,6 +1031,13 @@ def main() -> int:
         "--isolate-jobs",
         action="store_true",
         help="run each (model,k,seed) in a fresh subprocess to avoid JAX CPU OOM",
+    )
+    p.add_argument(
+        "--loss-objective",
+        type=str,
+        default="mu",
+        choices=["mu", "L_B"],
+        help="k-QSA/k-CSA train loss: mu (-log mu) or L_B (objective B); nl-CSA uses Renyi/L_half",
     )
     p.add_argument(
         "--train-only",
@@ -1117,7 +1223,7 @@ def main() -> int:
             if not runs:
                 print(f"[WARN] no runs for {name} k={k}")
                 continue
-            agg = _aggregate_mu_runs(runs, s, k, args.T)
+            agg = _aggregate_mu_runs(runs, s, k, args.T, loss_objective=args.loss_objective)
             agg["param_label"] = s.get("param_label")
             aggregates_by_k[str(k)].append(agg)
             mu_points.append(_mu_point_from_agg(agg, s, k, test=False))
@@ -1130,7 +1236,8 @@ def main() -> int:
     param_labels = {s["display"]: s["param_label"] for s in specs}
     plots = out / "plots"
     plot_aligned_vs_k(
-        mu_points, nl_refs, args.T, args.d, plots / "final_aligned_loss_vs_k.png", param_labels, "train"
+        mu_points, nl_refs, args.T, args.d, plots / "final_aligned_loss_vs_k.png", param_labels, "train",
+        loss_objective=args.loss_objective,
     )
     if mu_points_test:
         plot_aligned_vs_k(
@@ -1141,7 +1248,37 @@ def main() -> int:
             plots / "final_aligned_loss_vs_k_test.png",
             param_labels,
             "held-out test",
+            loss_objective=args.loss_objective,
         )
+    comparison_mono: list[dict] = []
+    comparison_poly: list[dict] = []
+    if args.loss_objective == "L_B":
+        for k in ks:
+            for agg in aggregates_by_k[str(k)]:
+                spec = agg.get("spec") or {}
+                km = spec.get("kernel_mode", "monomial")
+                if km == "monomial" and agg["model"] in ("k-QSA L=16", "k-CSA"):
+                    comparison_mono.append(agg)
+                elif km == "poly" and agg["model"] in ("poly-k-QSA L=16", "poly-k-CSA"):
+                    comparison_poly.append(agg)
+        if comparison_mono:
+            plot_LB_Lhalf_comparison_vs_k(
+                comparison_mono,
+                args.T,
+                args.d,
+                plots / "final_LB_vs_Lhalf_mono_train.png",
+                param_labels,
+                "monomial",
+            )
+        if comparison_poly:
+            plot_LB_Lhalf_comparison_vs_k(
+                comparison_poly,
+                args.T,
+                args.d,
+                plots / "final_LB_vs_Lhalf_poly_train.png",
+                param_labels,
+                "poly-kernel",
+            )
     log_mu_points = []
     for s in mu_specs:
         for k in ks:
@@ -1149,7 +1286,7 @@ def main() -> int:
                 if agg["model"] == s["display"]:
                     log_mu_points.append(_mu_point_log_ratio(agg, s, k))
                     break
-    if log_mu_points:
+    if log_mu_points and args.loss_objective != "L_B":
         plot_log_mu_ratio_vs_k(log_mu_points, nl_refs, args.T, args.d, plots / "final_log_mu_ratio_vs_k.png", param_labels)
     appendix_ks = _parse_ks(args.appendix_curves_ks, [3, 5])
     for k in ks:
@@ -1202,6 +1339,7 @@ def main() -> int:
             "csa_matrices": kcsa_matrix_param_count(args.d),
             "include_poly": not args.no_poly,
             "include_nl_288": bool(args.include_nl_288),
+            "loss_objective": args.loss_objective,
         },
         "model_specs": [
             {
@@ -1214,10 +1352,15 @@ def main() -> int:
         ],
         "styles": STYLES,
         "alignment_note": (
-            "Mu-models plotted as −logμ + log T; nl-CSA Renyi plotted as-is. "
-            "Train loss = final epoch on train split; test loss = same metric on a fresh PTB "
-            f"sample (test_data_seed={args.test_data_seed}, n={args.test_max_sentences}). "
-            "poly-k-QSA/CSA use kernel_mode=poly on the SAME vs-k plot as monomial."
+            "L_B campaign: k-QSA/k-CSA train & plot L_B; nl-CSA uses L_half_uniform (Renyi). "
+            "Comparison plots show L_B vs L_half_uniform at final params on train."
+            if args.loss_objective == "L_B"
+            else (
+                "Mu-models plotted as −logμ + log T; nl-CSA Renyi plotted as-is. "
+                "Train loss = final epoch on train split; test loss = same metric on a fresh PTB "
+                f"sample (test_data_seed={args.test_data_seed}, n={args.test_max_sentences}). "
+                "poly-k-QSA/CSA use kernel_mode=poly on the SAME vs-k plot as monomial."
+            )
         ),
         "convergence_warnings": warns,
         "trend_notes": trend_notes,
@@ -1226,6 +1369,8 @@ def main() -> int:
         "nl_refs": nl_refs,
         "nl_refs_test": nl_refs_test,
         "aggregates_by_k": aggregates_by_k,
+        "comparison_mono": comparison_mono,
+        "comparison_poly": comparison_poly,
         "per_seed": [
             {
                 "display": r["display"],

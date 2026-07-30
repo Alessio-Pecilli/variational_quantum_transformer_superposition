@@ -30,10 +30,12 @@ from encoding import Encoding
 from pennylane_jax_vqt import isometrize_matrix
 from qsa_training import (
     QSATrainConfig,
+    L_half_uniform_jax,
     _feature_qubits,
     _normalize_rows,
     classical_mu_jax,
     init_qsa_params,
+    loss_B_jax,
     ortho_matrix_jax,
     sequence_xy_from_tokens,
 )
@@ -81,6 +83,7 @@ class BaselineConfig:
     checkpoint_every: int = 20
     resume: bool = True
     kernel_mode: str = "monomial"
+    loss_objective: str = "mu"  # "mu" (-log mu) | "L_B" (objective B)
     val_fraction: float = 0.2
     test_data_seed: Optional[int] = None
     test_max_sentences: int = 200
@@ -240,6 +243,28 @@ def mu_loss_sentence(params, token_ids, pe, cfg: BaselineConfig):
     return -jnp.log(jnp.maximum(mu, cfg.epsilon))
 
 
+def lb_kqsa_loss_sentence(params, token_ids, pe, cfg: BaselineConfig):
+    """k-QSA train loss = L_B (real ansatz, no trainable phases)."""
+    emb = _embedding_forward(params["embedding"], cfg)
+    X, Y = sequence_xy_from_tokens(token_ids, emb, pe)
+    W = ortho_matrix_jax(params["weights_w"], cfg.d)
+    V = ortho_matrix_jax(params["weights_v"], cfg.d)
+    return loss_B_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode, epsilon=cfg.epsilon)
+
+
+def l_half_uniform_kqsa_sentence(params, token_ids, pe, cfg: BaselineConfig):
+    """k-QSA eval: L_half_uniform at fixed W,V (uniform Renyi-1/2 CE)."""
+    emb = _embedding_forward(params["embedding"], cfg)
+    X, Y = sequence_xy_from_tokens(token_ids, emb, pe)
+    W = ortho_matrix_jax(params["weights_w"], cfg.d)
+    V = ortho_matrix_jax(params["weights_v"], cfg.d)
+    return L_half_uniform_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode, epsilon=cfg.epsilon)
+
+
+def _kqsa_loss_for_cfg(cfg: BaselineConfig):
+    return lb_kqsa_loss_sentence if cfg.loss_objective == "L_B" else mu_loss_sentence
+
+
 def _orthogonalize_classical(raw: jnp.ndarray) -> jnp.ndarray:
     """Classical QR orthogonalization (independent of quantum RY gate angles)."""
     Q, R = jnp.linalg.qr(raw)
@@ -256,6 +281,33 @@ def kcsa_mu_loss_sentence(params, token_ids, pe, cfg: BaselineConfig):
     V = _orthogonalize_classical(params["V_raw"])
     mu = classical_mu_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode)
     return -jnp.log(jnp.maximum(mu, cfg.epsilon))
+
+
+def lb_kcsa_loss_sentence(params, token_ids, pe, cfg: BaselineConfig):
+    """k-CSA train loss = L_B."""
+    emb = _embedding_forward(params["embedding"], cfg)
+    X, Y = sequence_xy_from_tokens(token_ids, emb, pe)
+    W = _orthogonalize_classical(params["W_raw"])
+    V = _orthogonalize_classical(params["V_raw"])
+    return loss_B_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode, epsilon=cfg.epsilon)
+
+
+def l_half_uniform_kcsa_sentence(params, token_ids, pe, cfg: BaselineConfig):
+    emb = _embedding_forward(params["embedding"], cfg)
+    X, Y = sequence_xy_from_tokens(token_ids, emb, pe)
+    W = _orthogonalize_classical(params["W_raw"])
+    V = _orthogonalize_classical(params["V_raw"])
+    return L_half_uniform_jax(X, Y, W, V, cfg.k, kernel_mode=cfg.kernel_mode, epsilon=cfg.epsilon)
+
+
+def _kcsa_loss_for_cfg(cfg: BaselineConfig):
+    return lb_kcsa_loss_sentence if cfg.loss_objective == "L_B" else kcsa_mu_loss_sentence
+
+
+def _l_half_uniform_for_model(model: str):
+    if model == "k-QSA":
+        return l_half_uniform_kqsa_sentence
+    return l_half_uniform_kcsa_sentence
 
 
 def init_kcsa_params(vocab_size: int, cfg: BaselineConfig, key: jax.Array) -> dict:
@@ -672,8 +724,8 @@ def _finalize_mu_result(
         "final_loss": train_out["losses"][-1],
         "final_val_ce": train_out["val_ce_history"][-1],
         "final_val_ppl": train_out["val_ppl_history"][-1],
-        "train_metric": "neg_log_mu",
-        "val_metric_kind": "neg_log_mu",
+        "train_metric": "L_B" if cfg.loss_objective == "L_B" else "neg_log_mu",
+        "val_metric_kind": "L_B" if cfg.loss_objective == "L_B" else "neg_log_mu",
         "val_metric_common": None,
         "metric_warning": (
             "exp(val) = 1/μ is NOT language-model perplexity and must NOT be "
@@ -696,11 +748,23 @@ def _finalize_mu_result(
         "vocab_size": int(bundle["encoding"].vocabSize),
         "note": note,
     }
+    train_batch = bundle["token_batch"][bundle["train_idx"]]
+    lhalf_fn = _l_half_uniform_for_model(name)
+    result["final_L_half_uniform"] = eval_batch_mean_loss(
+        params, train_batch, bundle["pe"], cfg, lhalf_fn
+    )
+    if cfg.loss_objective == "L_B":
+        result["final_L_B"] = float(result["final_loss"])
     if "test_token_batch" in bundle:
         test_batch = bundle["test_token_batch"]
         result["final_test_loss"] = eval_batch_mean_loss(
             params, test_batch, bundle["pe"], cfg, loss_fn
         )
+        result["final_test_L_half_uniform"] = eval_batch_mean_loss(
+            params, test_batch, bundle["pe"], cfg, lhalf_fn
+        )
+        if cfg.loss_objective == "L_B":
+            result["final_test_L_B"] = float(result["final_test_loss"])
         result["num_test"] = int(bundle.get("num_test", test_batch.shape[0]))
         result["test_data_seed"] = int(cfg.test_data_seed) if cfg.test_data_seed is not None else None
     _save_run(result, params, bundle["sentences"], cfg, run_name)
@@ -719,13 +783,14 @@ def train_kqsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
     key = jax.random.PRNGKey(cfg.model_seed)
     params = init_qsa_params(bundle["encoding"].vocabSize, bundle["qcfg"], key)
     angle_n = qsa_angle_param_count(cfg.d, cfg.layers)
+    loss_fn = _kqsa_loss_for_cfg(cfg)
     train_out = _train_loop(
         "k-QSA",
         cfg,
         bundle,
         params,
-        mu_loss_sentence,
-        mu_loss_sentence,
+        loss_fn,
+        loss_fn,
         run_name,
         log,
     )
@@ -741,12 +806,17 @@ def train_kqsa(cfg: BaselineConfig, bundle: dict, logger: Optional[logging.Logge
         angle_n=angle_n,
         matrix_n=0,
         note=(
-            "Train loss = -log(mu) on train split; val_ce = same on val split. "
-            "Quantum-angle ortho W,V; model_seed controls init. "
-            "Local training does not execute the quantum circuit."
+            "Train loss = L_B (objective B, real ortho ansatz) on train split; "
+            "val = same on val split. Quantum-angle ortho W,V; model_seed controls init."
+            if cfg.loss_objective == "L_B"
+            else (
+                "Train loss = -log(mu) on train split; val_ce = same on val split. "
+                "Quantum-angle ortho W,V; model_seed controls init. "
+                "Local training does not execute the quantum circuit."
+            )
         ),
         run_name=run_name,
-        loss_fn=mu_loss_sentence,
+        loss_fn=loss_fn,
     )
  
 def train_kcsa(
@@ -763,13 +833,14 @@ def train_kcsa(
     key = jax.random.PRNGKey(cfg.model_seed + 31)
     params = init_kcsa_params(bundle["encoding"].vocabSize, cfg, key)
     matrix_n = kcsa_matrix_param_count(cfg.d)
+    loss_fn = _kcsa_loss_for_cfg(cfg)
     train_out = _train_loop(
         "k-CSA",
         cfg,
         bundle,
         params,
-        kcsa_mu_loss_sentence,
-        kcsa_mu_loss_sentence,
+        loss_fn,
+        loss_fn,
         run_name,
         log,
     )
@@ -785,12 +856,17 @@ def train_kcsa(
         angle_n=0,
         matrix_n=matrix_n,
         note=(
-            "Independent classical baseline: QR-orthogonal W,V from learnable raw matrices "
-            "(no quantum RY angles). Same data_seed / train conditions as k-QSA; "
-            "separate model_seed. Train loss = -log(mu); val_ce = -log(mu) on val split."
+            "Independent classical baseline: QR-orthogonal W,V. "
+            "Train loss = L_B on train split."
+            if cfg.loss_objective == "L_B"
+            else (
+                "Independent classical baseline: QR-orthogonal W,V from learnable raw matrices "
+                "(no quantum RY angles). Same data_seed / train conditions as k-QSA; "
+                "separate model_seed. Train loss = -log(mu); val_ce = -log(mu) on val split."
+            )
         ),
         run_name=run_name,
-        loss_fn=kcsa_mu_loss_sentence,
+        loss_fn=loss_fn,
     )
 
 
