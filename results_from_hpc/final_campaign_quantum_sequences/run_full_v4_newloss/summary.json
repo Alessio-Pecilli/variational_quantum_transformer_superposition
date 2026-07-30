@@ -1,0 +1,476 @@
+{
+  "config": {
+    "train_size": 256,
+    "test_size": 128,
+    "T": 32,
+    "d": 16,
+    "n_qubits": 4,
+    "dt": 1.0,
+    "ks": "1,2,3,5,6",
+    "epochs": 400,
+    "poly_epochs": 600,
+    "nl_epochs": 400,
+    "min_epochs": 60,
+    "patience": 40,
+    "loss_rel_tol": 0.0001,
+    "eval_every": 5,
+    "lr": 0.002,
+    "layers": 16,
+    "seed": 7,
+    "model_seed_base": 1042,
+    "n_seeds": 5,
+    "output_dir": "results_from_hpc/final_campaign_quantum_sequences/run_full_v4_newloss",
+    "skip_nl": false,
+    "quick": false
+  },
+  "loss_protocol": {
+    "kQSA_kCSA_train": "L_B = -log F, F = (T+1)/(2T) * mu/zeta (complex ansatz, trainable phi)",
+    "nlCSA_train": "L_half_uniform = -2 log((1/T) sum_j sqrt(p_j)) (soft kernel, k-independent)",
+    "comparison_plots": "L_B and L_half_uniform both evaluated on train with final params for mu-models"
+  },
+  "train_points": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "loss_mean": 6.625511089793053,
+      "loss_std": 0.07021634027853946
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "loss_mean": 6.693085089325825,
+      "loss_std": 0.08478843370871657
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 3,
+      "loss_mean": 6.767293355105977,
+      "loss_std": 0.10418337395840004
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 5,
+      "loss_mean": 6.877446711218871,
+      "loss_std": 0.0983347873368446
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 6,
+      "loss_mean": 6.8657503892165845,
+      "loss_std": 0.05534326210600073
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "loss_mean": 6.534958435232542,
+      "loss_std": 0.08162768595222583
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "loss_mean": 6.778246988999287,
+      "loss_std": 0.09254647597838046
+    },
+    {
+      "model": "k-CSA",
+      "k": 3,
+      "loss_mean": 6.859063832388516,
+      "loss_std": 0.04353131578569431
+    },
+    {
+      "model": "k-CSA",
+      "k": 5,
+      "loss_mean": 6.816455013477343,
+      "loss_std": 0.042518477642251765
+    },
+    {
+      "model": "k-CSA",
+      "k": 6,
+      "loss_mean": 6.799033708377212,
+      "loss_std": 0.04892968954139216
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "loss_mean": 5.912673302504042,
+      "loss_std": 0.1468910329519452
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "loss_mean": 5.953177730893815,
+      "loss_std": 0.2462129352894204
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 3,
+      "loss_mean": 5.7414884695612605,
+      "loss_std": 0.29939306296236984
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 5,
+      "loss_mean": 6.134489459618313,
+      "loss_std": 0.10974660652515196
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 6,
+      "loss_mean": 5.817785493771239,
+      "loss_std": 0.18685837862068583
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "loss_mean": 5.970888538476773,
+      "loss_std": 0.1762928283587754
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "loss_mean": 6.032213019959878,
+      "loss_std": 0.1283291727153811
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 3,
+      "loss_mean": 5.910042061089494,
+      "loss_std": 0.1489663349698976
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 5,
+      "loss_mean": 5.956526635387421,
+      "loss_std": 0.20565070318963838
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 6,
+      "loss_mean": 5.870972318233897,
+      "loss_std": 0.09111167048015983
+    }
+  ],
+  "test_points": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "loss_mean": 6.521565016345674,
+      "loss_std": 0.0471824828420629
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "loss_mean": 6.721936488994714,
+      "loss_std": 0.05635225297482814
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 3,
+      "loss_mean": 6.7484323868562655,
+      "loss_std": 0.097235282348555
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 5,
+      "loss_mean": 6.891570482999896,
+      "loss_std": 0.1078810784859432
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 6,
+      "loss_mean": 6.812557526011966,
+      "loss_std": 0.10824010193919645
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "loss_mean": 6.548581670632214,
+      "loss_std": 0.05570831668832756
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "loss_mean": 6.67588143086473,
+      "loss_std": 0.05178986232552347
+    },
+    {
+      "model": "k-CSA",
+      "k": 3,
+      "loss_mean": 6.83039218607758,
+      "loss_std": 0.09315246310540025
+    },
+    {
+      "model": "k-CSA",
+      "k": 5,
+      "loss_mean": 6.870553524515314,
+      "loss_std": 0.10347604589821487
+    },
+    {
+      "model": "k-CSA",
+      "k": 6,
+      "loss_mean": 6.811469014608727,
+      "loss_std": 0.1703419491452382
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "loss_mean": 5.995434008464661,
+      "loss_std": 0.16745957371204
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "loss_mean": 6.091717213763985,
+      "loss_std": 0.16518555077159164
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 3,
+      "loss_mean": 5.775732691877991,
+      "loss_std": 0.22609642135524677
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 5,
+      "loss_mean": 6.113533134626477,
+      "loss_std": 0.127114827325562
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 6,
+      "loss_mean": 5.901299169679445,
+      "loss_std": 0.32605765254701297
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "loss_mean": 6.018707403903044,
+      "loss_std": 0.17975068863867594
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "loss_mean": 6.009873889814977,
+      "loss_std": 0.1947093074419275
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 3,
+      "loss_mean": 6.0488841153530775,
+      "loss_std": 0.1513732597035821
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 5,
+      "loss_mean": 6.02655652382464,
+      "loss_std": 0.23636216034189045
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 6,
+      "loss_mean": 6.017104859924665,
+      "loss_std": 0.20693779004591176
+    }
+  ],
+  "mono_compare_points": [
+    {
+      "model": "k-QSA L=16",
+      "k": 1,
+      "L_B_mean": 6.625511089793053,
+      "L_B_std": 0.07021634027853946,
+      "L_half_mean": 3.0176034653139028,
+      "L_half_std": 0.02138647292962832
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 2,
+      "L_B_mean": 6.693085089325825,
+      "L_B_std": 0.08478843370871657,
+      "L_half_mean": 3.0110969733327955,
+      "L_half_std": 0.01594234217131086
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 3,
+      "L_B_mean": 6.767293355105977,
+      "L_B_std": 0.10418337395840004,
+      "L_half_mean": 2.9896657810143465,
+      "L_half_std": 0.03542634188118561
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 5,
+      "L_B_mean": 6.877446711218871,
+      "L_B_std": 0.0983347873368446,
+      "L_half_mean": 3.0191446893891785,
+      "L_half_std": 0.02199768636210079
+    },
+    {
+      "model": "k-QSA L=16",
+      "k": 6,
+      "L_B_mean": 6.8657503892165845,
+      "L_B_std": 0.05534326210600073,
+      "L_half_mean": 3.0045571098220285,
+      "L_half_std": 0.017437332498045372
+    },
+    {
+      "model": "k-CSA",
+      "k": 1,
+      "L_B_mean": 6.534958435232542,
+      "L_B_std": 0.08162768595222583,
+      "L_half_mean": 3.0246277585172896,
+      "L_half_std": 0.03376353302379593
+    },
+    {
+      "model": "k-CSA",
+      "k": 2,
+      "L_B_mean": 6.778246988999287,
+      "L_B_std": 0.09254647597838046,
+      "L_half_mean": 3.012584766262301,
+      "L_half_std": 0.02425635990508923
+    },
+    {
+      "model": "k-CSA",
+      "k": 3,
+      "L_B_mean": 6.859063832388516,
+      "L_B_std": 0.04353131578569431,
+      "L_half_mean": 3.017578451270097,
+      "L_half_std": 0.014616905095253293
+    },
+    {
+      "model": "k-CSA",
+      "k": 5,
+      "L_B_mean": 6.816455013477343,
+      "L_B_std": 0.042518477642251765,
+      "L_half_mean": 3.013311565821918,
+      "L_half_std": 0.013681612510504015
+    },
+    {
+      "model": "k-CSA",
+      "k": 6,
+      "L_B_mean": 6.799033708377212,
+      "L_B_std": 0.04892968954139216,
+      "L_half_mean": 3.0147966721124915,
+      "L_half_std": 0.019268319969046308
+    }
+  ],
+  "poly_compare_points": [
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 1,
+      "L_B_mean": 5.912673302504042,
+      "L_B_std": 0.1468910329519452,
+      "L_half_mean": 3.008928755619422,
+      "L_half_std": 0.02365820281480849
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 2,
+      "L_B_mean": 5.953177730893815,
+      "L_B_std": 0.2462129352894204,
+      "L_half_mean": 3.019839817130491,
+      "L_half_std": 0.008467592057591964
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 3,
+      "L_B_mean": 5.7414884695612605,
+      "L_B_std": 0.29939306296236984,
+      "L_half_mean": 2.9958426174603634,
+      "L_half_std": 0.04261005957990197
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 5,
+      "L_B_mean": 6.134489459618313,
+      "L_B_std": 0.10974660652515196,
+      "L_half_mean": 3.0345548317882307,
+      "L_half_std": 0.019927561528332718
+    },
+    {
+      "model": "poly-k-QSA L=16",
+      "k": 6,
+      "L_B_mean": 5.817785493771239,
+      "L_B_std": 0.18685837862068583,
+      "L_half_mean": 3.0154499738220863,
+      "L_half_std": 0.01569957452009404
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 1,
+      "L_B_mean": 5.970888538476773,
+      "L_B_std": 0.1762928283587754,
+      "L_half_mean": 3.0299703535050133,
+      "L_half_std": 0.033212666388366265
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 2,
+      "L_B_mean": 6.032213019959878,
+      "L_B_std": 0.1283291727153811,
+      "L_half_mean": 3.010310321357231,
+      "L_half_std": 0.023749614498808774
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 3,
+      "L_B_mean": 5.910042061089494,
+      "L_B_std": 0.1489663349698976,
+      "L_half_mean": 3.0091064206263276,
+      "L_half_std": 0.018367200755385976
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 5,
+      "L_B_mean": 5.956526635387421,
+      "L_B_std": 0.20565070318963838,
+      "L_half_mean": 3.0149288751761434,
+      "L_half_std": 0.010175484642670901
+    },
+    {
+      "model": "poly-k-CSA",
+      "k": 6,
+      "L_B_mean": 5.870972318233897,
+      "L_B_std": 0.09111167048015983,
+      "L_half_mean": 3.003513235432368,
+      "L_half_std": 0.032081771161467355
+    }
+  ],
+  "nl_refs_train": [
+    {
+      "model": "nl-CSA iso",
+      "loss_mean": 3.034391377349654,
+      "loss_std": 0.01823900536328897
+    },
+    {
+      "model": "nl-CSA gen",
+      "loss_mean": 3.0123528460532407,
+      "loss_std": 0.036130027798665226
+    }
+  ],
+  "nl_refs_test": [
+    {
+      "model": "nl-CSA iso",
+      "loss_mean": 3.032230322228945,
+      "loss_std": 0.03279820332477479
+    },
+    {
+      "model": "nl-CSA gen",
+      "loss_mean": 3.0140274467025314,
+      "loss_std": 0.037347314175559594
+    }
+  ],
+  "dataset": {
+    "train_shape": [
+      256,
+      33,
+      16
+    ],
+    "test_shape": [
+      128,
+      33,
+      16
+    ],
+    "note": "Hamiltonian parameters (J,h) vary per trajectory and are never given as model inputs."
+  }
+}

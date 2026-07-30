@@ -22,6 +22,14 @@ PLOT_STYLES = {
     "poly-k-CSA": dict(color="#E69F00", linestyle="--", marker="v", linewidth=2.2),
     "nl-CSA iso": dict(color="#000000", linestyle="-", marker="s", linewidth=2.2),
     "nl-CSA gen": dict(color="#000000", linestyle=":", marker="x", linewidth=2.4),
+    "k-QSA L=16 (L_B)": dict(color="#0072B2", linestyle="-", marker="o", linewidth=2.4),
+    "k-QSA L=16 (L_half)": dict(color="#0072B2", linestyle=":", marker="o", linewidth=2.0),
+    "k-CSA (L_B)": dict(color="#E69F00", linestyle="-", marker="s", linewidth=2.4),
+    "k-CSA (L_half)": dict(color="#E69F00", linestyle=":", marker="s", linewidth=2.0),
+    "poly-k-QSA L=16 (L_B)": dict(color="#0072B2", linestyle="-", marker="^", linewidth=2.2),
+    "poly-k-QSA L=16 (L_half)": dict(color="#0072B2", linestyle=":", marker="^", linewidth=2.0),
+    "poly-k-CSA (L_B)": dict(color="#E69F00", linestyle="-", marker="v", linewidth=2.2),
+    "poly-k-CSA (L_half)": dict(color="#E69F00", linestyle=":", marker="v", linewidth=2.0),
 }
 
 
@@ -214,7 +222,29 @@ def _wv_from_params(params: dict[str, jnp.ndarray], d: int, family: str) -> tupl
     return w, v
 
 
-def _coherent_mu_for_sequence(
+def _prefix_aj_zj(
+    x: jnp.ndarray,
+    y: jnp.ndarray,
+    w: jnp.ndarray,
+    v: jnp.ndarray,
+    k: int,
+    mode: str,
+    d: int,
+) -> tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
+    """Per-step <y_j|z_j> and ||z_j||^2 from causal kernel attention."""
+    t = x.shape[0]
+    s = jnp.conj(x) @ (w @ x.T)
+    a = jnp.conj(y) @ (v @ x.T)
+    kern, _ = _kernel_matrix(s, k, mode, d)
+    tri = jnp.tril(jnp.ones((t, t), dtype=jnp.float64))
+    kern = kern * tri
+    aj = jnp.sum(a * kern, axis=1)
+    zj = kern @ (x @ v.T)
+    wj2 = jnp.sum(jnp.abs(zj) ** 2, axis=1)
+    return aj, wj2, kern
+
+
+def _mu_zeta_nu_for_sequence(
     x: jnp.ndarray,
     y: jnp.ndarray,
     w: jnp.ndarray,
@@ -222,20 +252,51 @@ def _coherent_mu_for_sequence(
     phi: jnp.ndarray,
     k: int,
     mode: str,
-) -> jnp.ndarray:
-    t, d = x.shape
-    s = jnp.conj(x) @ (w @ x.T)
-    a = jnp.conj(y) @ (v @ x.T)
-    kern, lam = _kernel_matrix(s, k, mode, d)
-    tri = jnp.tril(jnp.ones((t, t), dtype=jnp.float64))
-    aj = jnp.sum(a * kern * tri, axis=1)
-    amp = jnp.sum(jnp.exp(1j * phi[:t]) * aj)
+    d: int,
+) -> tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
+    t = x.shape[0]
+    aj, wj2, kern = _prefix_aj_zj(x, y, w, v, k, mode, d)
+    _, lam = _kernel_matrix(jnp.conj(x) @ (w @ x.T), k, mode, d)
     ntri = t * (t + 1) / 2.0
-    mu = jnp.abs(amp / (lam * ntri)) ** 2
-    return jnp.real(mu)
+    mu = jnp.abs(jnp.sum(jnp.exp(1j * phi[:t]) * aj)) ** 2 / (lam**2 * ntri**2)
+    zeta = jnp.sum(wj2) / (lam**2 * t * ntri)
+    nu = jnp.sum(jnp.abs(aj) ** 2) / (lam**2 * t * ntri)
+    return jnp.real(mu), jnp.real(zeta), jnp.real(nu)
 
 
-def _batch_mu_loss(
+def _L_B_for_sequence(
+    x: jnp.ndarray,
+    y: jnp.ndarray,
+    w: jnp.ndarray,
+    v: jnp.ndarray,
+    phi: jnp.ndarray,
+    k: int,
+    mode: str,
+    d: int,
+) -> jnp.ndarray:
+    t = x.shape[0]
+    mu, zeta, _ = _mu_zeta_nu_for_sequence(x, y, w, v, phi, k, mode, d)
+    pref = (t + 1) / (2.0 * t)
+    f_val = pref * mu / jnp.maximum(zeta, 1e-30)
+    return -jnp.log(jnp.maximum(f_val, 1e-30))
+
+
+def _L_half_uniform_for_sequence(
+    x: jnp.ndarray,
+    y: jnp.ndarray,
+    w: jnp.ndarray,
+    v: jnp.ndarray,
+    k: int,
+    mode: str,
+    d: int,
+) -> jnp.ndarray:
+    aj, wj2, _ = _prefix_aj_zj(x, y, w, v, k, mode, d)
+    w_norm = jnp.sqrt(jnp.maximum(wj2, 1e-30))
+    p = jnp.clip((jnp.abs(aj) / jnp.maximum(w_norm, 1e-30)) ** 2, 1e-30, 1.0)
+    return -2.0 * jnp.log(jnp.maximum(jnp.mean(jnp.sqrt(p)), 1e-30))
+
+
+def _batch_L_B(
     params: dict[str, jnp.ndarray],
     states: jnp.ndarray,
     k: int,
@@ -247,8 +308,35 @@ def _batch_mu_loss(
     phi = params["phi"]
     y_batch = states[:, 1:, :]
     x_batch = states[:, :-1, :]
-    mu_vals = jax.vmap(lambda xs, ys: _coherent_mu_for_sequence(xs, ys, w, v, phi, k, mode))(x_batch, y_batch)
-    return jnp.mean(-jnp.log(jnp.maximum(mu_vals, 1e-12)))
+    losses = jax.vmap(lambda xs, ys: _L_B_for_sequence(xs, ys, w, v, phi, k, mode, d))(x_batch, y_batch)
+    return jnp.mean(losses)
+
+
+def _batch_L_half_uniform(
+    params: dict[str, jnp.ndarray],
+    states: jnp.ndarray,
+    k: int,
+    mode: str,
+    family: str,
+) -> jnp.ndarray:
+    d = states.shape[-1]
+    w, v = _wv_from_params(params, d, family)
+    y_batch = states[:, 1:, :]
+    x_batch = states[:, :-1, :]
+    losses = jax.vmap(lambda xs, ys: _L_half_uniform_for_sequence(xs, ys, w, v, k, mode, d))(x_batch, y_batch)
+    return jnp.mean(losses)
+
+
+def _batch_train_loss(
+    params: dict[str, jnp.ndarray],
+    states: jnp.ndarray,
+    k: int,
+    mode: str,
+    family: str,
+) -> jnp.ndarray:
+    if family.startswith("nlcsa"):
+        return _batch_L_half_uniform(params, states, k, mode, family)
+    return _batch_L_B(params, states, k, mode, family)
 
 
 @jax.jit(static_argnames=("k", "mode", "family"))
@@ -265,7 +353,7 @@ def _adam_step(
     eps: float,
     step: int,
 ):
-    loss, grads = jax.value_and_grad(_batch_mu_loss)(params, x_batch, k, mode, family)
+    loss, grads = jax.value_and_grad(_batch_train_loss)(params, x_batch, k, mode, family)
     m, v = moments
     m = jax.tree_util.tree_map(lambda mm, g: beta1 * mm + (1.0 - beta1) * g, m, grads)
     v = jax.tree_util.tree_map(lambda vv, g: beta2 * vv + (1.0 - beta2) * (jnp.abs(g) ** 2), v, grads)
@@ -341,7 +429,7 @@ def train_model(
         losses.append(loss_f)
 
         if ep % eval_every == 0 or ep == max_epochs:
-            test_loss = float(_batch_mu_loss(params, test_batch, k, kernel_mode, family))
+            test_loss = float(_batch_train_loss(params, test_batch, k, kernel_mode, family))
             test_losses.append(test_loss)
             test_epochs.append(ep)
 
@@ -356,20 +444,24 @@ def train_model(
             stop_reason = f"converged (patience={patience}, rel_tol={loss_rel_tol})"
             break
 
-    final_train = float(_batch_mu_loss(best_params, train_batch, k, kernel_mode, family))
-    final_test_mu = float(_batch_mu_loss(best_params, test_batch, k, kernel_mode, family))
-    aligned_history = [float(x + math.log(T)) for x in losses]
-    aligned_test_history = [float(x + math.log(T)) for x in test_losses]
+    final_train = float(_batch_train_loss(best_params, train_batch, k, kernel_mode, family))
+    final_test = float(_batch_train_loss(best_params, test_batch, k, kernel_mode, family))
+    final_train_L_B = float(_batch_L_B(best_params, train_batch, k, kernel_mode, family))
+    final_train_L_half = float(_batch_L_half_uniform(best_params, train_batch, k, kernel_mode, family))
+    final_test_L_B = float(_batch_L_B(best_params, test_batch, k, kernel_mode, family))
+    final_test_L_half = float(_batch_L_half_uniform(best_params, test_batch, k, kernel_mode, family))
 
     return {
         "params": best_params,
         "loss_history": losses,
-        "aligned_history": aligned_history,
         "test_loss_history": test_losses,
         "test_loss_epochs": test_epochs,
-        "aligned_test_history": aligned_test_history,
         "final_loss": final_train,
-        "final_test_mu_loss": final_test_mu,
+        "final_test_loss": final_test,
+        "final_train_L_B": final_train_L_B,
+        "final_train_L_half_uniform": final_train_L_half,
+        "final_test_L_B": final_test_L_B,
+        "final_test_L_half_uniform": final_test_L_half,
         "epochs_run": len(losses),
         "best_epoch_train_loss": float(best_loss),
         "converged": stop_reason.startswith("converged"),
@@ -398,21 +490,15 @@ def _predict_last_fidelity(
     return float(jnp.mean(fids))
 
 
-def aggregate(runs: list[dict[str, Any]]) -> dict[str, Any]:
-    hist = np.array([r["aligned_history"] for r in runs], dtype=float)
-    finals = np.array([r["aligned_loss"] for r in runs], dtype=float)
-    test_fid = np.array([r["test_neglog_fid"] for r in runs], dtype=float)
-    test_mu = np.array([r["aligned_test_mu_loss"] for r in runs], dtype=float)
+def aggregate(runs: list[dict[str, Any]], train_key: str, test_key: str) -> dict[str, Any]:
+    train_vals = np.array([r[train_key] for r in runs], dtype=float)
+    test_vals = np.array([r[test_key] for r in runs], dtype=float)
     epochs = np.array([r["epochs_run"] for r in runs], dtype=float)
     return {
-        "aligned_history": hist.mean(axis=0).tolist(),
-        "aligned_std": hist.std(axis=0).tolist(),
-        "aligned_loss_mean": float(finals.mean()),
-        "aligned_loss_std": float(finals.std()),
-        "aligned_test_fidelity_loss_mean": float(test_fid.mean()),
-        "aligned_test_fidelity_loss_std": float(test_fid.std()),
-        "aligned_test_mu_loss_mean": float(test_mu.mean()),
-        "aligned_test_mu_loss_std": float(test_mu.std()),
+        "train_loss_mean": float(train_vals.mean()),
+        "train_loss_std": float(train_vals.std()),
+        "test_loss_mean": float(test_vals.mean()),
+        "test_loss_std": float(test_vals.std()),
         "epochs_run_mean": float(epochs.mean()),
         "epochs_run_std": float(epochs.std()),
         "converged_fraction": float(np.mean([1.0 if r["converged"] else 0.0 for r in runs])),
@@ -420,7 +506,7 @@ def aggregate(runs: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def plot_vs_k(
-    mu_points: list[dict[str, Any]],
+    points: list[dict[str, Any]],
     out_path: Path,
     title: str,
     ykey_mean: str,
@@ -430,7 +516,7 @@ def plot_vs_k(
 ) -> None:
     fig, ax = plt.subplots(figsize=(10.5, 6))
     by_model: dict[str, list[dict[str, Any]]] = {}
-    for row in mu_points:
+    for row in points:
         by_model.setdefault(row["model"], []).append(row)
     all_ks: list[int] = []
     for name, rows in by_model.items():
@@ -477,37 +563,67 @@ def plot_vs_k(
     plt.close(fig)
 
 
-def plot_convergence_curves(aggs: list[dict[str, Any]], out_path: Path, T: int) -> None:
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5), sharex=False)
-    for agg in aggs:
-        name = agg["model"]
-        st = PLOT_STYLES.get(name, dict(color="0.3", linestyle="-", linewidth=2.0))
-        train = np.asarray(agg["aligned_history"], dtype=float)
-        xs = np.arange(1, len(train) + 1)
-        axes[0].plot(xs, train, color=st["color"], linestyle=st["linestyle"], linewidth=2.0, label=name)
-        if "aligned_std" in agg:
-            std = np.asarray(agg["aligned_std"], dtype=float)
-            if len(std) == len(train):
-                axes[0].fill_between(xs, train - std, train + std, color=st["color"], alpha=0.12, linewidth=0)
-        if agg.get("test_loss_epochs") and agg.get("aligned_test_history"):
-            tx = np.asarray(agg["test_loss_epochs"], dtype=int)
-            ty = np.asarray(agg["aligned_test_history"], dtype=float)
-            axes[1].plot(tx, ty, color=st["color"], linestyle=st["linestyle"], linewidth=2.0, label=name)
-    axes[0].set_title(f"Train aligned loss (-log mu + log T), T={T}")
-    axes[0].set_xlabel("epoch")
-    axes[0].grid(True, alpha=0.3)
-    axes[1].set_title("Test aligned mu-loss (same metric, held-out TFIM)")
-    axes[1].set_xlabel("epoch")
-    axes[1].grid(True, alpha=0.3)
-    axes[0].legend(fontsize=7)
-    axes[1].legend(fontsize=7)
+def plot_loss_pair_comparison(
+    points: list[dict[str, Any]],
+    out_path: Path,
+    title: str,
+    ylabel: str,
+) -> None:
+    """Plot L_B and L_half_uniform (train, final params) for mu-models."""
+    fig, ax = plt.subplots(figsize=(10.5, 6))
+    by_model: dict[str, list[dict[str, Any]]] = {}
+    for row in points:
+        by_model.setdefault(row["model"], []).append(row)
+    for name, rows in by_model.items():
+        rows = sorted(rows, key=lambda x: int(x["k"]))
+        ks = [int(r["k"]) for r in rows]
+        lb = [float(r["L_B_mean"]) for r in rows]
+        lb_std = [float(r["L_B_std"]) for r in rows]
+        lh = [float(r["L_half_mean"]) for r in rows]
+        lh_std = [float(r["L_half_std"]) for r in rows]
+        st_b = PLOT_STYLES.get(f"{name} (L_B)", PLOT_STYLES.get(name, dict(color="0.3", linestyle="-", marker="o")))
+        st_h = PLOT_STYLES.get(f"{name} (L_half)", dict(color=st_b["color"], linestyle=":", marker=st_b.get("marker", "o")))
+        ax.errorbar(ks, lb, yerr=lb_std, color=st_b["color"], linestyle=st_b["linestyle"], marker=st_b["marker"],
+                    linewidth=2.2, capsize=4, label=f"{name} ($L_B$)")
+        ax.errorbar(ks, lh, yerr=lh_std, color=st_h["color"], linestyle=st_h["linestyle"], marker=st_h["marker"],
+                    linewidth=2.0, capsize=4, label=f"{name} ($L_{{1/2}}$)")
+    ax.set_xlabel("k")
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="best", fontsize=8)
     fig.tight_layout()
     fig.savefig(out_path, dpi=220)
     plt.close(fig)
 
 
+def _run_record(
+    trained: dict[str, Any],
+    family: str,
+    mseed: int,
+) -> dict[str, Any]:
+    is_nl = family.startswith("nlcsa")
+    return {
+        "seed": mseed,
+        "loss_history": trained["loss_history"],
+        "test_loss_history": trained["test_loss_history"],
+        "test_loss_epochs": trained["test_loss_epochs"],
+        "train_loss": float(trained["final_loss"]),
+        "test_loss": float(trained["final_test_loss"]),
+        "train_L_B": float(trained["final_train_L_B"]),
+        "train_L_half_uniform": float(trained["final_train_L_half_uniform"]),
+        "test_L_B": float(trained["final_test_L_B"]),
+        "test_L_half_uniform": float(trained["final_test_L_half_uniform"]),
+        "epochs_run": trained["epochs_run"],
+        "converged": trained["converged"],
+        "stop_reason": trained["stop_reason"],
+        "train_metric": "L_half_uniform" if is_nl else "L_B",
+        "test_metric": "L_half_uniform" if is_nl else "L_B",
+    }
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Quantum-sequences k sweep (mono+poly+nl)")
+    parser = argparse.ArgumentParser(description="Quantum-sequences k sweep (L_B / L_half_uniform)")
     parser.add_argument("--train-size", type=int, default=256)
     parser.add_argument("--test-size", type=int, default=128)
     parser.add_argument("--T", type=int, default=32)
@@ -528,12 +644,6 @@ def main() -> int:
     parser.add_argument("--model-seed-base", type=int, default=1042)
     parser.add_argument("--n-seeds", type=int, default=5)
     parser.add_argument("--output-dir", type=str, default="results_from_hpc/final_campaign_quantum_sequences/loss")
-    parser.add_argument(
-        "--reuse-mu-summary",
-        type=str,
-        default="",
-        help="If set, reuse mu-model points from an existing summary.json and only train nl-CSA.",
-    )
     parser.add_argument("--skip-nl", action="store_true", help="Skip nl-CSA iso/gen horizontal refs.")
     parser.add_argument("--quick", action="store_true")
     args = parser.parse_args()
@@ -575,28 +685,18 @@ def main() -> int:
         seed=args.seed,
     )
 
-    mu_points_train: list[dict[str, Any]] = []
-    mu_points_test_fid: list[dict[str, Any]] = []
-    mu_points_test_mu: list[dict[str, Any]] = []
-    convergence_aggs: list[dict[str, Any]] = []
+    model_specs = [
+        ("k-QSA L=16", "kqsa", "monomial", args.epochs),
+        ("k-CSA", "kcsa", "monomial", args.epochs),
+        ("poly-k-QSA L=16", "kqsa", "poly", args.poly_epochs),
+        ("poly-k-CSA", "kcsa", "poly", args.poly_epochs),
+    ]
+    train_points: list[dict[str, Any]] = []
+    test_points: list[dict[str, Any]] = []
+    mono_compare_points: list[dict[str, Any]] = []
+    poly_compare_points: list[dict[str, Any]] = []
     nl_refs_train: list[dict[str, Any]] = []
-    nl_refs_test_mu: list[dict[str, Any]] = []
-    nl_refs_test_fid: list[dict[str, Any]] = []
-
-    if args.reuse_mu_summary:
-        prev = json.loads(Path(args.reuse_mu_summary).read_text(encoding="utf-8"))
-        mu_points_train = list(prev.get("mu_points_vs_k", []))
-        mu_points_test_mu = list(prev.get("mu_points_vs_k_test_mu", []))
-        mu_points_test_fid = list(prev.get("mu_points_vs_k_test_fidelity", []))
-        print(f"[reuse] loaded mu-model points from {args.reuse_mu_summary}")
-        model_specs: list[tuple[str, str, str, int]] = []
-    else:
-        model_specs = [
-            ("k-QSA L=16", "kqsa", "monomial", args.epochs),
-            ("k-CSA", "kcsa", "monomial", args.epochs),
-            ("poly-k-QSA L=16", "kqsa", "poly", args.poly_epochs),
-            ("poly-k-CSA", "kcsa", "poly", args.poly_epochs),
-        ]
+    nl_refs_test: list[dict[str, Any]] = []
 
     for display, family, mode, max_epochs in model_specs:
         for k in ks:
@@ -618,72 +718,38 @@ def main() -> int:
                     loss_rel_tol=args.loss_rel_tol,
                     eval_every=args.eval_every,
                 )
-                test_fid = _predict_last_fidelity(
-                    dataset.test_states, trained["params"], family=family, mode=mode, k=k
-                )
-                runs.append(
-                    {
-                        "seed": mseed,
-                        "loss_history": trained["loss_history"],
-                        "aligned_history": trained["aligned_history"],
-                        "test_loss_history": trained["test_loss_history"],
-                        "test_loss_epochs": trained["test_loss_epochs"],
-                        "aligned_test_history": trained["aligned_test_history"],
-                        "aligned_loss": float(trained["final_loss"] + math.log(args.T)),
-                        "aligned_test_mu_loss": float(trained["final_test_mu_loss"] + math.log(args.T)),
-                        "test_neglog_fid": float(-math.log(max(test_fid, 1e-12))),
-                        "epochs_run": trained["epochs_run"],
-                        "converged": trained["converged"],
-                        "stop_reason": trained["stop_reason"],
-                    }
-                )
-            agg = aggregate(runs)
-            payload = {"model": display, "family": family, "kernel_mode": mode, "k": k, "runs": runs, **agg}
+                runs.append(_run_record(trained, family, mseed))
+
+            agg_train = aggregate(runs, "train_loss", "test_loss")
+            agg_lb = {
+                "L_B_mean": float(np.mean([r["train_L_B"] for r in runs])),
+                "L_B_std": float(np.std([r["train_L_B"] for r in runs])),
+                "L_half_mean": float(np.mean([r["train_L_half_uniform"] for r in runs])),
+                "L_half_std": float(np.std([r["train_L_half_uniform"] for r in runs])),
+            }
+            payload = {"model": display, "family": family, "kernel_mode": mode, "k": k, "runs": runs, **agg_train, **agg_lb}
             (aggs_dir / f"{family}_{mode}_k{k}.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-            mu_points_train.append(
-                {
-                    "model": display,
-                    "k": k,
-                    "aligned_loss_mean": agg["aligned_loss_mean"],
-                    "aligned_loss_std": agg["aligned_loss_std"],
-                }
+            train_points.append(
+                {"model": display, "k": k, "loss_mean": agg_train["train_loss_mean"], "loss_std": agg_train["train_loss_std"]}
             )
-            mu_points_test_fid.append(
-                {
-                    "model": display,
-                    "k": k,
-                    "aligned_test_fidelity_loss_mean": agg["aligned_test_fidelity_loss_mean"],
-                    "aligned_test_fidelity_loss_std": agg["aligned_test_fidelity_loss_std"],
-                }
+            test_points.append(
+                {"model": display, "k": k, "loss_mean": agg_train["test_loss_mean"], "loss_std": agg_train["test_loss_std"]}
             )
-            mu_points_test_mu.append(
-                {
-                    "model": display,
-                    "k": k,
-                    "aligned_test_mu_loss_mean": agg["aligned_test_mu_loss_mean"],
-                    "aligned_test_mu_loss_std": agg["aligned_test_mu_loss_std"],
-                }
-            )
-            if k == ks[len(ks) // 2]:
-                convergence_aggs.append(
-                    {
-                        "model": display,
-                        "aligned_history": agg["aligned_history"],
-                        "aligned_std": agg["aligned_std"],
-                        "test_loss_epochs": runs[0]["test_loss_epochs"],
-                        "aligned_test_history": runs[0]["aligned_test_history"],
-                    }
-                )
+            compare_row = {"model": display, "k": k, **agg_lb}
+            if mode == "monomial":
+                mono_compare_points.append(compare_row)
+            else:
+                poly_compare_points.append(compare_row)
+
             print(
-                f"[{display} k={k}] train={agg['aligned_loss_mean']:.4f}+/-{agg['aligned_loss_std']:.4f} | "
-                f"test_mu={agg['aligned_test_mu_loss_mean']:.4f}+/-{agg['aligned_test_mu_loss_std']:.4f} | "
-                f"test_-logF={agg['aligned_test_fidelity_loss_mean']:.4f}+/-{agg['aligned_test_fidelity_loss_std']:.4f} | "
-                f"epochs~{agg['epochs_run_mean']:.0f} conv={agg['converged_fraction']:.0%}"
+                f"[{display} k={k}] train_L_B={agg_lb['L_B_mean']:.4f}+/-{agg_lb['L_B_std']:.4f} | "
+                f"train_L_half={agg_lb['L_half_mean']:.4f}+/-{agg_lb['L_half_std']:.4f} | "
+                f"test_L_B={float(np.mean([r['test_L_B'] for r in runs])):.4f} | "
+                f"epochs~{agg_train['epochs_run_mean']:.0f} conv={agg_train['converged_fraction']:.0%}"
             )
 
     if not args.skip_nl:
-        # Softmax kernel is k-independent: train once and plot as horizontal refs.
         nl_specs = [
             ("nl-CSA iso", "nlcsa_iso", "soft", args.nl_epochs),
             ("nl-CSA gen", "nlcsa_gen", "soft", args.nl_epochs),
@@ -708,129 +774,71 @@ def main() -> int:
                     loss_rel_tol=args.loss_rel_tol,
                     eval_every=args.eval_every,
                 )
-                test_fid = _predict_last_fidelity(
-                    dataset.test_states, trained["params"], family=family, mode=mode, k=bookkeeping_k
-                )
-                runs.append(
-                    {
-                        "seed": mseed,
-                        "loss_history": trained["loss_history"],
-                        "aligned_history": trained["aligned_history"],
-                        "test_loss_history": trained["test_loss_history"],
-                        "test_loss_epochs": trained["test_loss_epochs"],
-                        "aligned_test_history": trained["aligned_test_history"],
-                        "aligned_loss": float(trained["final_loss"] + math.log(args.T)),
-                        "aligned_test_mu_loss": float(trained["final_test_mu_loss"] + math.log(args.T)),
-                        "test_neglog_fid": float(-math.log(max(test_fid, 1e-12))),
-                        "epochs_run": trained["epochs_run"],
-                        "converged": trained["converged"],
-                        "stop_reason": trained["stop_reason"],
-                    }
-                )
-            agg = aggregate(runs)
-            payload = {
-                "model": display,
-                "family": family,
-                "kernel_mode": mode,
-                "k": "independent",
-                "runs": runs,
-                **agg,
-            }
+                runs.append(_run_record(trained, family, mseed))
+            agg_train = aggregate(runs, "train_loss", "test_loss")
+            payload = {"model": display, "family": family, "kernel_mode": mode, "k": "independent", "runs": runs, **agg_train}
             (aggs_dir / f"{family}_soft.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
             nl_refs_train.append(
-                {
-                    "model": display,
-                    "aligned_loss_mean": agg["aligned_loss_mean"],
-                    "aligned_loss_std": agg["aligned_loss_std"],
-                }
+                {"model": display, "loss_mean": agg_train["train_loss_mean"], "loss_std": agg_train["train_loss_std"]}
             )
-            nl_refs_test_mu.append(
-                {
-                    "model": display,
-                    "aligned_test_mu_loss_mean": agg["aligned_test_mu_loss_mean"],
-                    "aligned_test_mu_loss_std": agg["aligned_test_mu_loss_std"],
-                }
-            )
-            nl_refs_test_fid.append(
-                {
-                    "model": display,
-                    "aligned_test_fidelity_loss_mean": agg["aligned_test_fidelity_loss_mean"],
-                    "aligned_test_fidelity_loss_std": agg["aligned_test_fidelity_loss_std"],
-                }
-            )
-            convergence_aggs.append(
-                {
-                    "model": display,
-                    "aligned_history": agg["aligned_history"],
-                    "aligned_std": agg["aligned_std"],
-                    "test_loss_epochs": runs[0]["test_loss_epochs"],
-                    "aligned_test_history": runs[0]["aligned_test_history"],
-                }
+            nl_refs_test.append(
+                {"model": display, "loss_mean": agg_train["test_loss_mean"], "loss_std": agg_train["test_loss_std"]}
             )
             print(
-                f"[{display} k-indep] train={agg['aligned_loss_mean']:.4f}+/-{agg['aligned_loss_std']:.4f} | "
-                f"test_mu={agg['aligned_test_mu_loss_mean']:.4f}+/-{agg['aligned_test_mu_loss_std']:.4f} | "
-                f"test_-logF={agg['aligned_test_fidelity_loss_mean']:.4f}+/-{agg['aligned_test_fidelity_loss_std']:.4f} | "
-                f"epochs~{agg['epochs_run_mean']:.0f} conv={agg['converged_fraction']:.0%}"
+                f"[{display} k-indep] train_L_half={agg_train['train_loss_mean']:.4f}+/-{agg_train['train_loss_std']:.4f} | "
+                f"test_L_half={agg_train['test_loss_mean']:.4f}+/-{agg_train['test_loss_std']:.4f} | "
+                f"epochs~{agg_train['epochs_run_mean']:.0f} conv={agg_train['converged_fraction']:.0%}"
             )
 
     plot_vs_k(
-        mu_points_train,
-        plots / "final_aligned_loss_vs_k.png",
-        f"FINAL aligned loss vs k (T={args.T}, d={args.d}; train; mono+poly+nl)",
-        "aligned_loss_mean",
-        "aligned_loss_std",
-        r"aligned loss: $-\log\mu+\log T$",
+        train_points,
+        plots / "train_loss_L_B_vs_k.png",
+        f"Train loss vs k (T={args.T}, d={args.d}; kQSA/kCSA: $L_B$, nl-CSA: $L_{{1/2}}$)",
+        "loss_mean",
+        "loss_std",
+        r"train loss",
         nl_refs=nl_refs_train,
     )
     plot_vs_k(
-        mu_points_test_mu,
-        plots / "final_aligned_loss_vs_k_test_mu.png",
-        f"FINAL aligned loss vs k (T={args.T}, d={args.d}; held-out TFIM; test mu-loss)",
-        "aligned_test_mu_loss_mean",
-        "aligned_test_mu_loss_std",
-        r"test aligned loss: $-\log\mu+\log T$",
-        nl_refs=nl_refs_test_mu,
+        test_points,
+        plots / "test_loss_L_B_vs_k.png",
+        f"Test loss vs k (T={args.T}, d={args.d}; held-out TFIM; kQSA/kCSA: $L_B$, nl-CSA: $L_{{1/2}}$)",
+        "loss_mean",
+        "loss_std",
+        r"test loss",
+        nl_refs=nl_refs_test,
     )
-    plot_vs_k(
-        mu_points_test_fid,
-        plots / "final_aligned_loss_vs_k_test.png",
-        f"FINAL aligned loss vs k (T={args.T}, d={args.d}; held-out TFIM; y=-log prediction fidelity)",
-        "aligned_test_fidelity_loss_mean",
-        "aligned_test_fidelity_loss_std",
-        r"test loss: $-\log(\mathrm{prediction\ fidelity})$",
-        nl_refs=nl_refs_test_fid,
+    plot_loss_pair_comparison(
+        mono_compare_points,
+        plots / "train_mono_L_B_vs_L_half_uniform.png",
+        f"Mono kQSA/kCSA: $L_B$ vs $L_{{1/2}}$ on train (final params, T={args.T}, d={args.d})",
+        r"train loss (final checkpoint)",
     )
-    if convergence_aggs:
-        plot_convergence_curves(
-            convergence_aggs,
-            plots / "training_convergence_train_vs_test.png",
-            T=args.T,
-        )
+    plot_loss_pair_comparison(
+        poly_compare_points,
+        plots / "train_poly_L_B_vs_L_half_uniform.png",
+        f"Poly kQSA/kCSA: $L_B$ vs $L_{{1/2}}$ on train (final params, T={args.T}, d={args.d})",
+        r"train loss (final checkpoint)",
+    )
 
     summary = {
         "config": vars(args),
-        "mu_points_vs_k": mu_points_train,
-        "mu_points_vs_k_test_mu": mu_points_test_mu,
-        "mu_points_vs_k_test_fidelity": mu_points_test_fid,
+        "loss_protocol": {
+            "kQSA_kCSA_train": "L_B = -log F, F = (T+1)/(2T) * mu/zeta (complex ansatz, trainable phi)",
+            "nlCSA_train": "L_half_uniform = -2 log((1/T) sum_j sqrt(p_j)) (soft kernel, k-independent)",
+            "comparison_plots": "L_B and L_half_uniform both evaluated on train with final params for mu-models",
+        },
+        "train_points": train_points,
+        "test_points": test_points,
+        "mono_compare_points": mono_compare_points,
+        "poly_compare_points": poly_compare_points,
         "nl_refs_train": nl_refs_train,
-        "nl_refs_test_mu": nl_refs_test_mu,
-        "nl_refs_test_fidelity": nl_refs_test_fid,
+        "nl_refs_test": nl_refs_test,
         "dataset": {
             "train_shape": list(dataset.train_states.shape),
             "test_shape": list(dataset.test_states.shape),
             "note": "Hamiltonian parameters (J,h) vary per trajectory and are never given as model inputs.",
         },
-        "training_note": (
-            "Early stopping on train -log(mu) with patience; best checkpoint used for test metrics. "
-            "Test mu-loss uses the SAME learned shared phi_j from training (never optimal phi* recomputed on test). "
-            "Test fidelity is per-step T+1 and is phase-invariant (phi unused). "
-            "nl-CSA iso/gen use soft kernel (k-independent horizontal refs): iso=unitary W/V, gen=free W/V."
-        ),
-        "phi_protocol": (
-            "phi_j are trainable shared parameters of length T, optimized on train and frozen/reused at test. "
-            "Do NOT set phi_j=-arg(A_j) at test; that would be oracle phase alignment, not the learned model."
-        ),
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(f"[DONE] outputs in {out}")
