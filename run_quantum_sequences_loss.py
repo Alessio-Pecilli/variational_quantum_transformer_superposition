@@ -128,6 +128,50 @@ def generate_quantum_dataset(
     )
 
 
+def generate_classical_dataset(
+    train_size: int,
+    test_size: int,
+    d: int,
+    T: int,
+    seed: int,
+    kind: str = "markov",
+    rho: float = 0.8,
+) -> QuantumDataset:
+    """Classical real unit-sphere sequences (Markov / iid), stored as complex with Im=0.
+
+    Uses the same continuous L_B / L_half / L_1 readout as the quantum-sequences campaign,
+    so metrics are comparable across k-QSA / k-CSA / soft nl-CSA. Combined with the
+    complex RX-RY-RZ ansatz this isolates data (classical) vs ansatz (complex).
+    """
+    n_total = train_size + test_size
+    rng = np.random.default_rng(seed)
+    xs = np.zeros((n_total, T, d), dtype=np.float64)
+    ys = np.zeros_like(xs)
+    for si in range(n_total):
+        traj = [rng.standard_normal(d)]
+        traj[0] /= np.linalg.norm(traj[0])
+        for _ in range(T):
+            if kind == "iid":
+                nxt = rng.standard_normal(d)
+            else:
+                nxt = rho * traj[-1] + math.sqrt(max(1.0 - rho**2, 0.0)) * rng.standard_normal(d)
+            traj.append(nxt / np.linalg.norm(nxt))
+        traj = np.asarray(traj)
+        xs[si] = traj[:-1]
+        ys[si] = traj[1:]
+    # states[:, t] = token t; X=states[:,:-1], Y=states[:,1:] (length T each)
+    states = np.zeros((n_total, T + 1, d), dtype=np.complex128)
+    states[:, :-1, :] = xs
+    states[:, 1:, :] = ys
+    dummy = np.zeros((n_total, 2), dtype=np.float64)
+    return QuantumDataset(
+        train_states=states[:train_size],
+        test_states=states[train_size:],
+        train_params=dummy[:train_size],
+        test_params=dummy[train_size:],
+    )
+
+
 def _complex_ansatz_matrix(params: jnp.ndarray) -> jnp.ndarray:
     layers, n, _ = params.shape
     dim = 2**n
@@ -728,6 +772,14 @@ def main() -> int:
     parser.add_argument("--n-seeds", type=int, default=5)
     parser.add_argument("--output-dir", type=str, default="results_from_hpc/final_campaign_quantum_sequences/loss")
     parser.add_argument("--skip-nl", action="store_true", help="Skip nl-CSA iso/gen horizontal refs.")
+    parser.add_argument(
+        "--data-mode",
+        type=str,
+        default="quantum",
+        choices=["quantum", "classical"],
+        help="quantum=TFIM trajectories; classical=real Markov unit vectors (complex ansatz kept)",
+    )
+    parser.add_argument("--classical-rho", type=float, default=0.8, help="Markov correlation for classical data")
     parser.add_argument("--quick", action="store_true")
     args = parser.parse_args()
 
@@ -747,10 +799,16 @@ def main() -> int:
         args.layers = 2
         args.eval_every = 2
 
-    if args.d != 16:
-        raise ValueError("This quantum-sequences campaign is configured for d=16.")
-    if args.n_qubits != 4:
-        raise ValueError("d=16 requires n_qubits=4.")
+    if args.data_mode == "quantum":
+        if args.d != 16:
+            raise ValueError("Quantum-sequences campaign is configured for d=16.")
+        if args.n_qubits != 4:
+            raise ValueError("d=16 requires n_qubits=4.")
+    else:
+        # Classical unit vectors in R^d; d must match embedding dim used by complex ansatz truncation.
+        if args.d & (args.d - 1):
+            raise ValueError(f"classical mode: d must be a power of two for the complex ansatz, got {args.d}")
+        args.n_qubits = int(round(math.log2(args.d)))
 
     ks = [int(x.strip()) for x in args.ks.split(",") if x.strip()]
     out = Path(args.output_dir)
@@ -759,14 +817,25 @@ def main() -> int:
     plots.mkdir(parents=True, exist_ok=True)
     aggs_dir.mkdir(parents=True, exist_ok=True)
 
-    dataset = generate_quantum_dataset(
-        train_size=args.train_size,
-        test_size=args.test_size,
-        n_qubits=args.n_qubits,
-        T=args.T,
-        dt=args.dt,
-        seed=args.seed,
-    )
+    if args.data_mode == "classical":
+        dataset = generate_classical_dataset(
+            train_size=args.train_size,
+            test_size=args.test_size,
+            d=args.d,
+            T=args.T,
+            seed=args.seed,
+            kind="markov",
+            rho=args.classical_rho,
+        )
+    else:
+        dataset = generate_quantum_dataset(
+            train_size=args.train_size,
+            test_size=args.test_size,
+            n_qubits=args.n_qubits,
+            T=args.T,
+            dt=args.dt,
+            seed=args.seed,
+        )
 
     model_specs = [
         ("k-QSA L=16", "kqsa", "monomial", args.epochs),

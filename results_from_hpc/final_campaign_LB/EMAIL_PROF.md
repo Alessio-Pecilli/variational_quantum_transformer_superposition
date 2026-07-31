@@ -38,13 +38,11 @@ Poly: https://github.com/Alessio-Pecilli/variational_quantum_transformer_superpo
 
 L_half (eval) tipicamente **sotto** L_B (es. poly-k-QSA k=6: L_B≈0.59, L_half≈0.44).
 
-## 5. L_half vs k — train / test (tutti)
+## 5. L_half vs k — train / test
 
 Train: https://github.com/Alessio-Pecilli/variational_quantum_transformer_superposition/blob/PennyLaneG/results_from_hpc/final_campaign_LB/plots/final_Lhalf_vs_k_train.png  
 
 Test: https://github.com/Alessio-Pecilli/variational_quantum_transformer_superposition/blob/PennyLaneG/results_from_hpc/final_campaign_LB/plots/final_Lhalf_vs_k_test.png
-
-Su questo dataset PTB i mu-models stanno ~**0.44–0.70** (non ~3 come sul TFIM quantum-sequences). nl Renyi ~6.6–6.9.
 
 ## 6. L_1 (Shannon CE) vs k — train / test
 
@@ -52,9 +50,19 @@ Train: https://github.com/Alessio-Pecilli/variational_quantum_transformer_superp
 
 Test: https://github.com/Alessio-Pecilli/variational_quantum_transformer_superposition/blob/PennyLaneG/results_from_hpc/final_campaign_LB/plots/final_L1_vs_k_test.png
 
-mu-models ~0.45–0.93; nl iso CE ~7.35; nl gen CE ancora alto (~15.8, convergenza debole).
+### Check importante (L_half / L_1 “basse” per k-QSA vs nl)
 
-## 7. Training curves L_B a k=3
+**Non è un bug.** Su PTB le due famiglie usano metriche diverse:
+- **k-QSA/k-CSA:** CE continua su embedding in R^d → L_1 ~0.5–0.9  
+- **nl-CSA:** CE discreta next-token sul vocabolario (V≈3045, log V≈8.0) → L_1 ~7.3  
+
+Sul TFIM quantum-sequences invece **tutti** usano lo stesso readout continuo → L_half/L_1 ~3 per tutti (fair).
+
+Sanity check: `check_LB_Lhalf_L1.py` (Jensen OK; scala nl ≈ log V).
+
+Follow-up lanciato: **classical Markov sequences + complex ansatz** (stessa metrica continua del quantum), per isolare data vs ansatz — smoke locale già dà L_half≈3 / L_1≈3.3 per kQSA/kCSA/nl.
+
+## 7. Training curves L_B a k=3 (solo k-QSA/k-CSA, senza nl)
 
 https://github.com/Alessio-Pecilli/variational_quantum_transformer_superposition/blob/PennyLaneG/results_from_hpc/final_campaign_LB/plots/final_LB_training_curves_k3.png
 

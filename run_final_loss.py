@@ -1221,7 +1221,7 @@ def _replot_from_summary(
                 d=d,
                 k=3,
                 param_labels=param_labels,
-                title=f"FINAL L_B training curves (k=3, T={T}, d={d})",
+                title=f"FINAL L_B training curves (k=3, T={T}, d={d}; k-QSA/k-CSA only)",
             )
     appendix_ks = _parse_ks(
         appendix_curves_ks or str(summary.get("config", {}).get("appendix_curves_ks", "")),
@@ -1229,19 +1229,27 @@ def _replot_from_summary(
     )
     if appendix_curves_k is not None:
         appendix_ks = [int(appendix_curves_k)]
-    _plot_appendix_curves(aggs_by_k, nl_refs_renyi or nl_refs, appendix_ks, T, d, plots, param_labels)
+    # Appendix / per-k training curves: mu-models only (nl is different loss / k-indep)
+    _plot_appendix_curves(aggs_by_k, [], appendix_ks, T, d, plots, param_labels)
+    for k_str, aggs_k in aggs_by_k.items():
+        plot_final_aligned_bar(
+            aggs_k, T, plots / f"final_aligned_loss_bar_k{k_str}.png", title_suffix=f"k={k_str}"
+        )
+        plot_final_curves(
+            aggs_k,
+            plots / f"final_aligned_curves_k{k_str}.png",
+            T=T,
+            d=d,
+            k=int(k_str),
+            param_labels=param_labels,
+        )
+        plot_final_raw_curves(aggs_k, plots / f"final_raw_curves_k{k_str}.png")
     # legacy single-k aggregates
     aggs = summary.get("aggregates") or []
     if aggs and not aggs_by_k:
         plot_final_aligned_bar(aggs, T, plots / "final_aligned_loss_bar.png")
         plot_final_curves(aggs, plots / "final_aligned_curves.png")
         plot_final_raw_curves(aggs, plots / "final_raw_curves.png")
-    for k_str, aggs_k in aggs_by_k.items():
-        plot_final_aligned_bar(
-            aggs_k, T, plots / f"final_aligned_loss_bar_k{k_str}.png", title_suffix=f"k={k_str}"
-        )
-        plot_final_curves(aggs_k, plots / f"final_aligned_curves_k{k_str}.png", T=T, d=d, k=int(k_str), param_labels=param_labels)
-        plot_final_raw_curves(aggs_k, plots / f"final_raw_curves_k{k_str}.png")
     print(f"replot done in {plots}")
     return 0
 
@@ -1584,7 +1592,7 @@ def main() -> int:
             plots,
             param_labels,
         )
-        # Training curves L_B at k=3 for k-QSA / k-CSA (mono+poly)
+        # Training curves L_B at k=3 for k-QSA / k-CSA only (no nl-CSA)
         if "3" in aggregates_by_k and aggregates_by_k["3"]:
             plot_final_curves(
                 aggregates_by_k["3"],
@@ -1593,7 +1601,7 @@ def main() -> int:
                 d=args.d,
                 k=3,
                 param_labels=param_labels,
-                title=f"FINAL L_B training curves (k=3, T={args.T}, d={args.d})",
+                title=f"FINAL L_B training curves (k=3, T={args.T}, d={args.d}; k-QSA/k-CSA only)",
             )
     log_mu_points = []
     for s in mu_specs:
@@ -1606,6 +1614,7 @@ def main() -> int:
         plot_log_mu_ratio_vs_k(log_mu_points, nl_refs, args.T, args.d, plots / "final_log_mu_ratio_vs_k.png", param_labels)
     appendix_ks = _parse_ks(args.appendix_curves_ks, [3, 5])
     for k in ks:
+        # Bars may include nl refs; training curves are mu-only
         aggs_k = aggregates_by_k[str(k)] + nl_refs_renyi
         if not aggs_k:
             continue
@@ -1613,10 +1622,15 @@ def main() -> int:
             aggs_k, args.T, plots / f"final_aligned_loss_bar_k{k}.png", title_suffix=f"k={k}, d={args.d}"
         )
         plot_final_curves(
-            aggs_k, plots / f"final_aligned_curves_k{k}.png", T=args.T, d=args.d, k=k, param_labels=param_labels
+            aggregates_by_k[str(k)],
+            plots / f"final_aligned_curves_k{k}.png",
+            T=args.T,
+            d=args.d,
+            k=k,
+            param_labels=param_labels,
         )
-        plot_final_raw_curves(aggs_k, plots / f"final_raw_curves_k{k}.png")
-    _plot_appendix_curves(aggregates_by_k, nl_refs_renyi, appendix_ks, args.T, args.d, plots, param_labels)
+        plot_final_raw_curves(aggregates_by_k[str(k)], plots / f"final_raw_curves_k{k}.png")
+    _plot_appendix_curves(aggregates_by_k, [], appendix_ks, args.T, args.d, plots, param_labels)
 
     # Convergence check on all mu points + nl
     flat_for_check = [
