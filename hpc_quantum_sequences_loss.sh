@@ -38,7 +38,7 @@ SEED="${SEED:-7}"
 MODEL_SEED_BASE="${MODEL_SEED_BASE:-1042}"
 EVAL_EVERY="${EVAL_EVERY:-5}"
 KS_TAG="${KS//,/-}"
-OUTPUT_DIR="${OUTPUT_DIR:-results/quantum_sequences/LB_Lhalf_L1_T${T}_d${D}_ks${KS_TAG}_L${LAYERS}_n${N_SEEDS}_bestckpt}"
+OUTPUT_DIR="${OUTPUT_DIR:-results/quantum_sequences/LB_Lhalf_L1_T${T}_d${D}_ks${KS_TAG}_L${LAYERS}_n${N_SEEDS}_bestckpt_v2}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
 echo "Quantum sequences: T=$T d=$D n_qubits=$N_QUBITS ks=$KS layers=$LAYERS n_seeds=$N_SEEDS"

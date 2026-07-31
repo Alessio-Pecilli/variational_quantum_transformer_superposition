@@ -457,7 +457,8 @@ def _adam_step(
 
 
 def _copy_params(params: dict[str, jnp.ndarray]) -> dict[str, jnp.ndarray]:
-    return jax.tree_util.tree_map(lambda p: jnp.array(p), params)
+    # Host round-trip so best_params cannot alias live Adam buffers.
+    return jax.tree_util.tree_map(lambda p: jnp.asarray(np.array(p, copy=True)), params)
 
 
 def _init_params(family: str, d: int, T: int, layers: int, seed: int) -> dict[str, jnp.ndarray]:
@@ -509,6 +510,7 @@ def train_model(
     moments = (m0, v0)
     best_loss = float("inf")
     best_params = _copy_params(params)
+    best_epoch = 0
     stagnant = 0
     stop_reason = "max_epochs"
 
@@ -524,13 +526,20 @@ def train_model(
             test_losses.append(test_loss)
             test_epochs.append(ep)
 
-        # NOTE: when best_loss is +inf, do NOT multiply tol by abs(best_loss)
-        # (tol*inf=inf makes the improvement check always False and freezes best_params at init).
-        tol = 0.0 if not math.isfinite(best_loss) else loss_rel_tol * max(abs(best_loss), 1.0)
-        if loss_f + tol < best_loss:
+        # Best checkpoint: any strict improvement (never gate on tol*best_loss — when
+        # best_loss starts at +inf, tol*inf freezes best_params at init forever).
+        # Early-stop patience: only significant relative improvements reset the counter.
+        if loss_f < best_loss:
+            sig = (not math.isfinite(best_loss)) or (
+                (best_loss - loss_f) > loss_rel_tol * max(abs(best_loss), 1.0)
+            )
             best_loss = loss_f
             best_params = _copy_params(params)
-            stagnant = 0
+            best_epoch = ep
+            if sig:
+                stagnant = 0
+            elif ep >= min_epochs:
+                stagnant += 1
         elif ep >= min_epochs:
             stagnant += 1
 
@@ -547,6 +556,15 @@ def train_model(
     final_test_L_half = float(_batch_L_half_uniform(best_params, test_batch, k, kernel_mode, family))
     final_test_L_1 = float(_batch_L_1(best_params, test_batch, k, kernel_mode, family))
 
+    if losses:
+        hist_min = float(min(losses))
+        # Guardrail: reported final must track the running best, not epoch-0.
+        if final_train - hist_min > 0.05 * max(abs(hist_min), 1.0) + 1e-3:
+            raise RuntimeError(
+                f"best-checkpoint mismatch: final_train={final_train:.6f} vs "
+                f"min(history)={hist_min:.6f} (best_epoch={best_epoch}, n={len(losses)})"
+            )
+
     return {
         "params": best_params,
         "loss_history": losses,
@@ -561,6 +579,7 @@ def train_model(
         "final_test_L_half_uniform": final_test_L_half,
         "final_test_L_1": final_test_L_1,
         "epochs_run": len(losses),
+        "best_epoch": int(best_epoch),
         "best_epoch_train_loss": float(best_loss),
         "converged": stop_reason.startswith("converged"),
         "stop_reason": stop_reason,
@@ -745,6 +764,8 @@ def _run_record(
         "test_L_half_uniform": float(trained["final_test_L_half_uniform"]),
         "test_L_1": float(trained["final_test_L_1"]),
         "epochs_run": trained["epochs_run"],
+        "best_epoch": int(trained.get("best_epoch", -1)),
+        "best_epoch_train_loss": float(trained.get("best_epoch_train_loss", trained["final_loss"])),
         "converged": trained["converged"],
         "stop_reason": trained["stop_reason"],
         "train_metric": train_metric,
