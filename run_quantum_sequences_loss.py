@@ -524,7 +524,10 @@ def train_model(
             test_losses.append(test_loss)
             test_epochs.append(ep)
 
-        if loss_f + loss_rel_tol * max(abs(best_loss), 1.0) < best_loss:
+        # NOTE: when best_loss is +inf, do NOT multiply tol by abs(best_loss)
+        # (tol*inf=inf makes the improvement check always False and freezes best_params at init).
+        tol = 0.0 if not math.isfinite(best_loss) else loss_rel_tol * max(abs(best_loss), 1.0)
+        if loss_f + tol < best_loss:
             best_loss = loss_f
             best_params = _copy_params(params)
             stagnant = 0

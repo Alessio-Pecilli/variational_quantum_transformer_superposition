@@ -9,9 +9,9 @@ from pathlib import Path
 
 HOST = "apecilli@login.leonardo.cineca.it"
 REMOTE = "/leonardo_work/IscrC_QuSALa/variational_quantum_transformer_sovrapposition"
-OUT = "results/quantum_sequences/LB_Lhalf_L1_T32_d16_ks1-2-3-5-6_L16_n5"
-JOBS = ("51084137",)
-LOCAL_PACK = Path(__file__).resolve().parent / "results_from_hpc" / "final_campaign_quantum_sequences" / "run_full_v5_Lhalf_L1"
+OUT = "results/quantum_sequences/LB_Lhalf_L1_T32_d16_ks1-2-3-5-6_L16_n5_bestckpt"
+JOBS = ("51366474",)
+LOCAL_PACK = Path(__file__).resolve().parent / "results_from_hpc" / "final_campaign_quantum_sequences" / "run_full_v6_bestckpt"
 POLL_S = 300
 
 
