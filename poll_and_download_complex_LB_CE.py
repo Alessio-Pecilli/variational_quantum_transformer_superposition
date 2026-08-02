@@ -10,7 +10,7 @@ from pathlib import Path
 HOST = "apecilli@login.leonardo.cineca.it"
 REMOTE = "/leonardo_work/IscrC_QuSALa/variational_quantum_transformer_sovrapposition"
 OUT = "results/classical_sequences/complex_LB_CE_T32_d16_ks1-2-3-5_L16_n10"
-JOBS = ("JOBID_PLACEHOLDER",)
+JOBS = ("51675806",)
 LOCAL_PACK = (
     Path(__file__).resolve().parent
     / "results_from_hpc"
