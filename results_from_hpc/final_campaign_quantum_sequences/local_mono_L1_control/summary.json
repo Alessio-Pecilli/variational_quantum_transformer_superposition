@@ -1,0 +1,67 @@
+{
+  "config": {
+    "T": 16,
+    "d": 16,
+    "layers": 8,
+    "k": 3,
+    "n_seeds": 2
+  },
+  "rows": [
+    {
+      "family": "kqsa",
+      "seed": 1042,
+      "n_params": 208,
+      "L_B_init": 6.191902172111002,
+      "L_B_final": 4.628028878806318,
+      "L1_init": 3.3680762755805875,
+      "L1_final": 3.1935647116444934,
+      "hist0": 6.191902172111002,
+      "hist_last": 4.6359955332528635,
+      "epochs": 80,
+      "best_epoch": 80,
+      "eq_init_hist": true
+    },
+    {
+      "family": "kqsa",
+      "seed": 1043,
+      "n_params": 208,
+      "L_B_init": 6.269099706359346,
+      "L_B_final": 4.582190695113464,
+      "L1_init": 3.392962932771858,
+      "L1_final": 3.2569944645792037,
+      "hist0": 6.269099706359346,
+      "hist_last": 4.58852838316081,
+      "epochs": 80,
+      "best_epoch": 80,
+      "eq_init_hist": true
+    },
+    {
+      "family": "kcsa",
+      "seed": 1042,
+      "n_params": 528,
+      "L_B_init": 4.8208633676056944,
+      "L_B_final": 3.7557601132566534,
+      "L1_init": 3.3207073053429292,
+      "L1_final": 2.906204775436466,
+      "hist0": 4.8208633676056944,
+      "hist_last": 3.7634707231141946,
+      "epochs": 80,
+      "best_epoch": 80,
+      "eq_init_hist": true
+    },
+    {
+      "family": "kcsa",
+      "seed": 1043,
+      "n_params": 528,
+      "L_B_init": 4.701363353072502,
+      "L_B_final": 3.5926102021485695,
+      "L1_init": 3.3168285710719343,
+      "L1_final": 2.77394670795821,
+      "hist0": 4.701363353072502,
+      "hist_last": 3.6017065955159135,
+      "epochs": 80,
+      "best_epoch": 80,
+      "eq_init_hist": true
+    }
+  ]
+}
