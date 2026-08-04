@@ -1,0 +1,147 @@
+{
+  "config": {
+    "T": 16,
+    "d": 16,
+    "layers": 8,
+    "k": 3,
+    "n_seeds": 2,
+    "data": "classical_markov+complex",
+    "train_loss": "L_B for ALL including nl"
+  },
+  "rows": [
+    {
+      "model": "k-QSA",
+      "family": "kqsa",
+      "mode": "monomial",
+      "seed": 1042,
+      "n_params": 208,
+      "best_ep": 60,
+      "epochs": 60,
+      "L_B_init": 5.795974252248608,
+      "L_B_final": 4.574458755346757,
+      "L1_init": 3.34045874966627,
+      "L1_final": 3.196032908474
+    },
+    {
+      "model": "k-QSA",
+      "family": "kqsa",
+      "mode": "monomial",
+      "seed": 1043,
+      "n_params": 208,
+      "best_ep": 60,
+      "epochs": 60,
+      "L_B_init": 6.25001040309009,
+      "L_B_final": 4.830587681839722,
+      "L1_init": 3.40008110856074,
+      "L1_final": 3.335233478742299
+    },
+    {
+      "model": "k-CSA",
+      "family": "kcsa",
+      "mode": "monomial",
+      "seed": 1042,
+      "n_params": 528,
+      "best_ep": 60,
+      "epochs": 60,
+      "L_B_init": 2.4353497471007963,
+      "L_B_final": 2.3109156644916022,
+      "L1_init": 2.5553332873331884,
+      "L1_final": 2.6494699864281586
+    },
+    {
+      "model": "k-CSA",
+      "family": "kcsa",
+      "mode": "monomial",
+      "seed": 1043,
+      "n_params": 528,
+      "best_ep": 60,
+      "epochs": 60,
+      "L_B_init": 2.4706088527013064,
+      "L_B_final": 2.3161739124774803,
+      "L1_init": 2.551641330487629,
+      "L1_final": 2.638006616943094
+    },
+    {
+      "model": "nl-CSA iso",
+      "family": "nlcsa_iso",
+      "mode": "soft",
+      "seed": 1042,
+      "n_params": 512,
+      "best_ep": 60,
+      "epochs": 60,
+      "L_B_init": 2.3544926243689157,
+      "L_B_final": 2.2903722030720433,
+      "L1_init": 2.551382764166251,
+      "L1_final": 2.664353445183859
+    },
+    {
+      "model": "nl-CSA iso",
+      "family": "nlcsa_iso",
+      "mode": "soft",
+      "seed": 1043,
+      "n_params": 512,
+      "best_ep": 60,
+      "epochs": 60,
+      "L_B_init": 2.3772581262636594,
+      "L_B_final": 2.2948873996760444,
+      "L1_init": 2.5616588604248696,
+      "L1_final": 2.6438144009516056
+    },
+    {
+      "model": "nl-CSA gen",
+      "family": "nlcsa_gen",
+      "mode": "soft",
+      "seed": 1042,
+      "n_params": 1024,
+      "best_ep": 60,
+      "epochs": 60,
+      "L_B_init": 5.476796106062936,
+      "L_B_final": 3.9718232846239436,
+      "L1_init": 3.2971486712396754,
+      "L1_final": 3.1489666718896574
+    },
+    {
+      "model": "nl-CSA gen",
+      "family": "nlcsa_gen",
+      "mode": "soft",
+      "seed": 1043,
+      "n_params": 1024,
+      "best_ep": 60,
+      "epochs": 60,
+      "L_B_init": 5.811875694121108,
+      "L_B_final": 4.156724280061143,
+      "L1_init": 3.2895608598513957,
+      "L1_final": 3.148852440916933
+    }
+  ],
+  "agg": {
+    "k-QSA": {
+      "n_params": 208,
+      "L_B_final_mean": 4.702523218593239,
+      "L_B_final_std": 0.12806446324648268,
+      "L1_final_mean": 3.2656331936081493,
+      "L1_final_std": 0.06960028513414951
+    },
+    "k-CSA": {
+      "n_params": 528,
+      "L_B_final_mean": 2.313544788484541,
+      "L_B_final_std": 0.0026291239929390198,
+      "L1_final_mean": 2.643738301685626,
+      "L1_final_std": 0.005731684742532384
+    },
+    "nl-CSA iso": {
+      "n_params": 512,
+      "L_B_final_mean": 2.292629801374044,
+      "L_B_final_std": 0.002257598302000563,
+      "L1_final_mean": 2.6540839230677324,
+      "L1_final_std": 0.01026952211612664
+    },
+    "nl-CSA gen": {
+      "n_params": 1024,
+      "L_B_final_mean": 4.064273782342543,
+      "L_B_final_std": 0.09245049771859959,
+      "L1_final_mean": 3.148909556403295,
+      "L1_final_std": 5.711548636222474e-05
+    }
+  }
+}
