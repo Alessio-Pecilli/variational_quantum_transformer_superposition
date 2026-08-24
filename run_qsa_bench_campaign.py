@@ -568,7 +568,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--dt", type=float, default=0.35)
     p.add_argument("--classical-rho", type=float, default=0.8)
     p.add_argument("--ks", type=str, default="1,2,3,4,5,6")
-    p.add_argument("--layers", type=int, default=16)
+    p.add_argument(
+        "--layers", type=int, default=0,
+        help="kQSA ansatz layers. 0 = match CSA param count as closely as possible "
+             "(d=16 → L=43, 1032 vs CSA 1024).",
+    )
     p.add_argument("--epochs", type=int, default=400)
     p.add_argument("--poly-epochs", type=int, default=600)
     p.add_argument("--nl-epochs", type=int, default=400)
@@ -594,7 +598,7 @@ def main(argv: list[str] | None = None) -> int:
         args.d = 8
         args.n_qubits = 3
         args.ks = "1,2"
-        args.layers = 4
+        args.layers = 4  # smoke only; not param-matched
         args.epochs = 40
         args.poly_epochs = 50
         args.nl_epochs = 40
@@ -616,6 +620,20 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError(f"quantum requires d=2^n_qubits, got d={args.d}, n_qubits={args.n_qubits}")
 
     ks = [int(x.strip()) for x in args.ks.split(",") if x.strip()]
+    if int(args.layers) <= 0:
+        args.layers, qsa_np = qb.qsa_layers_matching_csa(args.d)
+    else:
+        qsa_np = qb.qsa_n_params(args.d, args.layers)
+    csa_np = qb.csa_n_params(args.d)
+    print(
+        f"param match: CSA/nl={csa_np}  QSA={qsa_np} (L={args.layers}, n={max(1, math.ceil(math.log2(args.d)))})",
+        flush=True,
+    )
+    print(
+        f"  (exact 1024 for QSA is impossible: count is always 6·L·n_qubits; using nearest)",
+        flush=True,
+    )
+
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
 

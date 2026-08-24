@@ -313,6 +313,30 @@ def chance_level(model, Xs, Ys, n_draws=200, seed=12345):
 # --------------------------------------------------------------------------- #
 #  7. models: the ONLY thing that differs between rows of the benchmark        #
 # --------------------------------------------------------------------------- #
+def csa_n_params(d: int) -> int:
+    """Free unitary W=exp(iH) and V: 2 real matrices of size d×d each, times two operators."""
+    return 4 * int(d) * int(d)
+
+
+def qsa_n_params(d: int, layers: int) -> int:
+    """Complex RX·RY·RZ + CNOT ansatz for W and V: 2 × L × n_qubits × 3 angles."""
+    n = max(1, ceil(log2(d)))
+    return 2 * int(layers) * n * 3
+
+
+def qsa_layers_matching_csa(d: int) -> tuple[int, int]:
+    """Choose L so QSA param count is as close as possible to CSA's 4 d^2.
+
+    Exact equality is impossible: QSA count is always a multiple of 6 n_qubits.
+    For d=16 (n=4) CSA=1024, nearest is L=43 → 1032.
+    """
+    n = max(1, ceil(log2(d)))
+    target = csa_n_params(d)
+    step = 6 * n
+    layers = max(1, int(round(target / step)))
+    return layers, qsa_n_params(d, layers)
+
+
 class Model:
     """A model = (parameter initialiser, parameter->(W,V) map, kernel, training loss)."""
 

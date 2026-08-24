@@ -25,7 +25,8 @@ N_QUBITS="${N_QUBITS:-4}"
 # Slurm --export splits on commas: pass KS=1:2:3:4:5:6
 KS="${KS:-1:2:3:4:5:6}"
 KS="${KS//:/,}"
-LAYERS="${LAYERS:-16}"
+# 0 = auto: QSA layers chosen to match CSA param count (d=16 → L=43, 1032 vs 1024)
+LAYERS="${LAYERS:-0}"
 EPOCHS="${EPOCHS:-400}"
 POLY_EPOCHS="${POLY_EPOCHS:-600}"
 NL_EPOCHS="${NL_EPOCHS:-400}"
@@ -43,7 +44,11 @@ DT="${DT:-0.35}"
 RHO="${RHO:-0.8}"
 DATA_MODE="${DATA_MODE:-both}"
 KS_TAG="${KS//,/-}"
-OUTPUT_DIR="${OUTPUT_DIR:-results/qsa_bench_campaign/LB_L1_T${T}_d${D}_ks${KS_TAG}_L${LAYERS}_n${N_SEEDS}}"
+LAYERS_TAG="${LAYERS}"
+if [[ "$LAYERS" == "0" ]]; then
+  LAYERS_TAG="matchCSA"
+fi
+OUTPUT_DIR="${OUTPUT_DIR:-results/qsa_bench_campaign/LB_L1_T${T}_d${D}_ks${KS_TAG}_L${LAYERS_TAG}_n${N_SEEDS}}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
 echo "qsa_bench campaign: mode=$DATA_MODE T=$T d=$D n_qubits=$N_QUBITS ks=$KS"
