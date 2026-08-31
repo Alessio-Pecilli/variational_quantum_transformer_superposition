@@ -12,7 +12,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=0
-#SBATCH --time=24:00:00
+#SBATCH --time=4-00:00:00
 
 set -euo pipefail
 
@@ -22,7 +22,7 @@ TS="${TS//:/,}"
 DS="${DS//:/,}"
 FIXED_D="${FIXED_D:-16}"
 FIXED_T="${FIXED_T:-32}"
-KS="${KS:-2:5}"
+KS="${KS:-2:5:7}"
 KS="${KS//:/,}"
 LAYERS="${LAYERS:-0}"
 EPOCHS="${EPOCHS:-300}"
@@ -36,7 +36,7 @@ BATCH_SIZE="${BATCH_SIZE:-16}"
 MODEL_SEED_BASE="${MODEL_SEED_BASE:-42}"
 DATA_SEED="${DATA_SEED:-7}"
 EVAL_EVERY="${EVAL_EVERY:-20}"
-OUTPUT_DIR="${OUTPUT_DIR:-results/qsa_bench_2508/mu_T${FIXED_T}_d${FIXED_D}_ks${KS//,/-}_n${N_SEEDS}}"
+OUTPUT_DIR="${OUTPUT_DIR:-results/qsa_bench_2508/mu_T${FIXED_T}_d${FIXED_D}_ks${KS//,/-}_n${N_SEEDS}_v2}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
 echo "mu sweep: Ts=$TS ds=$DS fixed_d=$FIXED_D fixed_T=$FIXED_T ks=$KS"
@@ -82,6 +82,7 @@ srun --mpi=pmix_v3 --mem=0 --export=ALL --cpu-bind=cores "$VENV_PY" run_mu_sweep
   --model-seed-base "$MODEL_SEED_BASE" \
   --data-seed "$DATA_SEED" \
   --eval-every "$EVAL_EVERY" \
+  --mu-at final \
   --output-dir "$OUTPUT_DIR"
 
 echo "=== JOB FINISHED at $(date) ==="

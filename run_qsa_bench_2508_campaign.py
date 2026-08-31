@@ -431,6 +431,9 @@ def train_adam_tokens(
     Xvoc_b, circ_b = qb.unpack_params(np.asarray(best_v), D, d, n_c)
     train_m = _full_metrics_tokens(model, circ_b, Xvoc_b, idx_tr)
     test_m = _full_metrics_tokens(model, circ_b, Xvoc_b, idx_te)
+    Xvoc_f, circ_f = qb.unpack_params(np.asarray(v), D, d, n_c)
+    final_train_m = _full_metrics_tokens(model, circ_f, Xvoc_f, idx_tr)
+    final_test_m = _full_metrics_tokens(model, circ_f, Xvoc_f, idx_te)
     qb.check_invariants(
         train_m, idx_tr.shape[1] - 1, label=f"({model.name} seed={seed})",
         verbose=verbose, alpha_mean=float(train_m.get("alpha_ar", 1.0)),
@@ -444,13 +447,19 @@ def train_adam_tokens(
             f"{time.time() - t0:.1f}s, {stop_reason})",
             flush=True,
         )
-    out = _run_result(seed, model, hist, best_epoch, best_loss, stop_reason, train_m, test_m)
+    out = _run_result(seed, model, hist, best_epoch, best_loss, stop_reason,
+                      train_m, test_m, final_train_m, final_test_m)
     out["n_emb"] = int(n_emb)
     out["alpha_ar_train"] = float(train_m.get("alpha_ar", 1.0))
     return out
 
 
-def _run_result(seed, model, hist, best_epoch, best_loss, stop_reason, train_m, test_m):
+def _run_result(seed, model, hist, best_epoch, best_loss, stop_reason,
+                train_m, test_m, final_train_m=None, final_test_m=None):
+    if final_train_m is None:
+        final_train_m = train_m
+    if final_test_m is None:
+        final_test_m = test_m
     return {
         "seed": int(seed),
         "n_params": int(model.n_params()),
@@ -470,6 +479,9 @@ def _run_result(seed, model, hist, best_epoch, best_loss, stop_reason, train_m, 
         "test_LB_excess": test_m["LB_excess"],
         "train_mu": train_m["mu"],
         "test_mu": test_m["mu"],
+        "train_mu_final": final_train_m["mu"],
+        "test_mu_final": final_test_m["mu"],
+        "final_epoch": int(len(hist)),
         "train_rho_mean": train_m.get("rho_mean", float("nan")),
         "test_rho_mean": test_m.get("rho_mean", float("nan")),
     }

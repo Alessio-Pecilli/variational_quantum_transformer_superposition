@@ -53,7 +53,7 @@ Run:  python qsa_bench.py            # full benchmark, classical + quantum seque
 from __future__ import annotations
 
 import sys
-from math import ceil, comb, factorial, log2
+from math import ceil, comb, factorial, log, log2
 
 import numpy as np
 from scipy.special import digamma
@@ -686,8 +686,10 @@ def qsa_layers_matching_csa(d: int) -> tuple[int, int]:
 
 
 def mu_advantage(d: int, k: int) -> float:
-    """Reference threshold k / C(d+k-1, k) used on the μ vs T / μ vs d panels."""
-    return float(k / comb(int(d) + int(k) - 1, int(k)))
+    """Advantage threshold k² log(d) / m_k with m_k = C(d+k-1, k)."""
+    kk, dd = int(k), int(d)
+    mk = comb(dd + kk - 1, kk)
+    return float((kk * kk) * log(dd) / mk)
 
 
 # --------------------------------------------------------------------------- #
