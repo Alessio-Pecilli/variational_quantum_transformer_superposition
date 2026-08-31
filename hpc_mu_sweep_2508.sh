@@ -5,7 +5,7 @@
 #
 #SBATCH --partition=boost_usr_prod
 #SBATCH --qos=boost_qos_lprod
-#SBATCH --account=iscrc_qusala
+#SBATCH --account=iscrc_manqo-gp
 #
 # μ vs T / μ vs d on qsa_bench_25_08 (classical PTB, trainable emb, circuit μ)
 #SBATCH --nodes=1
