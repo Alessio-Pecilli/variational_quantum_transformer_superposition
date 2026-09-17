@@ -24,6 +24,8 @@ FIXED_D="${FIXED_D:-16}"
 FIXED_T="${FIXED_T:-32}"
 KS="${KS:-2:5:7}"
 KS="${KS//:/,}"
+MODELS="${MODELS:-kqsa-mono,kqsa-poly,kcsa-mono,kcsa-poly}"
+MODELS="${MODELS//:/,}"
 LAYERS="${LAYERS:-0}"
 EPOCHS="${EPOCHS:-300}"
 TRAIN_SIZE="${TRAIN_SIZE:-64}"
@@ -36,10 +38,14 @@ BATCH_SIZE="${BATCH_SIZE:-16}"
 MODEL_SEED_BASE="${MODEL_SEED_BASE:-42}"
 DATA_SEED="${DATA_SEED:-7}"
 EVAL_EVERY="${EVAL_EVERY:-20}"
+MU_AT="${MU_AT:-final}"
+VS_T_ONLY="${VS_T_ONLY:-0}"
+VS_D_ONLY="${VS_D_ONLY:-0}"
+NO_PLOT="${NO_PLOT:-0}"
 OUTPUT_DIR="${OUTPUT_DIR:-results/qsa_bench_2508/mu_T${FIXED_T}_d${FIXED_D}_ks${KS//,/-}_n${N_SEEDS}_v2}"
 
 echo "=== JOB ${SLURM_JOB_ID:-local} STARTED at $(date) on $(hostname) ==="
-echo "mu sweep: Ts=$TS ds=$DS fixed_d=$FIXED_D fixed_T=$FIXED_T ks=$KS"
+echo "mu sweep: Ts=$TS ds=$DS fixed_d=$FIXED_D fixed_T=$FIXED_T ks=$KS models=$MODELS"
 echo "OUTPUT_DIR=$OUTPUT_DIR"
 
 module purge
@@ -64,12 +70,18 @@ test -f qsa_bench_25_08.py || { echo "ERROR: qsa_bench_25_08.py missing"; exit 1
 test -f ptb_sentences.txt || { echo "ERROR: ptb_sentences.txt missing"; exit 1; }
 mkdir -p logs "$OUTPUT_DIR"
 
+EXTRA_ARGS=()
+if [[ "$VS_T_ONLY" == "1" ]]; then EXTRA_ARGS+=(--vs-T-only); fi
+if [[ "$VS_D_ONLY" == "1" ]]; then EXTRA_ARGS+=(--vs-d-only); fi
+if [[ "$NO_PLOT" == "1" ]]; then EXTRA_ARGS+=(--no-plot); fi
+
 srun --mpi=pmix_v3 --mem=0 --export=ALL --cpu-bind=cores "$VENV_PY" run_mu_sweep_2508.py \
   --Ts "$TS" \
   --ds "$DS" \
   --fixed-d "$FIXED_D" \
   --fixed-T "$FIXED_T" \
   --ks "$KS" \
+  --models "$MODELS" \
   --layers "$LAYERS" \
   --epochs "$EPOCHS" \
   --train-size "$TRAIN_SIZE" \
@@ -82,8 +94,12 @@ srun --mpi=pmix_v3 --mem=0 --export=ALL --cpu-bind=cores "$VENV_PY" run_mu_sweep
   --model-seed-base "$MODEL_SEED_BASE" \
   --data-seed "$DATA_SEED" \
   --eval-every "$EVAL_EVERY" \
-  --mu-at final \
-  --output-dir "$OUTPUT_DIR"
+  --mu-at "$MU_AT" \
+  --output-dir "$OUTPUT_DIR" \
+  "${EXTRA_ARGS[@]}"
 
 echo "=== JOB FINISHED at $(date) ==="
-echo "Plots: $OUTPUT_DIR/mu_vs_T.png  $OUTPUT_DIR/mu_vs_d.png"
+echo "Summary: $OUTPUT_DIR/summary.json"
+if [[ "$NO_PLOT" != "1" ]]; then
+  echo "Plots: $OUTPUT_DIR/mu_vs_T.png  $OUTPUT_DIR/mu_vs_d.png"
+fi

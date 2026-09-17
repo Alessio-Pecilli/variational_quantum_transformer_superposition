@@ -27,13 +27,14 @@ from run_qsa_bench_2508_campaign import (
     train_adam_tokens,
 )
 
-MU_COLORS = {2: "#0072B2", 5: "#D55E00", 7: "#009E73"}
+MU_COLORS = {2: "#0072B2", 5: "#D55E00", 7: "#009E73", 11: "#CC79A7"}
 K_MODELS = [
     ("kqsa-mono", "mono", "L_B"),
     ("kqsa-poly", "poly", "L_B"),
     ("kcsa-mono", "mono", "L_B"),
     ("kcsa-poly", "poly", "L_B"),
 ]
+MODEL_BY_NAME = {m[0]: m for m in K_MODELS}
 FAMILIES = (
     ("kqsa", "QSA", "-"),
     ("kcsa", "CSA", "--"),
@@ -286,6 +287,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--fixed-d", type=int, default=16, help="d for μ vs T panel")
     p.add_argument("--fixed-T", type=int, default=32, help="T for μ vs d panel")
     p.add_argument("--ks", type=str, default="2,5,7")
+    p.add_argument(
+        "--models",
+        type=str,
+        default="kqsa-mono,kqsa-poly,kcsa-mono,kcsa-poly",
+        help="Comma-separated model names (subset of kqsa/kcsa mono/poly)",
+    )
     p.add_argument("--layers", type=int, default=0, help="0 = param-match CSA")
     p.add_argument("--train-size", type=int, default=64)
     p.add_argument("--test-size", type=int, default=32)
@@ -303,6 +310,12 @@ def main(argv: list[str] | None = None) -> int:
                    help="Use μ from last epoch (final) or best-checkpoint (best)")
     p.add_argument("--output-dir", type=str,
                    default="results/qsa_bench_2508/mu_sweep")
+    p.add_argument("--no-plot", action="store_true",
+                   help="Skip PNG panels (still write summary.json)")
+    p.add_argument("--vs-T-only", action="store_true",
+                   help="Only (T, fixed_d) jobs; ignore --ds / fixed_T panel")
+    p.add_argument("--vs-d-only", action="store_true",
+                   help="Only (fixed_T, d) jobs; ignore --Ts / fixed_d panel")
     p.add_argument("--quick", action="store_true")
     p.add_argument("--replot-only", action="store_true",
                    help="Rebuild plots from existing cells/ JSONs")
@@ -330,6 +343,16 @@ def main(argv: list[str] | None = None) -> int:
     Ts = [int(x) for x in args.Ts.split(",") if x.strip()]
     ds = [int(x) for x in args.ds.split(",") if x.strip()]
     ks = [int(x) for x in args.ks.split(",") if x.strip()]
+    model_names = [x.strip() for x in args.models.split(",") if x.strip()]
+    models = []
+    for name in model_names:
+        if name not in MODEL_BY_NAME:
+            raise SystemExit(f"unknown model {name!r}; choose from {list(MODEL_BY_NAME)}")
+        models.append(MODEL_BY_NAME[name])
+    if not models:
+        raise SystemExit("--models is empty")
+    if args.vs_T_only and args.vs_d_only:
+        raise SystemExit("use at most one of --vs-T-only / --vs-d-only")
     mu_key = _mu_key(args.mu_at)
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -338,10 +361,12 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("JAX required")
 
     jobs: list[tuple[int, int]] = []
-    for T in Ts:
-        jobs.append((T, args.fixed_d))
-    for d in ds:
-        jobs.append((args.fixed_T, d))
+    if not args.vs_d_only:
+        for T in Ts:
+            jobs.append((T, args.fixed_d))
+    if not args.vs_T_only:
+        for d in ds:
+            jobs.append((args.fixed_T, d))
     seen = set()
     uniq_jobs = []
     for T, d in jobs:
@@ -351,6 +376,8 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError(f"d must be power of two, got {d}")
         seen.add((T, d))
         uniq_jobs.append((T, d))
+    if not uniq_jobs:
+        raise SystemExit("no (T,d) jobs requested")
 
     agg_rows: list[dict[str, Any]] = []
     if args.replot_only:
@@ -364,7 +391,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         for T, d in uniq_jobs:
             for k in ks:
-                for name, kernel, loss in K_MODELS:
+                for name, kernel, loss in models:
                     if args.force_retrain:
                         cp = _cell_path(out, T, d, k, name)
                         if cp.is_file():
@@ -389,20 +416,28 @@ def main(argv: list[str] | None = None) -> int:
                     )
                     agg_rows.append(row)
 
-    plot_mu_panels(agg_rows, out, max_T=args.fixed_T, fixed_d=args.fixed_d)
+    plots: dict[str, str] = {}
+    if not args.no_plot and agg_rows:
+        plot_mu_panels(agg_rows, out, max_T=args.fixed_T, fixed_d=args.fixed_d)
+        plots = {
+            "mu_vs_T": str(out / "mu_vs_T.png"),
+            "mu_vs_d": str(out / "mu_vs_d.png"),
+        }
+        print(f"Wrote {out / 'mu_vs_T.png'} and {out / 'mu_vs_d.png'}", flush=True)
     summary = {
         "config": vars(args),
         "mu_key": mu_key,
         "advantage_formula": "k^2 * log(d) / C(d+k-1,k)",
         "n_cells": len(agg_rows),
         "rows": agg_rows,
-        "plots": {
-            "mu_vs_T": str(out / "mu_vs_T.png"),
-            "mu_vs_d": str(out / "mu_vs_d.png"),
-        },
+        "plots": plots,
+        "schema_note": (
+            "rows[] are merge-compatible with mu_T32_d16_ks2-5-7_n10_v2/summary.json "
+            "(same keys: T,d,k,model,mu_mean,mu_std,mu_advantage,margin_mean,...)"
+        ),
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    print(f"Wrote {out / 'mu_vs_T.png'} and {out / 'mu_vs_d.png'}", flush=True)
+    print(f"Wrote {out / 'summary.json'} ({len(agg_rows)} cells)", flush=True)
     return 0
 
 
