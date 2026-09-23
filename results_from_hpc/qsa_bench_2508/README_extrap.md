@@ -7,15 +7,16 @@ Points for fits without increasing qubit count much.
 | Pack | Content | Status |
 |------|---------|--------|
 | [`mu_extrap_k7_qsa_poly_d8_T2-16_n10/`](mu_extrap_k7_qsa_poly_d8_T2-16_n10/) | d=8, T=2,4,8,16 | done |
-| [`mu_extrap_k7_qsa_poly_T64_d8-16_n10/`](mu_extrap_k7_qsa_poly_T64_d8-16_n10/) | T=64 d=8 (d=16 pending) | partial |
-| [`mu_extrap_k7_qsa_poly_READY_for_fits.json`](mu_extrap_k7_qsa_poly_READY_for_fits.json) | **14 rows** merge for fitting | ready |
+| [`mu_extrap_k7_qsa_poly_T64_d8-16_n10/`](mu_extrap_k7_qsa_poly_T64_d8-16_n10/) | T=64 d=8 **and** d=16 | **done** |
+| [`mu_extrap_k7_qsa_poly_READY_for_fits.json`](mu_extrap_k7_qsa_poly_READY_for_fits.json) | **15 rows** merge for fitting | ready |
 
-Email draft: [`EMAIL_PROF_extrap_partial.md`](EMAIL_PROF_extrap_partial.md)
+Emails:
+- T=64 d=8: [`EMAIL_PROF_extrap_partial.md`](EMAIL_PROF_extrap_partial.md)
+- T=64 d=16: [`EMAIL_PROF_T64_d16.md`](EMAIL_PROF_T64_d16.md)
 
-## Still running / planned
+## Still planned
 
-- T=64 d=16 (local + HPC job)
-- k=11 QSA-poly μ vs T/d (queued later)
+- k=11 QSA-poly μ vs T/d
 
 ## Related (already sent)
 

@@ -1,10 +1,10 @@
 {
-  "n_cells": 14,
+  "n_cells": 15,
   "model": "kqsa-poly",
   "k": 7,
   "advantage_formula": "k^2 * log(d) / C(d+k-1,k)",
   "mu_key": "train_mu_final",
-  "note": "Ready for fits: all k=7 kqsa-poly from mu v2 + P1 d=8 T=2..16 + T=64 d=8. T=64 d=16 pending.",
+  "note": "All k=7 kqsa-poly: mu v2 + P1 d=8 T=2..16 + T=64 d=8 and d=16",
   "rows": [
     {
       "T": 32,
@@ -142,12 +142,12 @@
       "vocab_D": 106,
       "n_seeds": 10,
       "n_params": 252,
-      "mu_mean": 0.00041626719106178657,
-      "mu_std": 7.64415619709448e-05,
+      "mu_mean": 0.0004162671910617851,
+      "mu_std": 7.644156197094327e-05,
       "mu_advantage": 0.029688996370137513,
-      "margin_mean": 0.014020924987564964,
-      "train_LB_excess_mean": 0.40474871444631655,
-      "train_L1_excess_mean": 0.5376622429602366,
+      "margin_mean": 0.014020924987564914,
+      "train_LB_excess_mean": 0.4047487144463191,
+      "train_L1_excess_mean": 0.5376622429602511,
       "mu_key": "train_mu_final"
     },
     {
@@ -238,6 +238,24 @@
       "margin_mean": 0.038522217236756424,
       "train_LB_excess_mean": 0.3709969686410546,
       "train_L1_excess_mean": 0.6980550787429737,
+      "mu_key": "train_mu_final"
+    },
+    {
+      "T": 64,
+      "d": 16,
+      "k": 7,
+      "model": "kqsa-poly",
+      "kernel_mode": "poly",
+      "layers": 43,
+      "vocab_D": 106,
+      "n_seeds": 10,
+      "n_params": 1032,
+      "mu_mean": 2.3399039291587427e-05,
+      "mu_std": 3.036082980805111e-06,
+      "mu_advantage": 0.000796608777733308,
+      "margin_mean": 0.029373313407577158,
+      "train_LB_excess_mean": 0.3644368594606076,
+      "train_L1_excess_mean": 0.4797833074608569,
       "mu_key": "train_mu_final"
     },
     {
